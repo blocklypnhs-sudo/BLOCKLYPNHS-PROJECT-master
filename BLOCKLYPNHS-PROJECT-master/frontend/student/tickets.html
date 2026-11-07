@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support Center · BlockLearn</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script>
+    /* Apply saved theme before first paint (prevents flash) — same 'bl-theme' key as this page's script */
+    try {
+        var __t = localStorage.getItem('bl-theme');
+        if (!__t) __t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        document.documentElement.dataset.theme = __t;
+    } catch (e) {}
+</script>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ===== DESIGN TOKENS (compact, matches profile/settings pages) ===== */
+    :root {
+        --green-deep:#0c3b2d; --green-main:#12604a; --green-light:#1d8a5f; --green-soft:#e3f4ec;
+        --gold-warm:#e8b93c; --gold-light:#fbeecb; --coral:#e5604f; --coral-soft:#fce8e5;
+        --blue:#4a90d9; --blue-soft:#e4eefb;
+        --stone:#52705f; --stone-light:#6d8a7c;
+        --border-fresh:#e0ebe4; --card-white:#fff; --bg-main:#eef6f1;
+        --text-primary:#10382c; --text-secondary:#3f5f52;
+        --nested:rgba(255,255,255,.55); --input-bg:#fff; --chart-grid:#e8f0ec;
+        --row-bg:#ffffff; --row-border:#e3eee7;
+        --tile-bg:#e3f4ec; --tile-color:#147a54;
+        --grid-line:rgba(150,195,175,.26); --blob-opacity:.12; --g-overlay:rgba(255,255,255,.1);
+        --green-on-soft:#0d4d38; --gold-text:#9a7020;
+        --btn-dark:#0d4534; --btn-dark-hover:#093626;
+        --sh-xs:0 2px 8px rgba(16,56,44,.05); --sh-sm:0 4px 14px rgba(16,56,44,.06);
+        --sh-md:0 8px 24px rgba(16,56,44,.10); --sh-lg:0 14px 40px rgba(16,56,44,.14);
+        --toast-bg:#10382c;
+    }
+    [data-theme="dark"] {
+        --bg-main:#0e1f18; --text-primary:#dcefe6; --text-secondary:#9fc0b1;
+        --border-fresh:#20402f; --card-white:#14291f;
+        --nested:rgba(255,255,255,.045); --input-bg:#1a3329; --chart-grid:#1e3a2e;
+        --row-bg:#182f24; --row-border:#244534;
+        --tile-bg:#1c3a2c; --tile-color:#4ade80;
+        --green-soft:#163328; --gold-light:#2e2510; --coral-soft:#2e1a16; --blue-soft:#152535;
+        --stone-light:#8fb8a8; --grid-line:rgba(45,85,65,.22); --blob-opacity:.10; --g-overlay:rgba(255,255,255,.06);
+        --green-on-soft:#4ade80; --gold-text:#e0b45c;
+        --btn-dark:#17754f; --btn-dark-hover:#12603f;
+        --sh-xs:0 2px 8px rgba(0,0,0,.18); --sh-sm:0 4px 14px rgba(0,0,0,.22);
+        --sh-md:0 8px 24px rgba(0,0,0,.28); --sh-lg:0 14px 40px rgba(0,0,0,.32);
+        --toast-bg:#21493a;
+    }
+
+    html { height: 100%; }
+    body {
+        font-family:'Inter', system-ui, sans-serif; background:var(--bg-main);
+        color:var(--text-primary); line-height:1.5; min-height:100vh; overflow-x:hidden;
+        transition: background .4s, color .4s;
+    }
+
+    /* ===== BACKGROUND: light mint + subtle grid ===== */
+    .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .bg-layer::before {
+        content:''; position:absolute; inset:0;
+        background-image:linear-gradient(var(--grid-line) 1px, transparent 1px),
+                         linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size:44px 44px;
+    }
+    .bg-blob { position:absolute; border-radius:50%; filter:blur(90px); opacity:var(--blob-opacity); animation:drift 22s ease-in-out infinite alternate; }
+    .bg-blob--1 { width:420px; height:420px; top:-12%; right:-6%; background:radial-gradient(circle, rgba(40,168,122,.4), transparent 70%); }
+    .bg-blob--2 { width:340px; height:340px; bottom:-10%; left:6%; background:radial-gradient(circle, rgba(232,168,56,.25), transparent 70%); animation-duration:28s; animation-delay:-6s; }
+    @keyframes drift { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(25px,-30px) scale(1.04)} }
+
+    main { max-width:1100px; margin:0 auto; padding:20px 24px 28px; position:relative; z-index:1; }
+
+    /* ===== Top bar: floating compact controls ===== */
+    .top-bar {
+        display:flex; justify-content:space-between; align-items:center; gap:10px;
+        background:transparent; border:none; border-radius:0;
+        padding:0; margin-bottom:1rem; box-shadow:none;
+    }
+    .top-bar-right { display:flex; align-items:center; gap:8px; }
+    .back-pill {
+        display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+        color:var(--text-primary); font-size:.74rem; font-weight:700;
+        padding:4px 12px 4px 5px; border-radius:999px;
+        background:var(--card-white); border:1px solid var(--border-fresh);
+        box-shadow:var(--sh-xs); transition:all .2s; white-space:nowrap;
+    }
+    .back-pill:hover { border-color:var(--tile-color); box-shadow:var(--sh-sm); }
+    .back-pill i {
+        width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+        background:var(--tile-bg); color:var(--tile-color);
+        border-radius:9px; font-size:.68rem; transition:transform .25s;
+    }
+    .back-pill:hover i { transform:translateX(-2px); }
+    .theme-btn {
+        width:36px; height:36px; border-radius:11px; border:none;
+        background:transparent; color:var(--text-secondary); font-size:.9rem; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; transition:all .25s;
+    }
+    .theme-btn:hover { background:var(--card-white); color:var(--gold-warm); box-shadow:var(--sh-xs); }
+    .theme-btn .icon-sun { display:none; }
+    [data-theme="dark"] .theme-btn .icon-sun { display:inline; }
+    [data-theme="dark"] .theme-btn .icon-moon { display:none; }
+
+    /* ===== Hero: green gradient + waves (matches profile banner), compact ===== */
+    .hero {
+        background:linear-gradient(108deg,#0b3d2e 0%, #0f5540 42%, #167152 72%, #1b8a5f 100%);
+        border-radius:22px; padding:1.35rem 1.6rem; margin-bottom:1rem;
+        position:relative; overflow:hidden; color:#fff; box-shadow:var(--sh-md);
+    }
+    .hero::before {
+        content:''; position:absolute; top:-60%; right:-5%; width:420px; height:420px; border-radius:50%;
+        background:radial-gradient(circle, rgba(255,255,255,.09), transparent 62%);
+        pointer-events:none;
+    }
+    .hero-wave { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+    .hero-ring {
+        position:absolute; right:40px; top:50%; transform:translateY(-50%);
+        width:72px; height:72px; border-radius:50%;
+        border:1.5px solid rgba(255,255,255,.15);
+        display:flex; align-items:center; justify-content:center;
+        z-index:2;
+    }
+    .hero-ring::before {
+        content:''; position:absolute; inset:-9px; border-radius:50%;
+        border:1.5px dashed rgba(232,185,60,.4); animation:ringspin 26s linear infinite;
+    }
+    .hero-ring i { font-size:1.3rem; color:var(--gold-warm); }
+    @keyframes ringspin { to { transform:rotate(360deg); } }
+    .hero h1 { font-size:1.35rem; font-weight:800; letter-spacing:-.5px; position:relative; z-index:2; }
+    .hero h1 em { font-style:normal; color:var(--gold-warm); }
+    .hero p { font-size:.8rem; opacity:.8; max-width:520px; position:relative; z-index:2; margin-top:.2rem; }
+    .hero-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:.85rem; position:relative; z-index:2; }
+    .chip {
+        display:inline-flex; align-items:center; gap:6px;
+        background:var(--g-overlay); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+        border:1px solid rgba(255,255,255,.14); padding:4px 12px; border-radius:999px;
+        font-size:.68rem; font-weight:600; color:#eafff4;
+    }
+    .chip i { font-size:.6rem; }
+    .chip strong { font-weight:800; font-variant-numeric:tabular-nums; }
+
+    /* ===== Main tabs: compact segmented ===== */
+    .main-tabs {
+        display:flex; gap:6px; padding:5px;
+        background:var(--card-white);
+        border:1px solid var(--border-fresh); border-radius:16px;
+        margin-bottom:1rem; box-shadow:var(--sh-xs);
+        overflow-x:auto;
+    }
+    .main-tab {
+        flex:1; min-width:140px;
+        border:0; background:transparent; border-radius:11px;
+        padding:.55rem .9rem; font:inherit; font-size:.78rem; font-weight:700;
+        color:var(--stone); cursor:pointer; transition:all .25s;
+        display:flex; align-items:center; justify-content:center; gap:7px;
+        white-space:nowrap;
+    }
+    .main-tab:hover { color:var(--text-primary); background:var(--nested); }
+    .main-tab.active {
+        background:var(--btn-dark);
+        color:#fff; box-shadow:0 4px 12px rgba(13,69,52,.25);
+    }
+    .main-tab i { font-size:.72rem; }
+
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; animation: fuA .4s cubic-bezier(.4,0,.2,1) both; }
+
+    /* ===== Grid + panels: white rounded cards, compact ===== */
+    .grid { display:grid; grid-template-columns:340px 1fr; gap:1rem; align-items:start; }
+    .panel {
+        background:var(--card-white);
+        border:1px solid var(--border-fresh); border-radius:22px;
+        padding:1.15rem 1.3rem; box-shadow:var(--sh-sm);
+    }
+    .panel--form { position:sticky; top:20px; }
+    .panel h2 { font-size:.88rem; font-weight:800; margin-bottom:.85rem; display:flex; align-items:center; gap:9px; }
+    .panel h2 i {
+        width:32px; height:32px; border-radius:10px; flex-shrink:0;
+        background:var(--tile-bg); color:var(--tile-color);
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:.78rem;
+    }
+
+    /* ===== Form: compact ===== */
+    .field { margin-bottom:.8rem; }
+    label { display:block; font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--stone); margin-bottom:5px; }
+    input, select, textarea {
+        width:100%; border:1.5px solid var(--border-fresh); border-radius:10px;
+        padding:.55rem .75rem; font:inherit; font-size:.8rem;
+        background:var(--input-bg); color:var(--text-primary); transition:all .25s;
+    }
+    input::placeholder, textarea::placeholder { color:var(--stone-light); }
+    input:focus, select:focus, textarea:focus {
+        outline:none; border-color:var(--tile-color); box-shadow:0 0 0 3px rgba(29,138,95,.12);
+    }
+    textarea { min-height:100px; resize:vertical; }
+    .char-row { display:flex; justify-content:space-between; margin-top:4px; font-size:.6rem; color:var(--stone-light); }
+    .char-row b { font-variant-numeric:tabular-nums; }
+
+    .seg {
+        display:grid; grid-template-columns:repeat(3,1fr); gap:5px;
+        background:var(--nested); border:1px solid var(--border-fresh); border-radius:11px; padding:4px;
+    }
+    .seg button {
+        border:0; background:transparent; border-radius:8px; padding:.45rem .3rem;
+        font:inherit; font-size:.7rem; font-weight:700; color:var(--stone); cursor:pointer;
+        display:flex; align-items:center; justify-content:center; gap:5px; transition:all .25s;
+    }
+    .seg button i { font-size:.55rem; }
+    .seg button:hover { color:var(--text-primary); }
+    .seg button.active.v-low { background:var(--blue-soft); color:var(--blue); }
+    .seg button.active.v-medium { background:var(--gold-light); color:var(--gold-text); }
+    .seg button.active.v-high { background:var(--coral-soft); color:var(--coral); }
+
+    .submit-btn {
+        width:100%; margin-top:.9rem; border:0; border-radius:12px; padding:.72rem;
+        background:var(--btn-dark); color:#fff;
+        font:inherit; font-weight:700; font-size:.8rem; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; gap:8px;
+        box-shadow:0 4px 12px rgba(13,69,52,.22); transition:all .25s;
+    }
+    .submit-btn:hover { background:var(--btn-dark-hover); transform:translateY(-1px); }
+    .submit-btn:active { transform:translateY(0) scale(.98); }
+    .submit-btn:disabled { opacity:.7; cursor:not-allowed; transform:none; }
+    .submit-btn .spinner {
+        display:none; width:14px; height:14px; border:2px solid rgba(255,255,255,.35);
+        border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite;
+    }
+    .submit-btn.loading .spinner { display:block; }
+    .submit-btn.loading .btn-icon { display:none; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ===== List tools ===== */
+    .list-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:.8rem; }
+    .refresh-btn {
+        width:32px; height:32px; border-radius:10px; border:1.5px solid var(--border-fresh);
+        background:var(--card-white); color:var(--stone); font-size:.75rem; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; transition:all .25s;
+    }
+    .refresh-btn:hover { border-color:var(--tile-color); color:var(--tile-color); }
+    .refresh-btn.spinning i { animation:spin .8s linear infinite; }
+    .list-tools { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:.9rem; }
+    .tabs {
+        display:inline-flex; gap:3px; background:var(--nested);
+        border:1px solid var(--border-fresh); border-radius:11px; padding:4px;
+    }
+    .tab {
+        border:0; background:transparent; border-radius:8px; padding:.35rem .7rem;
+        font:inherit; font-size:.68rem; font-weight:600; color:var(--stone); cursor:pointer; transition:all .2s;
+    }
+    .tab:hover { color:var(--text-primary); }
+    .tab.active { background:var(--card-white); color:var(--green-on-soft); box-shadow:var(--sh-xs); }
+    .tab .cnt { font-size:.58rem; opacity:.65; margin-left:4px; font-variant-numeric:tabular-nums; }
+    .search { flex:1; min-width:180px; position:relative; display:flex; align-items:center; }
+    .search i { position:absolute; left:11px; color:var(--stone-light); font-size:.72rem; pointer-events:none; }
+    .search input { padding-left:2.1rem; font-size:.76rem; border-radius:10px; }
+    .search input:focus { box-shadow:0 0 0 3px rgba(29,138,95,.12); }
+
+    /* ===== Ticket cards: bordered white rows, compact ===== */
+    .ticket {
+        background:var(--row-bg); border:1px solid var(--row-border);
+        border-left:3px solid var(--accent, var(--stone-light));
+        border-radius:14px; padding:.8rem .95rem; margin-bottom:.6rem; transition:all .25s;
+    }
+    .ticket:hover { transform:translateY(-1px); box-shadow:var(--sh-md); border-color:rgba(20,122,84,.3); }
+    .ticket.p-low { --accent:var(--blue); }
+    .ticket.p-medium { --accent:var(--gold-warm); }
+    .ticket.p-high { --accent:var(--coral); }
+    .ticket-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:.4rem; }
+    .tk-no {
+        font-size:.64rem; font-weight:800; color:var(--gold-warm);
+        letter-spacing:.5px; font-variant-numeric:tabular-nums;
+    }
+    .status {
+        display:inline-flex; align-items:center; gap:5px;
+        font-size:.6rem; font-weight:700; padding:.22rem .6rem; border-radius:999px; white-space:nowrap;
+    }
+    .status i { font-size:.55rem; }
+    .st-pending { background:var(--gold-light); color:var(--gold-text); }
+    .st-progress { background:var(--blue-soft); color:var(--blue); }
+    .st-resolved { background:var(--green-soft); color:var(--green-on-soft); }
+    .st-closed { background:var(--nested); color:var(--stone); }
+    .ticket h3 { font-size:.85rem; font-weight:750; margin-bottom:.25rem; }
+    .tk-desc {
+        font-size:.76rem; color:var(--text-secondary);
+        display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .ticket-meta { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:.6rem; font-size:.62rem; }
+    .pill {
+        display:inline-flex; align-items:center; gap:5px;
+        padding:.2rem .6rem; border-radius:999px; font-weight:700; white-space:nowrap;
+    }
+    .pill i { font-size:.52rem; }
+    .pr-low { background:var(--blue-soft); color:var(--blue); }
+    .pr-medium { background:var(--gold-light); color:var(--gold-text); }
+    .pr-high { background:var(--coral-soft); color:var(--coral); }
+    .pill-cat { background:var(--tile-bg); color:var(--tile-color); border:1px solid var(--border-fresh); }
+    .tk-time { display:inline-flex; align-items:center; gap:5px; margin-left:auto; color:var(--stone-light); }
+    .tk-resolved {
+        display:flex; align-items:center; gap:6px; margin-top:.5rem;
+        font-size:.64rem; font-weight:600; color:var(--green-on-soft);
+        background:var(--green-soft); border-radius:9px; padding:.35rem .65rem; width:fit-content;
+    }
+
+    /* ===== FEEDBACK RATING STARS: compact ===== */
+    .star-rating {
+        display:flex; gap:7px; justify-content:center;
+        padding:.75rem; background:var(--nested);
+        border:1.5px solid var(--border-fresh); border-radius:12px;
+        margin-bottom:.4rem;
+    }
+    .star-btn {
+        width:42px; height:42px; border-radius:11px;
+        border:1.5px solid var(--border-fresh); background:var(--card-white);
+        color:var(--stone-light); font-size:1.25rem; cursor:pointer;
+        transition:all .2s ease; display:flex; align-items:center; justify-content:center;
+        font-family:inherit;
+    }
+    .star-btn:hover { transform:scale(1.08); border-color:var(--gold-warm); }
+    .star-btn.active {
+        background:linear-gradient(135deg, var(--gold-warm), #f0c060);
+        color:#fff; border-color:var(--gold-warm);
+        box-shadow:0 4px 12px rgba(232,185,60,.35);
+    }
+    .rating-hint {
+        text-align:center; font-size:.66rem; color:var(--stone-light);
+        margin-bottom:.9rem;
+    }
+    .rating-hint b { color:var(--gold-warm); font-weight:800; }
+
+    /* ===== Feedback item cards: bordered white rows ===== */
+    .fb-own-item {
+        background:var(--row-bg); border:1px solid var(--row-border);
+        border-radius:13px; padding:.85rem .95rem; margin-bottom:.6rem;
+        transition:all .25s;
+    }
+    .fb-own-item:hover { transform:translateY(-1px); box-shadow:var(--sh-md); }
+    .fb-own-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:.4rem; }
+    .fb-own-stars { color:var(--gold-warm); font-size:.82rem; letter-spacing:2px; }
+    .fb-own-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:.5rem; }
+    .fb-own-tag {
+        font-size:.6rem; font-weight:700; padding:.2rem .6rem;
+        border-radius:999px; background:var(--green-soft); color:var(--green-on-soft);
+    }
+    .fb-own-tag.tech { background:var(--coral-soft); color:var(--coral); }
+    .fb-own-tag.gold { background:var(--gold-light); color:var(--gold-text); }
+    .fb-own-comment {
+        font-size:.76rem; color:var(--text-secondary); line-height:1.5;
+        margin-bottom:.35rem;
+    }
+    .fb-own-time {
+        font-size:.6rem; color:var(--stone-light);
+        display:flex; align-items:center; gap:5px;
+    }
+
+    /* ===== Skeleton / empty / error ===== */
+    .skel-line {
+        height:10px; border-radius:6px; margin-bottom:9px;
+        background:linear-gradient(90deg, var(--chart-grid) 25%, var(--nested) 50%, var(--chart-grid) 75%);
+        background-size:200% 100%; animation:sk 1.2s infinite;
+    }
+    .skel-line.w30 { width:30%; } .skel-line.w60 { width:60%; }
+    .skel-line.w90 { width:90%; } .skel-line.w70 { width:70%; }
+    @keyframes sk { to { background-position:-200% 0; } }
+    .empty { padding:2.2rem 1rem; text-align:center; }
+    .empty i { font-size:1.9rem; color:var(--border-fresh); margin-bottom:.55rem; display:block; }
+    .empty p { font-size:.78rem; color:var(--stone-light); }
+    .empty small { font-size:.66rem; color:var(--stone-light); opacity:.7; display:block; margin-top:.2rem; }
+    .retry-btn {
+        margin-top:.9rem; border:1.5px solid var(--border-fresh); background:var(--card-white);
+        color:var(--tile-color); border-radius:10px; padding:.45rem .9rem;
+        font:inherit; font-size:.72rem; font-weight:700; cursor:pointer; transition:all .2s;
+        display:inline-flex; align-items:center; gap:6px;
+    }
+    .retry-btn:hover { border-color:var(--tile-color); background:var(--green-soft); }
+
+    /* ===== Toast ===== */
+    .toast-box { position:fixed; bottom:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; }
+    .toast-msg {
+        background:var(--toast-bg); color:#fff; padding:9px 15px; border-radius:11px;
+        font-size:.75rem; font-weight:500; box-shadow:0 8px 28px rgba(0,0,0,.2);
+        display:flex; align-items:center; gap:8px; position:relative; overflow:hidden;
+        animation:tIn .4s cubic-bezier(.4,0,.2,1); transition:all .3s;
+    }
+    .toast-msg i { color:var(--gold-warm); }
+    .toast-msg.error i { color:#ff8a7a; }
+    .toast-msg.out { opacity:0; transform:translateX(40px); }
+    .toast-msg::after {
+        content:''; position:absolute; left:0; bottom:0; height:2.5px;
+        background:var(--gold-warm); width:100%; animation:ttimer 3.2s linear forwards;
+    }
+    @keyframes tIn { from { opacity:0; transform:translateX(40px) scale(.95); } to { opacity:1; transform:none; } }
+    @keyframes ttimer { to { width:0; } }
+
+    /* ===== Entrance ===== */
+    .fu { opacity:0; transform:translateY(12px); animation:fuA .45s cubic-bezier(.4,0,.2,1) forwards; }
+    @keyframes fuA { to { opacity:1; transform:none; } }
+    .e1 { animation-delay:.04s; } .e2 { animation-delay:.08s; } .e3 { animation-delay:.12s; } .e4 { animation-delay:.16s; }
+
+    ::selection { background:var(--green-main); color:#fff; }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+        outline:2px solid var(--tile-color); outline-offset:2px;
+    }
+
+    /* ===== RESPONSIVE (original behavior preserved) ===== */
+    @media (max-width:960px) {
+        .grid { grid-template-columns:1fr; }
+        .panel--form { position:static; }
+        .hero-ring { display:none; }
+        main { padding:18px 18px 26px; }
+    }
+    @media (max-width:576px) {
+        main { padding:14px 12px 24px; }
+        .hero { padding:1.15rem 1.2rem; }
+        .hero h1 { font-size:1.15rem; }
+        .hero-chips { gap:6px; }
+        .list-tools { flex-direction:column; align-items:stretch; }
+        .search { min-width:0; }
+        .toast-box { left:12px; right:12px; bottom:12px; }
+        .toast-msg { justify-content:center; }
+        .main-tab { min-width:120px; font-size:.72rem; }
+        .star-btn { width:40px; height:40px; font-size:1.1rem; }
+        .top-bar { flex-wrap:wrap; }
+        .back-pill { font-size:.7rem; padding:3px 10px 3px 4px; }
+    }
+    /* Short desktop screens: tighten so the top of the page fits without extra scrolling */
+    @media (min-width:961px) and (max-height:820px) {
+        main { padding:16px 24px 24px; }
+        .hero { padding:1.1rem 1.5rem; margin-bottom:.85rem; }
+        .top-bar { margin-bottom:.8rem; }
+        .main-tabs { margin-bottom:.85rem; }
+        .panel { padding:1rem 1.2rem; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+        *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    }
+</style>
+    <link rel="stylesheet" href="/static/mobile.css">
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true">
+    <div class="bg-blob bg-blob--1"></div>
+    <div class="bg-blob bg-blob--2"></div>
+</div>
+
+<main>
+    <nav class="top-bar fu e1">
+        <a class="back-pill" href="/student_dashboard"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <a class="back-pill" href="/student_help"><i class="fas fa-circle-question"></i>Help &amp; FAQ</a>
+            <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+                <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero fu e2">
+        <!-- Decorative wave sweeps (visual only) -->
+        <svg class="hero-wave" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M0,160 C230,215 460,105 700,112 C930,119 1070,58 1200,22 L1200,300 L0,300 Z" fill="rgba(38,158,108,0.28)"/>
+            <path d="M0,205 C250,258 470,160 720,162 C950,164 1090,105 1200,72 L1200,300 L0,300 Z" fill="rgba(7,45,33,0.30)"/>
+            <path d="M0,245 C270,292 500,205 760,205 C980,205 1110,150 1200,120 L1200,300 L0,300 Z" fill="rgba(255,255,255,0.06)"/>
+        </svg>
+        <div class="hero-ring"><i class="fas fa-headset"></i></div>
+        <h1>Support <em>Center</em></h1>
+        <p>Submit tickets and share your feedback. Your voice helps us improve BlockLearn.</p>
+        <div class="hero-chips">
+            <span class="chip"><i class="fas fa-ticket"></i>Tickets <strong id="statTotal">0</strong></span>
+            <span class="chip"><i class="fas fa-hourglass-half"></i>Open <strong id="statOpen">0</strong></span>
+            <span class="chip"><i class="fas fa-comments"></i>My Feedback <strong id="statFeedback">0</strong></span>
+        </div>
+    </header>
+
+    <!-- ===== MAIN TABS ===== -->
+    <div class="main-tabs fu e3">
+        <button class="main-tab active" data-pane="tickets">
+            <i class="fas fa-ticket"></i> Tickets
+        </button>
+        <button class="main-tab" data-pane="feedback">
+            <i class="fas fa-comment-dots"></i> Send Feedback
+        </button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PANE 1: TICKETS                                              -->
+    <!-- ============================================================ -->
+    <div class="tab-pane active" id="pane-tickets">
+        <div class="grid">
+            <section class="panel panel--form">
+                <h2><i class="fas fa-paper-plane"></i>Submit a Ticket</h2>
+                <form id="ticketForm">
+                    <div class="field">
+                        <label for="subject">Subject</label>
+                        <input id="subject" required maxlength="255" placeholder="What do you need help with?">
+                    </div>
+                    <div class="field">
+                        <label for="category">Category</label>
+                        <select id="category">
+                            <option value="technical">Technical Issue</option>
+                            <option value="account">Account &amp; Login</option>
+                            <option value="grades">Grades &amp; Assessments</option>
+                            <option value="content">Course Content</option>
+                            <option value="other" selected>Other</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Priority</label>
+                        <div class="seg" id="prioritySeg">
+                            <button type="button" data-value="low" class="v-low"><i class="fas fa-arrow-down"></i>Low</button>
+                            <button type="button" data-value="medium" class="v-medium active"><i class="fas fa-equals"></i>Medium</button>
+                            <button type="button" data-value="high" class="v-high"><i class="fas fa-arrow-up"></i>High</button>
+                        </div>
+                        <input type="hidden" id="priority" value="medium">
+                    </div>
+                    <div class="field">
+                        <label for="messageInput">Message</label>
+                        <textarea id="messageInput" required maxlength="1000" placeholder="Describe the issue in detail…"></textarea>
+                        <div class="char-row"><span>Be as specific as possible</span><span><b id="charCount">0</b>/1000</span></div>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="spinner"></span>
+                        <i class="fas fa-paper-plane btn-icon"></i>
+                        <span class="btn-label">Submit Ticket</span>
+                    </button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <div class="list-head">
+                    <h2><i class="fas fa-ticket"></i>My Tickets</h2>
+                    <button class="refresh-btn" id="refreshBtn" title="Refresh"><i class="fas fa-rotate"></i></button>
+                </div>
+                <div class="list-tools">
+                    <div class="tabs" id="tabs">
+                        <button class="tab active" data-filter="all">All<span class="cnt" id="cntAll">0</span></button>
+                        <button class="tab" data-filter="open">Open<span class="cnt" id="cntOpen">0</span></button>
+                        <button class="tab" data-filter="resolved">Resolved<span class="cnt" id="cntResolved">0</span></button>
+                    </div>
+                </div>
+                <div id="ticketList"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PANE 2: SEND FEEDBACK                                        -->
+    <!-- ============================================================ -->
+    <div class="tab-pane" id="pane-feedback">
+        <div class="grid">
+            <section class="panel panel--form">
+                <h2><i class="fas fa-comment-dots"></i>Share Your Feedback</h2>
+                <p style="font-size:.74rem;color:var(--stone-light);margin-bottom:.9rem;line-height:1.5;">
+                    Your feedback helps us improve the learning experience for everyone. Salamat!
+                </p>
+
+                <form id="feedbackForm">
+                    <div class="field">
+                        <label>Your Rating</label>
+                        <div class="star-rating" id="starRating">
+                            <button type="button" class="star-btn" data-star="1" aria-label="1 star">★</button>
+                            <button type="button" class="star-btn" data-star="2" aria-label="2 stars">★</button>
+                            <button type="button" class="star-btn" data-star="3" aria-label="3 stars">★</button>
+                            <button type="button" class="star-btn" data-star="4" aria-label="4 stars">★</button>
+                            <button type="button" class="star-btn" data-star="5" aria-label="5 stars">★</button>
+                        </div>
+                        <div class="rating-hint" id="ratingHint">Tap a star to rate</div>
+                        <input type="hidden" id="fbRating" value="0">
+                    </div>
+
+                    <div class="field">
+                        <label for="fbType">Feedback Type</label>
+                        <select id="fbType">
+                            <option value="learning" selected>Learning (content, difficulty, activities)</option>
+                            <option value="technical">Technical (bugs, login, errors)</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fbCategory">Category</label>
+                        <select id="fbCategory">
+                            <!-- options filled via JS -->
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fbLanguage">Related Language <span style="text-transform:none;font-weight:500;color:var(--stone-light);">(optional)</span></label>
+                        <select id="fbLanguage">
+                            <option value="">— None —</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="php">PHP</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fbComment">Comment <span style="text-transform:none;font-weight:500;color:var(--stone-light);">(optional)</span></label>
+                        <textarea id="fbComment" maxlength="1000" placeholder="Tell us what you think…" style="min-height:90px;"></textarea>
+                        <div class="char-row"><span>Share details to help us improve</span><span><b id="fbCharCount">0</b>/1000</span></div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="feedbackSubmitBtn">
+                        <span class="spinner"></span>
+                        <i class="fas fa-paper-plane btn-icon"></i>
+                        <span class="btn-label">Submit Feedback</span>
+                    </button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <div class="list-head">
+                    <h2><i class="fas fa-history"></i>My Recent Feedback</h2>
+                    <button class="refresh-btn" id="fbRefreshBtn" title="Refresh"><i class="fas fa-rotate"></i></button>
+                </div>
+                <div id="fbMyList">
+                    <div class="empty"><i class="fas fa-spinner fa-spin"></i><p>Loading your feedback…</p></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<div class="toast-box" id="toastBox"></div>
+
+<script>
+const escapeHtml = value => String(value || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const $ = id => document.getElementById(id);
+
+/* ── Theme ── */
+const applyTheme = t => { document.documentElement.dataset.theme = t; localStorage.setItem('bl-theme', t); };
+applyTheme(localStorage.getItem('bl-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+ $('themeBtn').addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+/* ── Status / priority maps ── */
+const STATUS_META = {
+    pending:     { label:'Pending',     cls:'st-pending', icon:'fa-clock' },
+    open:        { label:'Open',        cls:'st-pending', icon:'fa-clock' },
+    in_progress: { label:'In Progress', cls:'st-progress', icon:'fa-spinner' },
+    answered:    { label:'Answered',    cls:'st-progress', icon:'fa-reply' },
+    resolved:    { label:'Resolved',    cls:'st-resolved', icon:'fa-circle-check' },
+    closed:      { label:'Closed',      cls:'st-closed',  icon:'fa-lock' }
+};
+const PRIORITY_META = {
+    low:    { cls:'pr-low',    icon:'fa-arrow-down' },
+    medium: { cls:'pr-medium', icon:'fa-equals' },
+    high:   { cls:'pr-high',   icon:'fa-arrow-up' }
+};
+const CATEGORY_LABELS = {
+    technical:'Technical', account:'Account', grades:'Grades', content:'Content', other:'Other'
+};
+
+const LEARNING_CATEGORIES = [
+    'Difficulty', 'Learning Experience', 'Usability', 'Content', 'Activity', 'Other'
+];
+const TECHNICAL_CATEGORIES = [
+    'Login Problem', 'System Error', 'Page/Interface Problem',
+    'Performance Problem', 'Activity/Module Technical Issue', 'Other'
+];
+
+const normStatus = s => String(s || 'pending').toLowerCase().replace(/\s+/g, '_');
+const catLabel = c => CATEGORY_LABELS[String(c).toLowerCase()] || String(c).charAt(0).toUpperCase() + String(c).slice(1);
+
+const parseDate = s => { if (!s) return null; const d = new Date(String(s).replace(' ', 'T')); return isNaN(d) ? null : d; };
+function timeAgo(s) {
+    const d = parseDate(s); if (!d) return '';
+    const sec = (Date.now() - d.getTime()) / 1000;
+    if (sec < 0) return '';
+    if (sec < 60) return 'just now';
+    if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
+    if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
+    if (sec < 604800) return Math.floor(sec / 86400) + 'd ago';
+    return d.toLocaleDateString();
+}
+const fullDate = s => { const d = parseDate(s); return d ? d.toLocaleString() : ''; };
+
+let allTickets = [];
+let activeFilter = 'all';
+let selectedRating = 0;
+
+/* ── Toast ── */
+function toast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = 'toast-msg' + (type === 'error' ? ' error' : '');
+    el.innerHTML = `<i class="fas ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i><span>${escapeHtml(msg)}</span>`;
+    $('toastBox').appendChild(el);
+    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, 3200);
+}
+
+/* ── MAIN TABS ── */
+document.querySelectorAll('.main-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const pane = document.getElementById('pane-' + tab.dataset.pane);
+        if (pane) pane.classList.add('active');
+
+        if (tab.dataset.pane === 'feedback') {
+            loadMyFeedback();
+        }
+    });
+});
+
+/* ============================================================ */
+/* TICKETS                                                      */
+/* ============================================================ */
+function renderTickets() {
+    const list = $('ticketList');
+
+    const total = allTickets.length;
+    const open = allTickets.filter(t => !['resolved', 'closed'].includes(normStatus(t.status))).length;
+    const resolved = allTickets.filter(t => normStatus(t.status) === 'resolved').length;
+    $('statTotal').textContent = total; $('statOpen').textContent = open;
+    $('cntAll').textContent = total; $('cntOpen').textContent = open; $('cntResolved').textContent = resolved;
+
+    let items = allTickets.filter(t => {
+        const st = normStatus(t.status);
+        if (activeFilter === 'open' && ['resolved', 'closed'].includes(st)) return false;
+        if (activeFilter === 'resolved' && st !== 'resolved') return false;
+        return true;
+    });
+
+    items.sort((a, b) => (parseDate(b.created_at) || 0) - (parseDate(a.created_at) || 0));
+
+    if (!items.length) {
+        list.innerHTML = allTickets.length
+            ? `<div class="empty"><i class="fas fa-filter"></i><p>No tickets match your filters.</p></div>`
+            : `<div class="empty"><i class="fas fa-inbox"></i><p>No tickets yet.</p><small>Your submitted tickets will appear here.</small></div>`;
+        return;
+    }
+
+    list.innerHTML = items.map(t => {
+        const desc = t.description ?? t.message ?? '';
+        const num = String(t.ticket_number ?? t.id ?? '');
+        const displayNum = /^\d+$/.test(num) ? '#' + num : num;
+        const st = normStatus(t.status);
+        const pr = String(t.priority || 'medium').toLowerCase();
+        const sm = STATUS_META[st] || STATUS_META.pending;
+        const pm = PRIORITY_META[pr] || PRIORITY_META.medium;
+        return `
+        <article class="ticket p-${escapeHtml(pr)}" title="Created ${escapeHtml(fullDate(t.created_at))}">
+            <div class="ticket-top">
+                <span class="tk-no">${escapeHtml(displayNum)}</span>
+                <span class="status ${sm.cls}"><i class="fas ${sm.icon}"></i>${sm.label}</span>
+            </div>
+            <h3>${escapeHtml(t.subject)}</h3>
+            <p class="tk-desc">${escapeHtml(desc)}</p>
+            <div class="ticket-meta">
+                <span class="pill ${pm.cls}"><i class="fas ${pm.icon}"></i>${pr.charAt(0).toUpperCase() + pr.slice(1)}</span>
+                ${t.category ? `<span class="pill pill-cat"><i class="fas fa-folder-open"></i>${escapeHtml(catLabel(t.category))}</span>` : ''}
+                <span class="tk-time"><i class="fas fa-clock"></i>${escapeHtml(timeAgo(t.created_at) || t.created_at || '')}</span>
+            </div>
+            ${st === 'resolved' && t.resolved_at ? `<div class="tk-resolved"><i class="fas fa-circle-check"></i>Resolved ${escapeHtml(timeAgo(t.resolved_at))}</div>` : ''}
+        </article>`;
+    }).join('');
+}
+
+async function loadTickets() {
+    const list = $('ticketList'), refresh = $('refreshBtn');
+    refresh.classList.add('spinning');
+    list.innerHTML = Array(3).fill(`<div class="ticket"><div class="skel-line w30"></div><div class="skel-line w90"></div><div class="skel-line w70"></div><div class="skel-line w60"></div></div>`).join('');
+    try {
+        const response = await fetch('/get_tickets');
+        const data = await response.json();
+        if (!data.success) {
+            list.innerHTML = `<div class="empty"><i class="fas fa-triangle-exclamation"></i><p>${escapeHtml(data.message || 'Unable to load tickets.')}</p><button class="retry-btn" onclick="loadTickets()"><i class="fas fa-rotate"></i>Try Again</button></div>`;
+            return;
+        }
+        allTickets = data.tickets || [];
+        renderTickets();
+    } catch {
+        list.innerHTML = `<div class="empty"><i class="fas fa-wifi"></i><p>Network error. Check your connection.</p><button class="retry-btn" onclick="loadTickets()"><i class="fas fa-rotate"></i>Try Again</button></div>`;
+    } finally {
+        refresh.classList.remove('spinning');
+    }
+}
+
+ $('prioritySeg').querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        $('prioritySeg').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        $('priority').value = btn.dataset.value;
+    });
+});
+ $('messageInput').addEventListener('input', () => { $('charCount').textContent = $('messageInput').value.length; });
+ $('tabs').querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        $('tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeFilter = tab.dataset.filter;
+        renderTickets();
+    });
+});
+ $('refreshBtn').addEventListener('click', loadTickets);
+
+ $('ticketForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const btn = $('submitBtn');
+    const subject = $('subject').value.trim();
+    const message = $('messageInput').value.trim();
+    const priority = $('priority').value;
+    const category = $('category').value;
+
+    btn.classList.add('loading'); btn.disabled = true;
+    try {
+        const response = await fetch('/submit_ticket', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subject, priority, category, message, description: message })
+        });
+        const data = await response.json();
+        if (data.success) {
+            toast(data.message || 'Ticket submitted successfully!');
+            event.target.reset();
+            $('prioritySeg').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.value === 'medium'));
+            $('priority').value = 'medium';
+            $('charCount').textContent = '0';
+            loadTickets();
+        } else {
+            toast(data.message || 'Unable to submit ticket.', 'error');
+        }
+    } catch {
+        toast('Network error. Please try again.', 'error');
+    } finally {
+        btn.classList.remove('loading'); btn.disabled = false;
+    }
+});
+
+loadTickets();
+
+/* ============================================================ */
+/* FEEDBACK FORM (STUDENT)                                      */
+/* ============================================================ */
+function fbRefreshCategoryOptions() {
+    const type = $('fbType').value;
+    const list = type === 'learning' ? LEARNING_CATEGORIES : TECHNICAL_CATEGORIES;
+    const sel = $('fbCategory');
+    sel.innerHTML = list.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+}
+fbRefreshCategoryOptions();
+ $('fbType').addEventListener('change', fbRefreshCategoryOptions);
+
+function fbUpdateStars() {
+    document.querySelectorAll('.star-btn').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.star) <= selectedRating);
+    });
+    const hint = $('ratingHint');
+    const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    hint.innerHTML = selectedRating
+        ? `<b>${labels[selectedRating]}</b> &mdash; ${selectedRating} out of 5`
+        : 'Tap a star to rate';
+}
+
+document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        selectedRating = parseInt(btn.dataset.star);
+        $('fbRating').value = selectedRating;
+        fbUpdateStars();
+    });
+    btn.addEventListener('mouseenter', () => {
+        const hoverVal = parseInt(btn.dataset.star);
+        document.querySelectorAll('.star-btn').forEach(b => {
+            b.classList.toggle('active', parseInt(b.dataset.star) <= hoverVal);
+        });
+    });
+});
+ $('starRating').addEventListener('mouseleave', fbUpdateStars);
+
+ $('fbComment').addEventListener('input', () => {
+    $('fbCharCount').textContent = $('fbComment').value.length;
+});
+
+ $('feedbackForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const btn = $('feedbackSubmitBtn');
+
+    const rating = parseInt($('fbRating').value);
+    if (!rating || rating < 1 || rating > 5) {
+        toast('Please select a rating first.', 'error');
+        return;
+    }
+
+    const payload = {
+        rating: rating,
+        category: $('fbCategory').value,
+        comment: $('fbComment').value.trim(),
+        feedback_type: $('fbType').value,
+        language: $('fbLanguage').value || null,
+        // Optional context — pwede mong i-link kung galing sa assessment page
+        assessment_id: null,
+        activity_id: null,
+        module_id: null,
+    };
+
+    btn.classList.add('loading'); btn.disabled = true;
+    try {
+        const response = await fetch('/submit_feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (data.success) {
+            toast(data.message || 'Feedback submitted — thank you! 💚');
+            // Reset form
+            event.target.reset();
+            selectedRating = 0;
+            $('fbRating').value = 0;
+            $('fbCharCount').textContent = '0';
+            fbUpdateStars();
+            fbRefreshCategoryOptions();
+            loadMyFeedback();
+        } else {
+            toast(data.message || 'Unable to submit feedback.', 'error');
+        }
+    } catch {
+        toast('Network error. Please try again.', 'error');
+    } finally {
+        btn.classList.remove('loading'); btn.disabled = false;
+    }
+});
+
+/* ============================================================ */
+/* MY FEEDBACK (own only)                                       */
+/* ============================================================ */
+async function loadMyFeedback() {
+    const box = $('fbMyList');
+    box.innerHTML = `<div class="empty"><i class="fas fa-spinner fa-spin"></i><p>Loading your feedback…</p></div>`;
+    try {
+        const r = await fetch('/get_my_feedback');
+        const d = await r.json();
+        if (!d.success) {
+            box.innerHTML = `<div class="empty"><i class="fas fa-triangle-exclamation"></i><p>${escapeHtml(d.message || 'Unable to load your feedback.')}</p></div>`;
+            return;
+        }
+        const items = d.feedback || [];
+        $('statFeedback').textContent = items.length;
+
+        if (!items.length) {
+            box.innerHTML = `<div class="empty"><i class="fas fa-comment-slash"></i><p>No feedback yet.</p><small>Your submitted feedback will appear here.</small></div>`;
+            return;
+        }
+
+        box.innerHTML = items.map(f => {
+            const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+            const typeClass = f.feedback_type === 'technical' ? 'tech' : '';
+            return `<div class="fb-own-item">
+                <div class="fb-own-head">
+                    <span class="fb-own-stars">${stars}</span>
+                </div>
+                <div class="fb-own-tags">
+                    <span class="fb-own-tag ${typeClass}">
+                        <i class="fas ${f.feedback_type === 'technical' ? 'fa-bug' : 'fa-graduation-cap'}"></i>
+                        ${escapeHtml(f.category)}
+                    </span>
+                    ${f.language ? `<span class="fb-own-tag gold"><i class="fas fa-code"></i> ${escapeHtml(String(f.language).toUpperCase())}</span>` : ''}
+                </div>
+                ${f.comment ? `<div class="fb-own-comment">${escapeHtml(f.comment)}</div>` : ''}
+                <div class="fb-own-time">
+                    <i class="far fa-clock"></i>
+                    ${escapeHtml(timeAgo(f.created_at) || f.created_at || '')}
+                </div>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        console.error(e);
+        box.innerHTML = `<div class="empty"><i class="fas fa-wifi"></i><p>Network error.</p></div>`;
+    }
+}
+
+ $('fbRefreshBtn').addEventListener('click', loadMyFeedback);
+</script>
+    <script src="/static/mobile.js" defer></script>
+</body>
+</html>

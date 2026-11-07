@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python Playground · BlockLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/blockly/blockly.min.js">
+    </script>
+    <script src="https://unpkg.com/blockly/python_compressed.js">
+    </script>
+    <script src="/static/js/score_breakdown.js"></script>
+    <script src="/static/js/learning_timer.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f6f3;
+            min-height: 100vh;
+        }
+
+        :root {
+            --green-deep: #145a42;
+            --green-main: #145a42;
+            --green-light: #28a87a;
+            --green-soft: #e2f3ed;
+            --gold-warm: #e8a838;
+            --gold-light: #fce9c5;
+            --coral: #e06050;
+            --coral-soft: #fce8e5;
+            --blue: #4a90d9;
+            --blue-soft: #e4eefb;
+            --stone: #7f9e92;
+            --stone-light: #a8bfb4;
+            --border-fresh: #dde9e3;
+            --card-white: #ffffff;
+            --bg-main: #f0f6f3;
+            --text-primary: #1a463a;
+            --text-secondary: #4a6b5e;
+            --shadow-sm: 0 4px 16px rgba(20, 90, 66, 0.06);
+            --shadow-md: 0 8px 28px rgba(20, 90, 66, 0.08);
+            --shadow-lg: 0 16px 48px rgba(20, 90, 66, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --card-glass: rgba(255, 255, 255, 0.85);
+        }
+
+        .container-custom {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        .top-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 0.4rem 1.5rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+        }
+        .page-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin: 0;
+        }
+        .page-title i {
+            color: var(--gold-warm);
+            margin-right: 8px;
+        }
+        .playground-close {
+            background: var(--coral-soft);
+            color: var(--coral);
+            border: none;
+            padding: 4px 14px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .playground-close:hover {
+            background: var(--coral);
+            color: white;
+        }
+
+        .activity-header {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .activity-header .left h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .activity-header .left .sub {
+            font-size: 11px;
+            color: var(--stone-light);
+        }
+        .activity-header .meta {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .activity-header .meta span {
+            font-size: 11px;
+            color: var(--stone);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .activity-header .meta span i {
+            color: var(--green-main);
+        }
+
+        .workspace-panel {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .expected-top {
+            padding: 8px 16px;
+            background: #1a2d27;
+            border-bottom: 1px solid var(--border-fresh);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .expected-top .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #8fb8a8;
+            margin-right: 4px;
+        }
+        .expected-top .value {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            color: #fbbf24;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .workspace-toolbar {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-fresh);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: var(--bg-main);
+        }
+        .workspace-toolbar .lang-badge {
+            background: var(--green-soft);
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--green-deep);
+        }
+        .workspace-toolbar .actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .workspace-toolbar .actions button {
+            padding: 3px 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .btn-run {
+            background: var(--green-main);
+            color: white;
+        }
+        .btn-run:hover {
+            background: var(--green-deep);
+        }
+        .btn-clear {
+            background: var(--coral-soft);
+            color: var(--coral);
+        }
+        .btn-clear:hover {
+            background: var(--coral);
+            color: white;
+        }
+        .btn-submit {
+            background: var(--gold-warm);
+            color: #1a4235;
+        }
+        .btn-submit:hover {
+            background: #d49a2a;
+        }
+
+        .workspace-wrapper {
+            height: 400px;
+            min-height: 400px;
+            max-height: 540px;
+            overflow: hidden;
+            position: relative;
+        }
+        #blocklyDiv {
+            height: 100%;
+            width: 100%;
+            min-height: 400px;
+            max-height: 540px;
+            background: #fefefb;
+        }
+
+        .output-panel {
+            padding: 8px 16px 12px;
+            border-top: 1px solid var(--border-fresh);
+            background: #1a2d27;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .output-panel .output-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .output-panel .output-col {
+            flex: 1;
+            min-width: 120px;
+        }
+        .output-panel .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #8fb8a8;
+            margin-bottom: 1px;
+        }
+        .output-panel .output-text {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            color: #bbf0e0;
+            min-height: 20px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+        .output-panel .output-text.success {
+            color: #4ade80;
+        }
+        .output-panel .output-text.error {
+            color: #f87171;
+        }
+
+        @media (max-width: 768px) {
+            .container-custom {
+                padding: 12px 10px;
+            }
+            .activity-header {
+                padding: 10px 14px;
+            }
+            .activity-header .left h3 {
+                font-size: 13px;
+            }
+            .workspace-wrapper {
+                height: 260px;
+                min-height: 260px;
+            }
+            #blocklyDiv {
+                min-height: 260px;
+                max-height: 360px;
+            }
+            .output-panel .output-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .expected-top {
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .expected-top .value {
+                font-size: 12px;
+            }
+        }
+        @media (max-width: 576px) {
+            .workspace-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .workspace-toolbar .actions {
+                justify-content: center;
+            }
+            .top-bar {
+                padding: 0.3rem 1rem;
+            }
+            .page-title {
+                font-size: 0.85rem;
+            }
+        }
+
+        @keyframes tIn {
+            0% {
+                opacity: 0;
+                transform: translateX(40px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        #toastBox {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast-msg {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: tIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+        }
+        .toast-msg.success {
+            background: #1a463a;
+            color: white;
+        }
+        .toast-msg.error {
+            background: #dc2626;
+            color: white;
+        }
+    </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+<script src="/static/js/blockly_code_preview.js"></script>
+</head>
+<body>
+
+    <div class="container-custom">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <p class="page-title"><i class="fab fa-python"></i>Python Playground</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="playground-close" onclick="window.location.href='/assessments_python'"><i class="fas fa-times"></i> Close</button>
+            </div>
+        </div>
+
+        <!-- Activity Header -->
+        <div class="activity-header">
+            <div class="left">
+                <h3 id="activityTitle">Python Fundamentals</h3>
+                <div class="sub" id="activitySub">Python · Assessment #1</div>
+            </div>
+            <div class="meta">
+                <span><i class="fas fa-star"></i> <span id="activityPoints">10 points</span></span>
+                <span><i class="fas fa-signal"></i> <span id="activityDifficulty">Easy</span></span>
+            </div>
+        </div>
+
+        <!-- Workspace Panel -->
+        <div class="workspace-panel">
+            <!-- Expected output at the top -->
+            <div class="expected-top">
+                <span class="label"><i class="fas fa-bullseye me-1"></i> Expected Output</span>
+                <span class="value" id="expectedOutputText">Hello, World!</span>
+            </div>
+
+            <div class="workspace-toolbar">
+                <span class="lang-badge"><i class="fab fa-python me-1"></i> Python</span>
+                <div class="actions">
+                    <button class="btn-clear" onclick="clearWorkspace()"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+                    <button class="btn-run" onclick="runPythonCode()"><i class="fas fa-play me-1"></i> Run</button>
+                    <button class="btn-submit" onclick="submitActivity()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+                </div>
+            </div>
+            <div class="workspace-wrapper">
+                <div id="blocklyDiv"></div>
+            </div>
+            <!-- Output Panel -->
+            <div class="output-panel">
+                <div class="output-row">
+                    <div class="output-col">
+                        <div class="label"><i class="fas fa-terminal me-1"></i> Your Output</div>
+                        <div class="output-text" id="outputText">Run your code to see output</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ACTIVITY DATA =====
+        const activityData = {
+            1: {
+                title: 'Python Fundamentals',
+                sub: 'Python · Assessment #1',
+                points: '10 points',
+                difficulty: 'Easy',
+                output: 'Hello, World!',
+                blocks: ['print', 'TEXT'],
+                blocksXml: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+                expectedOutput: 'Hello, World!'
+            },
+            2: {
+                title: 'Variables & Data Types',
+                sub: 'Python · Assessment #2',
+                points: '10 points',
+                difficulty: 'Easy',
+                output: 'Juan',
+                blocks: ['SET VARIABLE', 'PRINT', 'TEXT', 'GET VARIABLE'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="variables_set" x="20" y="20">
+                        <field name="VAR">name</field>
+                        <value name="VALUE">
+                            <block type="text">
+                                <field name="TEXT">Juan</field>
+                            </block>
+                        </value>
+                    </block>
+                </xml>`,
+                expectedOutput: 'Juan'
+            },
+            3: {
+                title: 'Conditional Statements',
+                sub: 'Python · Assessment #3',
+                points: '10 points',
+                difficulty: 'Medium',
+                output: 'Positive',
+                blocks: ['IF-ELSE', 'COMPARE', 'PRINT', 'NUMBER'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="controls_if" x="20" y="20">
+                        <mutation else="1"></mutation>
+                        <value name="IF0">
+                            <block type="logic_compare">
+                                <field name="OP">GT</field>
+                                <value name="A">
+                                    <block type="math_number"><field name="NUM">10</field></block>
+                                </value>
+                                <value name="B">
+                                    <block type="math_number"><field name="NUM">5</field></block>
+                                </value>
+                            </block>
+                        </value>
+                    </block>
+                </xml>`,
+                expectedOutput: 'Positive'
+            },
+            4: {
+                title: 'Loops & Iterations',
+                sub: 'Python · Assessment #4',
+                points: '10 points',
+                difficulty: 'Medium',
+                output: '1\n2\n3\n4\n5',
+                blocks: ['FOR LOOP', 'PRINT', 'GET VARIABLE'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="controls_for" x="20" y="20">
+                        <field name="VAR">i</field>
+                        <value name="FROM">
+                            <block type="math_number"><field name="NUM">1</field></block>
+                        </value>
+                        <value name="TO">
+                            <block type="math_number"><field name="NUM">5</field></block>
+                        </value>
+                        <value name="BY">
+                            <block type="math_number"><field name="NUM">1</field></block>
+                        </value>
+                    </block>
+                </xml>`,
+                expectedOutput: '1\n2\n3\n4\n5'
+            },
+            5: {
+                title: 'Functions & Modules',
+                sub: 'Python · Assessment #5',
+                points: '10 points',
+                difficulty: 'Hard',
+                output: 'Welcome to BlockLearn!',
+                blocks: ['DEFINE FUNCTION', 'PRINT', 'CALL FUNCTION', 'TEXT'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="python_function_def" x="20" y="20">
+                        <mutation>
+                            <arg name=""></arg>
+                        </mutation>
+                        <field name="NAME">greet</field>
+                        <next>
+                            <block type="python_function_call">
+                                <mutation name="greet"></mutation>
+                                <field name="NAME">greet</field>
+                            </block>
+                        </next>
+                    </block>
+                </xml>`,
+                expectedOutput: 'Welcome to BlockLearn!'
+            }
+        };
+
+        // ===== GET ACTIVITY ID =====
+        function getActivityId() {
+            const params = new URLSearchParams(window.location.search);
+            return parseInt(params.get('id')) || 1;
+        }
+
+        // ===== RENDER HEADER & EXPECTED =====
+        function renderActivity(id) {
+            const data = activityData[id];
+            if (!data) return;
+            document.getElementById('activityTitle').textContent = data.title;
+            document.getElementById('activitySub').textContent = data.sub;
+            document.getElementById('activityPoints').textContent = data.points;
+            document.getElementById('activityDifficulty').textContent = data.difficulty;
+            document.getElementById('expectedOutputText').textContent = data.expectedOutput || data.output || '—';
+            window.currentActivityData = data;
+        }
+
+        // ===== BLOCKLY SETUP (with all block definitions from the second document) =====
+        let workspace;
+        let saveBlocksTimer;
+
+        function saveAssessmentBlocks() {
+            if (!workspace) return;
+            clearTimeout(saveBlocksTimer);
+            saveBlocksTimer = setTimeout(() => {
+                const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+                fetch('/save_assessment_blocks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        language: 'python',
+                        assessment_number: getActivityId(),
+                        code_blocks: codeBlocks
+                    })
+                }).catch(() => {});
+            }, 300);
+        }
+
+        function initBlockly(blocksXml) {
+            if (workspace) {
+                workspace.dispose();
+            }
+
+            registerPythonBlocks(); // <-- this function contains all block definitions
+
+            // The exact toolbox from the second document
+            const toolbox = `
+                <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none;">
+                    <category name="BASIC" colour="#268e6c">
+                        <block type="text_print"></block>
+                        <block type="text"></block>
+                    </category>
+                    <category name="VARIABLES" colour="#8b5cf6">
+                        <block type="variables_set"></block>
+                        <block type="variables_get"></block>
+                    </category>
+                    <category name="MATH" colour="#10b981">
+                        <block type="math_number"></block>
+                        <block type="math_arithmetic"></block>
+                    </category>
+                    <category name="LOGIC" colour="#f0b84d">
+                        <block type="controls_if"></block>
+                        <block type="logic_compare"></block>
+                        <block type="logic_boolean"></block>
+                    </category>
+                    <category name="LOOPS" colour="#d97706">
+                        <block type="controls_for"></block>
+                        <block type="controls_whileUntil"></block>
+                        <block type="controls_repeat"></block>
+                    </category>
+                    <category name="FUNCTIONS" colour="#7c3aed">
+                        <block type="python_function_def"></block>
+                        <block type="python_function_call"></block>
+                    </category>
+                </xml>
+            `;
+
+            workspace = Blockly.inject('blocklyDiv', {
+                toolbox: toolbox,
+                trashcan: true,
+                zoom: { controls: true, wheel: true, startScale: 0.9 },
+                renderer: 'zelos'
+            });
+            window.attachBlocklyCodePreview(
+                workspace,
+                'blocklyDiv',
+                () => Blockly.Python.workspaceToCode(workspace),
+                'Python'
+            );
+
+            if (blocksXml) {
+                try {
+                    const xmlDom = Blockly.utils.xml.textToDom(blocksXml);
+                    Blockly.Xml.domToWorkspace(xmlDom, workspace);
+                } catch (e) {
+                    console.error('Error loading blocks:', e);
+                }
+            }
+
+            Blockly.svgResize(workspace);
+            workspace.addChangeListener(saveAssessmentBlocks);
+            window.addEventListener('resize', () => {
+                if (workspace) Blockly.svgResize(workspace);
+            });
+        }
+
+        // ===== COMPLETE BLOCK DEFINITIONS (copied from the second document) =====
+        function registerPythonBlocks() {
+            if (!Blockly.Blocks['text_print']) {
+                Blockly.Blocks['text_print'] = {
+                    init: function() {
+                        this.appendValueInput('TEXT')
+                            .setCheck('String')
+                            .appendField('print');
+                        this.setInputsInline(true);
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#268e6c');
+                        this.setTooltip('Print a message');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['text']) {
+                Blockly.Blocks['text'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldTextInput(''), 'TEXT');
+                        this.setOutput(true, 'String');
+                        this.setColour('#8b5cf6');
+                        this.setTooltip('A text string');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['variables_set']) {
+                Blockly.Blocks['variables_set'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField('set')
+                            .appendField(new Blockly.FieldTextInput('item'), 'VAR')
+                            .appendField('to');
+                        this.appendValueInput('VALUE');
+                        this.setInputsInline(true);
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#8b5cf6');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['variables_get']) {
+                Blockly.Blocks['variables_get'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldTextInput('item'), 'VAR');
+                        this.setOutput(true, ['String', 'Number']);
+                        this.setColour('#8b5cf6');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['math_number']) {
+                Blockly.Blocks['math_number'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 1), 'NUM');
+                        this.setOutput(true, 'Number');
+                        this.setColour('#10b981');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['math_arithmetic']) {
+                Blockly.Blocks['math_arithmetic'] = {
+                    init: function() {
+                        this.appendValueInput('A')
+                            .setCheck('Number');
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldDropdown([
+                                ['+', 'ADD'],
+                                ['-', 'SUBTRACT'],
+                                ['×', 'MULTIPLY'],
+                                ['÷', 'DIVIDE']
+                            ]), 'OP');
+                        this.appendValueInput('B')
+                            .setCheck('Number');
+                        this.setInputsInline(true);
+                        this.setOutput(true, 'Number');
+                        this.setColour('#10b981');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['controls_if']) {
+                Blockly.Blocks['controls_if'] = {
+                    init: function() {
+                        this.appendValueInput('IF0')
+                            .setCheck('Boolean')
+                            .appendField('if');
+                        this.appendStatementInput('DO0')
+                            .appendField('then');
+                        this.appendStatementInput('ELSE')
+                            .appendField('else');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#f0b84d');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['logic_compare']) {
+                Blockly.Blocks['logic_compare'] = {
+                    init: function() {
+                        this.appendValueInput('A')
+                            .setCheck(['Number', 'String']);
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldDropdown([
+                                ['=', 'EQ'],
+                                ['≠', 'NEQ'],
+                                ['>', 'GT'],
+                                ['<', 'LT'],
+                                ['≥', 'GTE'],
+                                ['≤', 'LTE']
+                            ]), 'OP');
+                        this.appendValueInput('B')
+                            .setCheck(['Number', 'String']);
+                        this.setInputsInline(true);
+                        this.setOutput(true, 'Boolean');
+                        this.setColour('#f0b84d');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['logic_boolean']) {
+                Blockly.Blocks['logic_boolean'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldDropdown([
+                                ['true', 'TRUE'],
+                                ['false', 'FALSE']
+                            ]), 'BOOL');
+                        this.setOutput(true, 'Boolean');
+                        this.setColour('#f0b84d');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['controls_for']) {
+                Blockly.Blocks['controls_for'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField('for')
+                            .appendField(new Blockly.FieldTextInput('i'), 'VAR')
+                            .appendField('from');
+                        this.appendValueInput('FROM')
+                            .setCheck('Number');
+                        this.appendDummyInput()
+                            .appendField('to');
+                        this.appendValueInput('TO')
+                            .setCheck('Number');
+                        this.appendDummyInput()
+                            .appendField('step');
+                        this.appendValueInput('BY')
+                            .setCheck('Number');
+                        this.appendStatementInput('DO')
+                            .appendField('do');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#d97706');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['controls_whileUntil']) {
+                Blockly.Blocks['controls_whileUntil'] = {
+                    init: function() {
+                        this.appendValueInput('BOOL')
+                            .setCheck('Boolean')
+                            .appendField(new Blockly.FieldDropdown([
+                                ['while', 'WHILE'],
+                                ['until', 'UNTIL']
+                            ]), 'MODE');
+                        this.appendStatementInput('DO')
+                            .appendField('do');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#d97706');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['controls_repeat']) {
+                Blockly.Blocks['controls_repeat'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField('repeat')
+                            .appendField(new Blockly.FieldNumber(10, 0, Infinity, 1), 'TIMES')
+                            .appendField('times');
+                        this.appendStatementInput('DO')
+                            .appendField('do');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#d97706');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['python_function_def']) {
+                Blockly.Blocks['python_function_def'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField('def')
+                            .appendField(new Blockly.FieldTextInput('myFunction'), 'NAME')
+                            .appendField('()');
+                        this.appendStatementInput('STACK')
+                            .appendField('body');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#7c3aed');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['python_function_call']) {
+                Blockly.Blocks['python_function_call'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField('call')
+                            .appendField(new Blockly.FieldTextInput('myFunction'), 'NAME')
+                            .appendField('()');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#7c3aed');
+                    }
+                };
+            }
+
+            // ── Python generators ── (copied from the second document)
+            if (Blockly.Python) {
+                function pythonVariableName(block) {
+                    const field = block.getField('VAR');
+                    const fieldValue = field ? field.getValue() : 'item';
+                    const variableMap = block.workspace && block.workspace.getVariableMap
+                        ? block.workspace.getVariableMap()
+                        : null;
+                    const variable = variableMap && variableMap.getVariableById
+                        ? variableMap.getVariableById(fieldValue)
+                        : null;
+                    const name = variable ? variable.name : fieldValue;
+                    const safeName = String(name || 'item').replace(/\W/g, '_');
+                    return /^[A-Za-z_]\w*$/.test(safeName) ? safeName : 'item';
+                }
+
+                Blockly.Python['text_print'] = function(block) {
+                    var text = Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || '""';
+                    return 'print(' + text + ')\n';
+                };
+
+                Blockly.Python['text'] = function(block) {
+                    var text = block.getFieldValue('TEXT') || '';
+                    return [JSON.stringify(text), Blockly.Python.ORDER_ATOMIC];
+                };
+
+                Blockly.Python['variables_set'] = function(block) {
+                    var varName = pythonVariableName(block);
+                    var value = Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || '""';
+                    return varName + ' = ' + value + '\n';
+                };
+
+                Blockly.Python['variables_get'] = function(block) {
+                    var varName = pythonVariableName(block);
+                    return [varName, Blockly.Python.ORDER_ATOMIC];
+                };
+
+                Blockly.Python['math_number'] = function(block) {
+                    var num = block.getFieldValue('NUM');
+                    return [num, Blockly.Python.ORDER_ATOMIC];
+                };
+
+                Blockly.Python['math_arithmetic'] = function(block) {
+                    var a = Blockly.Python.valueToCode(block, 'A', Blockly.Python.ORDER_ATOMIC) || '0';
+                    var b = Blockly.Python.valueToCode(block, 'B', Blockly.Python.ORDER_ATOMIC) || '0';
+                    var op = block.getFieldValue('OP');
+                    var symbol = op === 'ADD' ? '+' : op === 'SUBTRACT' ? '-' : op === 'MULTIPLY' ? '*' : '/';
+                    return ['(' + a + ' ' + symbol + ' ' + b + ')', Blockly.Python.ORDER_ATOMIC];
+                };
+
+                Blockly.Python['logic_compare'] = function(block) {
+                    var a = Blockly.Python.valueToCode(block, 'A', Blockly.Python.ORDER_ATOMIC) || '0';
+                    var b = Blockly.Python.valueToCode(block, 'B', Blockly.Python.ORDER_ATOMIC) || '0';
+                    var op = block.getFieldValue('OP');
+                    var symbol = op === 'EQ' ? '==' : op === 'NEQ' ? '!=' : op === 'GT' ? '>' : op === 'LT' ? '<' : op === 'GTE' ?
+                        '>=' : '<=';
+                    return ['(' + a + ' ' + symbol + ' ' + b + ')', Blockly.Python.ORDER_ATOMIC];
+                };
+
+                Blockly.Python['logic_boolean'] = function(block) {
+                    var bool = block.getFieldValue('BOOL');
+                    return [bool === 'TRUE' ? 'True' : 'False', Blockly.Python.ORDER_ATOMIC];
+                };
+
+                Blockly.Python['controls_if'] = function(block) {
+                    var condition = Blockly.Python.valueToCode(block, 'IF0', Blockly.Python.ORDER_ATOMIC) || 'False';
+                    var doCode = Blockly.Python.statementToCode(block, 'DO0') || '';
+                    var elseCode = block.getInput('ELSE')
+                        ? Blockly.Python.statementToCode(block, 'ELSE') || ''
+                        : '';
+                    var code = 'if ' + condition + ':\n' + doCode;
+                    if (elseCode) {
+                        code += 'else:\n' + elseCode;
+                    }
+                    return code;
+                };
+
+                Blockly.Python['controls_for'] = function(block) {
+                    var varName = pythonVariableName(block);
+                    var from = Blockly.Python.valueToCode(block, 'FROM', Blockly.Python.ORDER_ATOMIC) || '0';
+                    var to = Blockly.Python.valueToCode(block, 'TO', Blockly.Python.ORDER_ATOMIC) || '0';
+                    var by = Blockly.Python.valueToCode(block, 'BY', Blockly.Python.ORDER_ATOMIC) || '1';
+                    var doCode = Blockly.Python.statementToCode(block, 'DO') || '';
+                    var rangeExpression = by.trim().startsWith('-')
+                        ? 'range(' + from + ', ' + to + ' - 1, ' + by + ')'
+                        : 'range(' + from + ', ' + to + ' + 1, ' + by + ')';
+                    return 'for ' + varName + ' in ' + rangeExpression + ':\n' + doCode;
+                };
+
+                Blockly.Python['controls_whileUntil'] = function(block) {
+                    var mode = block.getFieldValue('MODE');
+                    var condition = Blockly.Python.valueToCode(block, 'BOOL', Blockly.Python.ORDER_ATOMIC) || 'False';
+                    var doCode = Blockly.Python.statementToCode(block, 'DO') || '';
+                    if (mode === 'UNTIL') {
+                        return 'while not ' + condition + ':\n' + doCode;
+                    }
+                    return 'while ' + condition + ':\n' + doCode;
+                };
+
+                Blockly.Python['controls_repeat'] = function(block) {
+                    var times = block.getFieldValue('TIMES');
+                    var doCode = Blockly.Python.statementToCode(block, 'DO') || '';
+                    return 'for _ in range(' + times + '):\n' + doCode;
+                };
+
+                Blockly.Python['python_function_def'] = function(block) {
+                    var name = block.getFieldValue('NAME');
+                    var stack = Blockly.Python.statementToCode(block, 'STACK') || '';
+                    return 'def ' + name + '():\n' + (stack || '    pass\n');
+                };
+
+                Blockly.Python['python_function_call'] = function(block) {
+                    var name = block.getFieldValue('NAME');
+                    return name + '()\n';
+                };
+
+                if (Blockly.Python.forBlock) {
+                    [
+                        'text_print',
+                        'text',
+                        'variables_set',
+                        'variables_get',
+                        'math_number',
+                        'math_arithmetic',
+                        'logic_compare',
+                        'logic_boolean',
+                        'controls_if',
+                        'controls_for',
+                        'controls_whileUntil',
+                        'controls_repeat',
+                        'python_function_def',
+                        'python_function_call'
+                    ].forEach(function(type) {
+                        if (Blockly.Python[type]) {
+                            Blockly.Python.forBlock[type] = Blockly.Python[type];
+                        }
+                    });
+                }
+            }
+        }
+
+        // ===== WORKSPACE FUNCTIONS =====
+        function clearWorkspace() {
+            if (confirm('Clear all blocks from workspace?')) {
+                if (workspace) {
+                    workspace.clear();
+                    document.getElementById('outputText').textContent = 'Run your code to see output';
+                    document.getElementById('outputText').className = 'output-text';
+                }
+            }
+        }
+
+        function pythonPreviewCode(pythonCode) {
+            const lines = String(pythonCode || '').split(/\r?\n/);
+            const output = [];
+            const openBlocks = [];
+
+            function normalizeExpression(expression) {
+                return String(expression)
+                    .replace(/\bNone\b/g, 'null')
+                    .replace(/\bTrue\b/g, 'true')
+                    .replace(/\bFalse\b/g, 'false')
+                    .replace(/\bnot\b/g, '!')
+                    .replace(/\band\b/g, '&&')
+                    .replace(/\bor\b/g, '||')
+                    .replace(/<>/g, '!=');
+            }
+
+            function closeOpenBlocks(targetIndent) {
+                while (openBlocks.length && openBlocks[openBlocks.length - 1].indent >= targetIndent) {
+                    const block = openBlocks.pop();
+                    output.push(block.closer);
+                }
+            }
+
+            lines.forEach(rawLine => {
+                const line = rawLine.replace(/\t/g, '  ');
+                if (!line.trim()) return;
+
+                const statement = line.trim();
+                const indent = line.match(/^\s*/)[0].length;
+                const elifMatch = statement.match(/^elif\s+(.+):$/);
+                const elseMatch = statement === 'else:';
+
+                if (elifMatch) {
+                    if (openBlocks.length) {
+                        openBlocks.pop();
+                    }
+                    output.push(`} else if (${normalizeExpression(elifMatch[1])}) {`);
+                    openBlocks.push({ indent, closer: '}' });
+                    return;
+                }
+
+                if (elseMatch) {
+                    if (openBlocks.length) {
+                        openBlocks.pop();
+                    }
+                    output.push('} else {');
+                    openBlocks.push({ indent, closer: '}' });
+                    return;
+                }
+
+                if (statement.startsWith('if ') && statement.endsWith(':')) {
+                    closeOpenBlocks(indent);
+                    output.push(`if (${normalizeExpression(statement.replace(/^if\s+(.+):$/, '$1'))}) {`);
+                    openBlocks.push({ indent, closer: '}' });
+                    return;
+                }
+
+                if (statement.startsWith('while ') && statement.endsWith(':')) {
+                    closeOpenBlocks(indent);
+                    output.push(`while (${normalizeExpression(statement.replace(/^while\s+(.+):$/, '$1'))}) {`);
+                    openBlocks.push({ indent, closer: '}' });
+                    return;
+                }
+
+                if (statement.startsWith('for ') && /in\s+range\(/.test(statement) && statement.endsWith(':')) {
+                    closeOpenBlocks(indent);
+                    const loopMatch = statement.match(/^for\s+([A-Za-z_]\w*)\s+in\s+range\((.*)\):$/);
+                    if (loopMatch) {
+                        const variableName = loopMatch[1];
+                        const args = loopMatch[2].split(',').map(part => part.trim());
+                        const start = args[0] || '0';
+                        const end = args[1] || '0';
+                        const step = args[2] || '1';
+                        const normalizedStep = Number(step) || 1;
+                        const comparison = normalizedStep < 0 ? '>=' : '<=';
+                        const increment = normalizedStep === 1 ? '++' : normalizedStep === -1 ? '--' : `+= ${step}`;
+                        output.push(`for (let ${variableName} = ${start}; ${variableName} ${comparison} ${end}; ${variableName} ${increment}) {`);
+                        openBlocks.push({ indent, closer: '}' });
+                        return;
+                    }
+                }
+
+                if (/^def\s+[A-Za-z_]\w*\s*\(\)\s*:/.test(statement)) {
+                    closeOpenBlocks(indent);
+                    const fnMatch = statement.match(/^def\s+([A-Za-z_]\w*)\s*\(\)\s*:/);
+                    output.push(`function ${fnMatch[1]}() {`);
+                    openBlocks.push({ indent, closer: '}' });
+                    return;
+                }
+
+                if (statement.startsWith('print(') && statement.endsWith(')')) {
+                    const inner = statement.slice(6, -1).trim();
+                    output.push(`console.log(${normalizeExpression(inner)});`);
+                    return;
+                }
+
+                if (statement.endsWith(':') && !statement.includes(' ')) {
+                    closeOpenBlocks(indent);
+                    output.push(statement.slice(0, -1) + ' {');
+                    openBlocks.push({ indent, closer: '}' });
+                    return;
+                }
+
+                const finalStatement = normalizeExpression(statement);
+                output.push(finalStatement.endsWith(';') ? finalStatement : `${finalStatement};`);
+            });
+
+            while (openBlocks.length) {
+                output.push(openBlocks.pop().closer);
+            }
+
+            return output.join('\n');
+        }
+
+        function runPythonCode() {
+            const output = document.getElementById('outputText');
+            try {
+                if (!workspace) {
+                    output.textContent = 'Workspace not initialized';
+                    output.className = 'output-text error';
+                    return;
+                }
+                if (typeof Blockly.Python === 'undefined') {
+                    output.textContent = 'Python generator not available';
+                    output.className = 'output-text error';
+                    return;
+                }
+                let code = Blockly.Python.workspaceToCode(workspace);
+                if (!code || code.trim() === '') {
+                    output.textContent = 'No code to run. Build your solution first!';
+                    output.className = 'output-text error';
+                    return;
+                }
+                window.lastGeneratedCode = code;
+                const assessmentNumber = getActivityId();
+                const definedFunctions = new Set(
+                    Array.from(code.matchAll(/^\s*def\s+([A-Za-z_]\w*)\s*\(/gm), match => match[1])
+                );
+                const calledFunctions = Array.from(code.matchAll(/^\s*([A-Za-z_]\w*)\s*\(\)\s*$/gm), match => match[1])
+                    .filter(name => name !== 'print');
+                const missingFunction = calledFunctions.find(name => !definedFunctions.has(name));
+                if (missingFunction) {
+                    output.textContent = 'Execution error: Function "' + missingFunction + '" is not defined.';
+                    output.className = 'output-text error';
+                    return;
+                }
+                code = pythonPreviewCode(code);
+                console.debug('[assessment] Generated JavaScript before execution:', code);
+                try {
+                    let printOutput = [];
+                    const originalPrint = console.log;
+                    console.log = function(...args) {
+                        printOutput.push(args.join(' '));
+                    };
+                    try {
+                        Function(code)();
+                    } finally {
+                        console.log = originalPrint;
+                    }
+                    if (printOutput.length > 0) {
+                        output.textContent = printOutput.join('\n');
+                        output.className = 'output-text success';
+                    } else {
+                        output.textContent = 'No output printed. Add a print block to display a result.';
+                        output.className = 'output-text';
+                    }
+                } catch (e) {
+                        output.textContent = 'Execution error: ' + e.message;
+                        console.error('Generated preview code:', code);
+                    output.className = 'output-text error';
+                }
+            } catch (e) {
+                output.textContent = 'Error: ' + e.message;
+                output.className = 'output-text error';
+            }
+        }
+
+        async function submitActivity() {
+            const output = document.getElementById('outputText');
+            const data = window.currentActivityData;
+            if (!data) {
+                alert('No activity loaded');
+                return;
+            }
+            const expected = data.expectedOutput || data.output;
+            const result = output.textContent.trim();
+            const placeholder = 'Run your code to see output';
+            if (result && result !== placeholder && result !== 'Workspace cleared' && !result.startsWith('Error')) {
+                const params = new URLSearchParams(window.location.search);
+                const assessmentNumber = parseInt(params.get('id'), 10) || 1;
+                const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+                try {
+                    const response = await fetch('/submit_assessment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            language: 'python',
+                            assessment_number: assessmentNumber,
+                            code_blocks: codeBlocks,
+                            generated_code: window.lastGeneratedCode || '',
+                            output: result,
+                            duration_seconds: window.getLearningDurationSeconds()
+                        })
+                    });
+                    const submission = await response.json();
+                    if (!submission.success) {
+                        showToast(submission.message || 'Failed to save assessment score.', 'error');
+                        return;
+                    }
+                    window.showScoreAttemptFeedback(submission, submission.activity_title || data.title, {
+                        returnLabel: 'Back to Assessments',
+                        returnUrl: '/assessments_python'
+                    });
+                    showToast(`${submission.status === 'completed' ? '✓ Completed' : 'Submitted'} · Score: ${submission.points}/${submission.max_points}`, submission.status === 'completed' ? 'success' : 'error');
+                    try { localStorage.setItem('progress_updated', Date.now().toString()); } catch (error) {}
+                } catch (error) {
+                    showToast('Unable to save assessment score.', 'error');
+                    return;
+                }
+            } else {
+                showToast('⚠️ Run your code first and match the expected output.', 'error');
+            }
+        }
+
+        function showToast(message, type) {
+            const box = document.getElementById('toastBox');
+            if (!box) {
+                const div = document.createElement('div');
+                div.id = 'toastBox';
+                document.body.appendChild(div);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg ' + type;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            document.getElementById('toastBox').appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(40px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const id = getActivityId();
+            renderActivity(id);
+            const data = activityData[id];
+            if (data) {
+                setTimeout(() => {
+                    initBlockly();
+                }, 200);
+            }
+        });
+    </script>
+
+</body>
+</html>

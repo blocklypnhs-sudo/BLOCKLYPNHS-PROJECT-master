@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>C++ Module 2 · Loops · BlockLearn</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/8.0.4/blockly.min.js"></script>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --cpp-main:#004482;--cpp-light:#e8edf3;--cpp-deep:#003366;
+    --gold-warm:#e8a838;--gold-light:#fce9c5;--coral:#e06050;--coral-soft:#fce8e5;
+    --blue:#4a90d9;--blue-soft:#e4eefb;--stone:#7f9e92;--stone-light:#a8bfb4;
+    --green-deep:#145a42;--green-main:#145a42;--green-soft:#e2f3ed;
+    --border-fresh:#dde9e3;--card-white:#fff;--bg-main:#f0f6f3;
+    --text-primary:#1a463a;--text-secondary:#4a6b5e;
+    --shadow-sm:0 4px 16px rgba(20,90,66,.06);--shadow-md:0 8px 28px rgba(20,90,66,.08);
+    --shadow-lg:0 16px 48px rgba(20,90,66,.12);
+    --radius-sm:10px;--radius-md:16px;--radius-lg:20px;--radius-xl:28px;
+    --glass-bg:rgba(255,255,255,.75);--glass-border:rgba(255,255,255,.6);
+    --card-glass:rgba(255,255,255,.85);
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg-main);color:var(--text-primary);min-height:100vh}
+  .container-custom{max-width:1200px;margin:0 auto;padding:20px 24px 60px}
+
+  .top-bar{background:var(--glass-bg);backdrop-filter:blur(20px);border-radius:var(--radius-xl);
+    padding:.5rem 1.5rem;margin-bottom:1.2rem;display:flex;justify-content:space-between;
+    align-items:center;border:1px solid var(--glass-border);box-shadow:var(--shadow-sm)}
+  .page-title{font-size:1rem;font-weight:800;color:var(--text-primary);margin:0}
+  .page-title i{color:var(--cpp-main);margin-right:8px}
+  .btn-back{background:var(--coral-soft);color:var(--coral);border:none;padding:6px 16px;
+    border-radius:40px;font-weight:600;font-size:12px;cursor:pointer;transition:.3s;font-family:inherit}
+  .btn-back:hover{background:var(--coral);color:#fff}
+
+  .stepper{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:1.2rem;background:var(--card-glass);
+    backdrop-filter:blur(12px);border-radius:var(--radius-lg);padding:10px 14px;
+    border:1px solid var(--glass-border);box-shadow:var(--shadow-sm);overflow-x:auto}
+  .step-chip{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;
+    color:var(--stone);padding:5px 10px;border-radius:40px;transition:.25s;cursor:pointer;
+    white-space:nowrap;border:1.5px solid transparent;background:none;font-family:inherit}
+  .step-chip .num{width:18px;height:18px;border-radius:50%;background:var(--border-fresh);
+    color:var(--stone);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700}
+  .step-chip.active{background:var(--cpp-light);color:var(--cpp-deep);border-color:var(--cpp-main)}
+  .step-chip.active .num{background:var(--cpp-main);color:#fff}
+  .step-chip.done{color:var(--green-main)}
+  .step-chip.done .num{background:var(--green-main);color:#fff}
+  .step-chip.locked{opacity:.5;cursor:not-allowed}
+
+  .section{background:var(--card-glass);backdrop-filter:blur(12px);border-radius:var(--radius-lg);
+    border:1px solid var(--glass-border);box-shadow:var(--shadow-sm);padding:1.6rem 1.8rem;
+    margin-bottom:1.2rem;display:none}
+  .section.active{display:block;animation:fadeUp .4s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .section h2{font-size:1.15rem;font-weight:800;color:var(--text-primary);margin-bottom:.3rem;
+    display:flex;align-items:center;gap:10px}
+  .section h2 i{color:var(--cpp-main)}
+  .section .subtitle{font-size:.8rem;color:var(--stone-light);margin-bottom:1.2rem}
+
+  .module-hero{background:linear-gradient(135deg,#e8edf3 0%,#fff 60%,#fce9c5 100%);
+    border-radius:var(--radius-lg);padding:1.6rem 1.8rem;border:1px solid var(--glass-border);
+    box-shadow:var(--shadow-sm);margin-bottom:1.2rem}
+  .module-hero h1{font-size:1.5rem;font-weight:900;color:#2c3a6c;margin-bottom:.2rem}
+  .module-hero .lang-pill{display:inline-flex;align-items:center;gap:6px;background:#1a463a;
+    color:#ffd43b;font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:40px;margin-bottom:.6rem}
+  .module-hero .overview{font-size:.85rem;color:#3a4a6c;line-height:1.6;margin-bottom:.9rem}
+  .module-meta{display:flex;gap:16px;flex-wrap:wrap}
+  .module-meta span{font-size:.75rem;color:#2c3a6c;font-weight:600;display:flex;align-items:center;gap:5px}
+
+  .obj-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .obj-list li{display:flex;gap:10px;font-size:.85rem;color:var(--text-secondary);line-height:1.5;
+    background:var(--bg-main);padding:10px 14px;border-radius:var(--radius-sm);border-left:3px solid var(--cpp-main)}
+  .obj-list li i{color:var(--cpp-main);margin-top:2px;flex-shrink:0}
+  /* keep text and inline <code> flowing as one sentence */
+  .obj-list li{display:block;position:relative;padding-left:38px}
+  .obj-list li i{position:absolute;left:13px;top:13px;margin-top:0}
+
+  .callout{padding:12px 16px;border-radius:var(--radius-sm);font-size:.82rem;line-height:1.6;
+    margin:12px 0;display:flex;gap:10px;align-items:flex-start}
+  .callout.info{background:var(--blue-soft);color:#1e3a6e;border-left:3px solid var(--blue)}
+  .callout.tip{background:var(--green-soft);color:var(--green-deep);border-left:3px solid var(--green-main)}
+  .callout.warn{background:var(--gold-light);color:#7a5b00;border-left:3px solid var(--gold-warm)}
+  .callout i{margin-top:2px;flex-shrink:0}
+
+  pre.code{background:#1a2d27;color:#bbf0e0;padding:14px 16px;border-radius:var(--radius-sm);
+    font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:.78rem;line-height:1.6;
+    overflow-x:auto;margin:10px 0;position:relative}
+  pre.code .filename{position:absolute;top:0;right:0;background:#0f1f19;color:#8fb8a8;
+    font-size:.6rem;padding:3px 10px;border-bottom-left-radius:8px;font-weight:600;letter-spacing:.5px}
+  pre.code .kw{color:#ff9d5c}pre.code .str{color:#f7df1e}
+  pre.code .num{color:#4ade80}pre.code .cmt{color:#7fa898;font-style:italic}
+  pre.code .fn{color:#b48cff}pre.code .var{color:#6ab8e8}
+
+  .output-box{background:#0f1f19;color:#4ade80;padding:12px 16px;border-radius:var(--radius-sm);
+    font-family:'SF Mono',Consolas,monospace;font-size:.78rem;line-height:1.6;
+    margin:10px 0;border-left:3px solid var(--green-main)}
+  .output-box .label{color:#8fb8a8;font-size:.6rem;text-transform:uppercase;letter-spacing:.6px;
+    font-weight:700;display:block;margin-bottom:4px}
+
+  .btn-nav{background:var(--cpp-main);color:#fff;border:none;padding:9px 22px;
+    border-radius:40px;font-weight:700;font-size:.8rem;cursor:pointer;transition:.3s;
+    font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  .btn-nav:hover{background:var(--cpp-deep);transform:translateY(-1px)}
+  .btn-nav.secondary{background:var(--bg-main);color:var(--text-secondary)}
+  .btn-nav.secondary:hover{background:var(--border-fresh);color:var(--text-primary)}
+  .btn-nav:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.4rem;
+    padding-top:1rem;border-top:1px solid var(--border-fresh);gap:10px;flex-wrap:wrap}
+
+  .workspace-panel{background:var(--card-glass);border-radius:var(--radius-lg);
+    border:1px solid var(--glass-border);overflow:hidden;margin:12px 0}
+  .workspace-toolbar{padding:8px 14px;border-bottom:1px solid var(--border-fresh);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg-main)}
+  .workspace-toolbar .lang-badge{background:var(--cpp-light);padding:3px 12px;border-radius:40px;
+    font-size:.65rem;font-weight:700;color:var(--cpp-deep)}
+  .workspace-toolbar .actions{display:flex;gap:5px;flex-wrap:wrap}
+  .workspace-toolbar .actions button{padding:5px 14px;border-radius:40px;border:none;
+    font-weight:600;font-size:.7rem;cursor:pointer;transition:.3s;font-family:inherit}
+  .btn-run{background:var(--cpp-main);color:#fff}.btn-run:hover{background:var(--cpp-deep)}
+  .btn-clear{background:var(--coral-soft);color:var(--coral)}.btn-clear:hover{background:var(--coral);color:#fff}
+  .btn-hint{background:var(--gold-light);color:#7a5b00}.btn-hint:hover{background:var(--gold-warm);color:#fff}
+  .btn-submit{background:var(--gold-warm);color:#1a4235}.btn-submit:hover{background:#d49a2a}
+
+  #blocklyDiv,#blocklyDiv2,#blocklyDiv3{height:340px;width:100%;background:#fefefb}
+  .output-panel{padding:10px 16px;border-top:1px solid var(--border-fresh);background:#1a2d27}
+  .output-panel .label{font-size:.6rem;text-transform:uppercase;font-weight:700;letter-spacing:.6px;
+    color:#8fb8a8;margin-bottom:3px;display:block}
+  .output-panel .output-text{font-family:'SF Mono',Consolas,monospace;font-size:.78rem;
+    color:#bbf0e0;min-height:20px;line-height:1.5;word-break:break-all;white-space:pre-wrap}
+  .output-panel .output-text.success{color:#4ade80}
+  .output-panel .output-text.error{color:#f87171}
+  .expected-strip{padding:8px 16px;background:#1a2d27;border-bottom:1px solid var(--border-fresh);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .expected-strip .label{font-size:.6rem;text-transform:uppercase;font-weight:700;letter-spacing:.6px;color:#8fb8a8}
+  .expected-strip .value{font-family:'SF Mono',Consolas,monospace;font-size:.8rem;color:#fbbf24;font-weight:600;white-space:pre-wrap}
+
+  .quiz-q{background:var(--bg-main);border-radius:var(--radius-md);padding:1.1rem 1.3rem;margin-bottom:12px;
+    border:1px solid var(--border-fresh)}
+  .quiz-q .q-text{font-size:.88rem;font-weight:600;color:var(--text-primary);margin-bottom:10px;line-height:1.5;white-space:pre-line}
+  .quiz-opts{display:flex;flex-direction:column;gap:6px}
+  .quiz-opt{padding:9px 14px;border-radius:var(--radius-sm);background:#fff;border:1.5px solid var(--border-fresh);
+    font-size:.82rem;cursor:pointer;transition:.2s;text-align:left;font-family:inherit;color:var(--text-secondary)}
+  .quiz-opt:hover{border-color:var(--cpp-main);background:var(--cpp-light)}
+  .quiz-opt.correct{background:var(--green-soft);border-color:var(--green-main);color:var(--green-deep);font-weight:600}
+  .quiz-opt.incorrect{background:var(--coral-soft);border-color:var(--coral);color:var(--coral);font-weight:600}
+  .quiz-opt:disabled{cursor:default}
+  .quiz-feedback{font-size:.78rem;margin-top:8px;padding:8px 12px;border-radius:8px;display:none;line-height:1.5}
+  .quiz-feedback.show{display:block}
+  .quiz-feedback.ok{background:var(--green-soft);color:var(--green-deep)}
+  .quiz-feedback.no{background:var(--coral-soft);color:var(--coral)}
+
+  .result-card{border-radius:var(--radius-md);padding:1.4rem 1.6rem;text-align:center;margin:14px 0}
+  .result-card.pass{background:linear-gradient(135deg,#e2f3ed,#d1ead9);border:2px solid var(--green-main)}
+  .result-card.fail{background:linear-gradient(135deg,#fce8e5,#fbd6d1);border:2px solid var(--coral)}
+  .result-card .score{font-size:2.4rem;font-weight:900;line-height:1}
+  .result-card.pass .score{color:var(--green-deep)}
+  .result-card.fail .score{color:var(--coral)}
+  .result-card .verdict{font-size:1rem;font-weight:800;margin-top:4px}
+  .result-card .detail{font-size:.8rem;color:var(--text-secondary);margin-top:8px;line-height:1.6}
+
+  .completion-card{background:linear-gradient(135deg,#e8edf3,#fce9c5);border-radius:var(--radius-lg);
+    padding:1.8rem;text-align:center;border:2px solid var(--cpp-main)}
+  .completion-card .trophy{font-size:3rem;margin-bottom:8px}
+  .completion-card h3{font-size:1.3rem;font-weight:900;color:#2c3a6c;margin-bottom:6px}
+  .completion-card .stat{font-size:.82rem;color:#2c3a6c;margin:4px 0}
+  .completion-card .stat strong{color:#1a463a}
+
+  #toastBox{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px}
+  .toast-msg{padding:10px 16px;border-radius:12px;font-size:.78rem;font-weight:500;
+    box-shadow:0 8px 32px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px;
+    animation:tIn .4s cubic-bezier(.4,0,.2,1);transition:.3s;color:#fff}
+  .toast-msg.success{background:#1a463a}.toast-msg.error{background:#dc2626}
+  @keyframes tIn{from{opacity:0;transform:translateX(40px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+  @media(max-width:768px){
+    .container-custom{padding:12px 10px 40px}
+    .section{padding:1.1rem 1.2rem}
+    #blocklyDiv,#blocklyDiv2,#blocklyDiv3{height:260px}
+    .step-chip{font-size:.62rem;padding:4px 8px}
+  }
+</style>
+</head>
+<body data-module-language="cpp" data-lesson-number="2" data-student-id="{{ session.get('user_id', '') }}">
+<div class="container-custom">
+
+  <div class="top-bar">
+    <div><p class="page-title"><iconify-icon icon="logos:cplusplus" style="color:var(--cpp-main);"></iconify-icon> C++ · Module 2</p></div>
+    <button class="btn-back" onclick="window.location.href='/student_modules'">
+      <i class="fas fa-times me-1"></i> Close
+    </button>
+  </div>
+
+  <div class="stepper" id="stepper"></div>
+
+  <!-- ========== 0. INTRO ========== -->
+  <section class="section active" data-step="0">
+    <div class="module-hero">
+      <span class="lang-pill"><iconify-icon icon="logos:cplusplus"></iconify-icon> C++</span>
+      <h1>C++ Loops</h1>
+      <p class="overview">
+        Learn how to repeat code efficiently with <code>for</code>, <code>while</code>, and <code>do-while</code> loops. Loops let you run the same block of code many times without writing it again.
+      </p>
+      <div class="module-meta">
+        <span><i class="fas fa-clock"></i> 30 mins</span>
+        <span><i class="fas fa-signal"></i> Beginner+</span>
+        <span><i class="fas fa-star"></i> 10 points</span>
+        <span><i class="fas fa-code"></i> for / while / do-while</span>
+      </div>
+    </div>
+
+    <h2><i class="fas fa-bullseye"></i> Learning Objectives</h2>
+    <p class="subtitle">By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li><i class="fas fa-check-circle"></i> Explain why loops are useful (avoid repeated code).</li>
+      <li><i class="fas fa-check-circle"></i> Write a <code>for</code> loop with a counter variable.</li>
+      <li><i class="fas fa-check-circle"></i> Use loops to display numbers in sequence.</li>
+      <li><i class="fas fa-check-circle"></i> Repeat a message a specific number of times.</li>
+      <li><i class="fas fa-check-circle"></i> Predict loop output based on the counter range.</li>
+      <li><i class="fas fa-check-circle"></i> Combine loops with variables and math.</li>
+    </ul>
+
+    <h2 style="margin-top:1.4rem"><i class="fas fa-clipboard-check"></i> Prerequisites</h2>
+    <div class="callout info">
+      <i class="fas fa-info-circle"></i>
+      <div><strong>Prerequisite:</strong> C++ Module 1 (Basics). You must already know <code>cout &lt;&lt;</code>, typed variables (<code>int</code>, <code>double</code>, <code>string</code>, <code>bool</code>), math operations, and <code>if</code> statements.</div>
+    </div>
+
+    <div class="btn-row">
+      <span></span>
+      <button class="btn-nav" onclick="goStep(1)">Start Lesson <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 1. LESSON ========== -->
+  <section class="section" data-step="1">
+    <h2><i class="fas fa-book-open"></i> Lesson Content</h2>
+    <p class="subtitle">Read carefully — the quiz and final assessment test exactly these concepts.</p>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1rem 0 .4rem">1. Why Loops?</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      Imagine you want to print the numbers 1 to 100. Writing <code>cout</code> a hundred times is impractical. A <strong>loop</strong> repeats a block of code — you write it <em>once</em> and let the computer repeat it.
+    </p>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">2. The for Loop</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      The <code>for</code> loop is the most common when you know <em>how many times</em> to repeat. It has three parts inside parentheses:
+    </p>
+    <pre class="code"><span class="filename">main.cpp</span><span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="num">1</span>; <span class="var">i</span> &lt;= <span class="num">5</span>; <span class="var">i</span>++) {
+    <span class="fn">cout</span> &lt;&lt; <span class="var">i</span> &lt;&lt; endl;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>1
+2
+3
+4
+5</div>
+    <div class="callout tip">
+      <i class="fas fa-lightbulb"></i>
+      <div><strong>Anatomy of the for-loop:</strong> <strong>Initialization</strong> — <code>int i = 1;</code> (runs once). <strong>Condition</strong> — <code>i &lt;= 5;</code> (checked before each repetition). <strong>Update</strong> — <code>i++</code> (runs after each repetition; <code>++</code> means "add 1").</div>
+    </div>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      <strong>Important:</strong> In C++, the counter's type must be declared — <code>int i</code> — unlike Python or JavaScript where you just write <code>i</code> or <code>let i</code>.
+    </p>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">3. Counting Down</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      You can also count backwards using <code>i--</code> (subtract 1):
+    </p>
+    <pre class="code"><span class="filename">main.cpp</span><span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="num">5</span>; <span class="var">i</span> &gt;= <span class="num">1</span>; <span class="var">i</span>--) {
+    <span class="fn">cout</span> &lt;&lt; <span class="var">i</span> &lt;&lt; endl;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>5
+4
+3
+2
+1</div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">4. Skipping by 2</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      Instead of <code>i++</code>, use <code>i += 2</code> to skip:
+    </p>
+    <pre class="code"><span class="filename">main.cpp</span><span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="num">2</span>; <span class="var">i</span> &lt;= <span class="num">10</span>; <span class="var">i</span> += <span class="num">2</span>) {
+    <span class="fn">cout</span> &lt;&lt; <span class="var">i</span> &lt;&lt; <span class="str">" "</span>;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>2 4 6 8 10</div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">5. The while Loop</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      The <code>while</code> loop keeps repeating as long as the condition is true. Useful when you <em>don't know</em> the exact number of repetitions in advance.
+    </p>
+    <pre class="code"><span class="filename">main.cpp</span><span class="kw">int</span> <span class="var">count</span> = <span class="num">1</span>;
+<span class="kw">while</span> (<span class="var">count</span> &lt;= <span class="num">3</span>) {
+    <span class="fn">cout</span> &lt;&lt; <span class="str">"Count: "</span> &lt;&lt; <span class="var">count</span> &lt;&lt; endl;
+    <span class="var">count</span>++;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>Count: 1
+Count: 2
+Count: 3</div>
+    <div class="callout warn">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div><strong>Warning:</strong> If you forget <code>count++</code>, the loop runs forever (infinite loop).</div>
+    </div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">6. The do-while Loop</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      <code>do-while</code> runs the body <em>at least once</em>, then checks the condition. Note the semicolon after <code>while(...)</code>:
+    </p>
+    <pre class="code"><span class="filename">main.cpp</span><span class="kw">int</span> <span class="var">x</span> = <span class="num">10</span>;
+<span class="kw">do</span> {
+    <span class="fn">cout</span> &lt;&lt; <span class="str">"Runs once"</span> &lt;&lt; endl;
+    <span class="var">x</span>++;
+} <span class="kw">while</span> (<span class="var">x</span> &lt; <span class="num">5</span>);</pre>
+    <div class="output-box"><span class="label">Output</span>Runs once</div>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      Even though <code>x &lt; 5</code> is <code>false</code>, the body ran once. This is the key difference from <code>while</code>.
+    </p>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(0)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav secondary" type="button" data-mark-lesson-complete data-next-step="2"><i class="fas fa-check"></i> Mark Lesson Complete</button>
+      <button class="btn-nav" onclick="goStep(2)">Worked Example <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 2. WORKED EXAMPLE ========== -->
+  <section class="section" data-step="2">
+    <h2><i class="fas fa-laptop-code"></i> Worked Example</h2>
+    <p class="subtitle">Let's build a loop step by step.</p>
+
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      <strong>Task:</strong> Display the even numbers from 2 to 10 using a for loop.
+    </p>
+
+    <pre class="code"><span class="filename">main.cpp</span><span class="cmt">#include &lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">for</span> (<span class="kw">int</span> <span class="var">i</span> = <span class="num">2</span>; <span class="var">i</span> &lt;= <span class="num">10</span>; <span class="var">i</span> += <span class="num">2</span>) {
+        <span class="fn">cout</span> &lt;&lt; <span class="var">i</span> &lt;&lt; <span class="str">" "</span>;
+    }
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+    <div class="output-box"><span class="label">Expected Output</span>2 4 6 8 10</div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1rem 0 .4rem">Step-by-step trace</h3>
+    <ol style="font-size:.85rem;color:var(--text-secondary);line-height:1.8;padding-left:1.4rem">
+      <li><code>int i = 2</code> — start at 2 (first even number).</li>
+      <li><code>i &lt;= 10</code> — stop when i goes past 10.</li>
+      <li><code>i += 2</code> — add 2 each time (skip odd numbers).</li>
+      <li>Print <code>i</code> followed by a space.</li>
+      <li>Trace the loop: i = 2, 4, 6, 8, 10 → output <code>2 4 6 8 10</code>.</li>
+    </ol>
+
+    <div class="callout tip">
+      <i class="fas fa-puzzle-piece"></i>
+      <div><strong>Matching Blockly blocks:</strong> <code>for (int i = 2; i &lt;= 10; i += 2)</code> → <code>cout &lt;&lt; i &lt;&lt; " "</code></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" onclick="goStep(3)">Guided Practice <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 3. GUIDED PRACTICE ========== -->
+  <section class="section" data-step="3">
+    <h2><i class="fas fa-hands-helping"></i> Guided Practice</h2>
+    <p class="subtitle">Build the solution yourself using the Blockly workspace. Follow the instructions one step at a time.</p>
+
+    <div class="callout info">
+      <i class="fas fa-list-ol"></i>
+      <div>
+        <strong>Instructions (Print even numbers from 2 to 10):</strong>
+        <ol style="margin:6px 0 0 18px;line-height:1.7">
+          <li>From the <strong>LOOPS</strong> category, drag a <code>for</code> block.</li>
+          <li>Set counter name <code>i</code>, start <code>1</code>, and end <code>5</code>.</li>
+          <li>Inside the loop body, use a <code>math</code> block to calculate <code>i × 2</code>.</li>
+          <li>Connect the math block to <code>cout &lt;&lt;</code> to print each even number.</li>
+          <li>Click <strong>Run</strong>, check the output, then click <strong>Submit</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="expected-strip">
+        <span class="label"><i class="fas fa-bullseye me-1"></i> Expected Output</span>
+        <span class="value">2
+4
+6
+8
+10</span>
+      </div>
+      <div class="workspace-toolbar">
+        <span class="lang-badge"><iconify-icon icon="logos:cplusplus"></iconify-icon> C++</span>
+        <div class="actions">
+          <button class="btn-hint" onclick="showHint()"><i class="fas fa-lightbulb me-1"></i> Hint</button>
+          <button class="btn-clear" onclick="clearWorkspace('guided')"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+          <button class="btn-run" onclick="runCppCode('guided')"><i class="fas fa-play me-1"></i> Run</button>
+          <button class="btn-submit" onclick="submitGuided()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+      </div>
+      <div id="blocklyDiv"></div>
+      <div class="output-panel">
+        <span class="label"><i class="fas fa-terminal me-1"></i> Your Output</span>
+        <div class="output-text" id="guidedOutput">Run your code to see output</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" onclick="goStep(4)">Independent Practice <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 4. INDEPENDENT PRACTICE ========== -->
+  <section class="section" data-step="4">
+    <h2><i class="fas fa-user-graduate"></i> Independent Practice</h2>
+    <p class="subtitle">Solve the task on your own using the instructions and expected output below.</p>
+
+    <div class="callout warn">
+      <i class="fas fa-tasks"></i>
+      <div>
+        <strong>Task:</strong> Use a for loop to print 1, 2, and 3, each on its own line.
+      </div>
+    </div>
+    <div class="callout info">
+      <i class="fas fa-list-ol"></i>
+      <div><strong>Instructions:</strong>
+        <ol style="margin:6px 0 0 18px;line-height:1.7">
+          <li>Add a <code>for</code> loop with integer counter <code>i</code>, starting at <code>1</code> and ending at <code>3</code>.</li>
+          <li>Inside the loop, print <code>i</code> with <code>cout</code> followed by a newline (such as <code>endl</code>).</li>
+          <li>Run and check that 1, 2, and 3 appear on separate lines, then click <strong>Submit</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="expected-strip">
+        <span class="label"><i class="fas fa-bullseye me-1"></i> Expected Output</span>
+        <span class="value">1<br>2<br>3</span>
+      </div>
+      <div class="workspace-toolbar">
+        <span class="lang-badge"><iconify-icon icon="logos:cplusplus"></iconify-icon> C++</span>
+        <div class="actions">
+          <button class="btn-hint" onclick="showHint()"><i class="fas fa-lightbulb me-1"></i> Hint</button>
+          <button class="btn-clear" onclick="clearWorkspace('independent')"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+          <button class="btn-run" onclick="runCppCode('independent')"><i class="fas fa-play me-1"></i> Run</button>
+          <button class="btn-submit" onclick="submitIndependent()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+      </div>
+      <div id="blocklyDiv2"></div>
+      <div class="output-panel">
+        <span class="label"><i class="fas fa-terminal me-1"></i> Your Output</span>
+        <div class="output-text" id="independentOutput">Run your code to see output</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" onclick="goStep(5)">Knowledge Check <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 5. QUIZ ========== -->
+  <section class="section" data-step="5">
+    <h2><i class="fas fa-question-circle"></i> Knowledge Check</h2>
+    <p class="subtitle">Answer all 10 questions. Earn at least 7 points to move to the assessment.</p>
+    <div id="quizContainer"></div>
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(4)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" id="quizNextBtn" onclick="finishQuiz()" disabled>Final Assessment <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 6. ASSESSMENT ========== -->
+  <section class="section" data-step="6">
+    <h2><i class="fas fa-clipboard-check"></i> Final Assessment</h2>
+    <p class="subtitle">This is the graded task for Module 2. Score ≥ 75 to pass.</p>
+
+    <div class="callout warn">
+      <i class="fas fa-bullseye"></i>
+      <div>
+        <strong>Assessment Task:</strong> Use a <code>for</code> loop to display numbers 1 to 10, each on its own line.
+      </div>
+    </div>
+    <div class="callout info">
+      <i class="fas fa-list-ol"></i>
+      <div><strong>Instructions:</strong>
+        <ol style="margin:6px 0 0 18px;line-height:1.7">
+          <li>Add a <code>for</code> loop with integer counter <code>i</code>, starting at <code>1</code> and ending at <code>10</code>.</li>
+          <li>Print <code>i</code> inside the loop and add a newline after each number.</li>
+          <li>Run and confirm 1 through 10 appear on separate lines, then click <strong>Submit</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="expected-strip">
+        <span class="label"><i class="fas fa-bullseye me-1"></i> Expected Output</span>
+        <span class="value">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span>
+      </div>
+      <div class="workspace-toolbar">
+        <span class="lang-badge"><iconify-icon icon="logos:cplusplus"></iconify-icon> C++ · 25 pts</span>
+        <div class="actions">
+          <button class="btn-clear" onclick="clearWorkspace('assessment')"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+          <button class="btn-run" onclick="runCppCode('assessment')"><i class="fas fa-play me-1"></i> Run</button>
+          <button class="btn-submit" onclick="submitAssessment()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+      </div>
+      <div id="blocklyDiv3"></div>
+      <div class="output-panel">
+        <span class="label"><i class="fas fa-terminal me-1"></i> Your Output</span>
+        <div class="output-text" id="assessmentOutput">Run your code to see output</div>
+      </div>
+    </div>
+
+    <div id="assessmentResult"></div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(5)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" id="completionBtn" onclick="goStep(7)" disabled>View Completion <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 7. COMPLETION ========== -->
+  <section class="section" data-step="7">
+    <h2><i class="fas fa-flag-checkered"></i> Module Completion</h2>
+    <div id="completionContent"></div>
+  </section>
+
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+/* ============================================================
+   MODULE DATA
+   ============================================================ */
+const MODULE = {
+  id: 'cpp-02-loops',
+  number: 2,
+  language: 'cpp',
+  title: 'C++ Loops',
+  steps: ['Intro','Lesson','Example','Guided','Independent','Quiz','Assessment','Complete'],
+  quiz: [
+    {
+      q: 'How many times does this loop run? for (int i = 1; i <= 5; i++)',
+      options: ['4 times', '5 times', '6 times', 'Infinite'],
+      correct: 1,
+      explain: 'i starts at 1, runs while i <= 5: i = 1,2,3,4,5 → 5 iterations.'
+    },
+    {
+      q: 'What happens if you forget the update (i++) in a for loop?',
+      options: ['The loop skips', 'The loop runs forever (infinite loop)', 'C++ auto-fixes it', 'Compile error'],
+      correct: 1,
+      explain: 'Without i++, the condition stays true — infinite loop.'
+    },
+    {
+      q: 'Which loop always runs its body at least once?',
+      options: ['for', 'while', 'do-while', 'None of the above'],
+      correct: 2,
+      explain: 'do-while runs the body first, THEN checks. So the body always executes at least once.'
+    }
+  ],
+  assessment: {
+    points: 25,
+    expectedOutput: '1\n2\n3\n4\n5\n6\n7\n8\n9\n10',
+    taskDescription: 'Display numbers 1 to 10 using a for loop.'
+  },
+  independentExpectedOutput: '1\n2\n3'
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let currentStep = 0;
+let quizAnswers = [];
+let guidedWorkspace, independentWorkspace, assessmentWorkspace;
+let lastGeneratedCode = {};
+let assessmentResultData = null;
+const PROGRESS_KEY = 'blocklearn_assessment_' + MODULE.id + '_' + document.body.dataset.studentId;
+
+function saveProgress() {
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify({ currentStep, quizAnswers, assessmentResultData })); } catch (e) {}
+}
+function loadProgress() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null');
+    if (!saved || typeof saved !== 'object') return;
+    currentStep = Math.max(0, Math.min(Number(saved.currentStep) || 0, MODULE.steps.length - 1));
+    quizAnswers = Array.isArray(saved.quizAnswers) ? saved.quizAnswers : [];
+    assessmentResultData = saved.assessmentResultData || null;
+  } catch (e) {}
+}
+
+/* ============================================================
+   STEPPER
+   ============================================================ */
+function renderStepper() {
+  const el = document.getElementById('stepper');
+  el.innerHTML = MODULE.steps.map((label, i) => {
+    let cls = 'step-chip';
+    if (i === currentStep) cls += ' active';
+    else if (i < currentStep) cls += ' done';
+    else if (i > currentStep) cls += ' locked';
+    const num = i < currentStep ? '<i class="fas fa-check" style="font-size:.55rem"></i>' : (i + 1);
+    return `<button class="${cls}" ${i > currentStep ? 'disabled' : ''} onclick="goStep(${i}, true)"><span class="num">${num}</span>${label}</button>`;
+  }).join('');
+}
+
+function goStep(n, fromStepper) {
+  if (n < 0 || n >= MODULE.steps.length) return;
+  if (fromStepper && n > currentStep) {
+    showToast('Complete the current section first.', 'error');
+    return;
+  }
+  if (!fromStepper && n > currentStep + 1) return;
+  if (n === 6 && quizAnswers.filter(a => a !== undefined).length < MODULE.quiz.length) {
+    showToast('Please answer all quiz questions first.', 'error');
+    return;
+  }
+  if (n === 7 && !isModulePassed(assessmentResultData)) {
+    showToast(assessmentResultData ? 'Score below the pass mark. Retry the assessment to continue.' : 'Submit the assessment first.', 'error');
+    return;
+  }
+  currentStep = n;
+  saveProgress();
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.querySelector(`.section[data-step="${n}"]`);
+  if (target) target.classList.add('active');
+  renderStepper();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (n === 3 && !guidedWorkspace) initGuided();
+  if (n === 4 && !independentWorkspace) initIndependent();
+  if (n === 6 && !assessmentWorkspace) initAssessment();
+  if (n === 7) renderCompletion();
+}
+
+/* ============================================================
+   BLOCKLY — C++ blocks (with while/do-while)
+   ============================================================ */
+function registerCppBlocks() {
+  if (!Blockly.Blocks['cpp_cout']) {
+    Blockly.Blocks['cpp_cout'] = { init: function() {
+      this.appendValueInput('TEXT').setCheck(['String','Number']).appendField('cout <<');
+      this.setInputsInline(true);
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#004482');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_variable']) {
+    Blockly.Blocks['cpp_variable'] = { init: function() {
+      this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown([['int','int'],['double','double'],['string','string'],['bool','bool']]),'TYPE')
+        .appendField(new Blockly.FieldTextInput('myVar'),'NAME').appendField('=');
+      this.appendValueInput('VALUE');
+      this.setInputsInline(true);
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_variable_get']) {
+    Blockly.Blocks['cpp_variable_get'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldTextInput('myVar'),'NAME');
+      this.setOutput(true, ['String','Number']); this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_text']) {
+    Blockly.Blocks['cpp_text'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldTextInput(''),'TEXT');
+      this.setOutput(true,'String'); this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_number']) {
+    Blockly.Blocks['cpp_number'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldNumber(0,-Infinity,Infinity,1),'NUM');
+      this.setOutput(true,'Number'); this.setColour('#10b981');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_math_operation']) {
+    Blockly.Blocks['cpp_math_operation'] = { init: function() {
+      this.appendValueInput('A').setCheck('Number').appendField('math');
+      this.appendDummyInput().appendField(new Blockly.FieldDropdown([['+','ADD'],['-','SUBTRACT'],['×','MULTIPLY'],['÷','DIVIDE']]),'OP');
+      this.appendValueInput('B').setCheck('Number').appendField('');
+      this.setInputsInline(true); this.setOutput(true,'Number'); this.setColour('#10b981');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_if']) {
+    Blockly.Blocks['cpp_if'] = { init: function() {
+      this.appendValueInput('IF0').setCheck('Boolean').appendField('if');
+      this.appendStatementInput('DO0').appendField('then');
+      this.appendStatementInput('ELSE').appendField('else');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#f0b84d');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_compare']) {
+    Blockly.Blocks['cpp_compare'] = { init: function() {
+      this.appendValueInput('A').setCheck(['Number','String']);
+      this.appendDummyInput().appendField(new Blockly.FieldDropdown([['=','EQ'],['≠','NEQ'],['>','GT'],['<','LT'],['≥','GTE'],['≤','LTE']]),'OP');
+      this.appendValueInput('B').setCheck(['Number','String']);
+      this.setInputsInline(true); this.setOutput(true,'Boolean'); this.setColour('#f0b84d');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_for']) {
+    Blockly.Blocks['cpp_for'] = { init: function() {
+      this.appendDummyInput().appendField('for (int').appendField(new Blockly.FieldTextInput('i'),'VAR').appendField('=');
+      this.appendValueInput('FROM').setCheck('Number');
+      this.appendDummyInput()
+        .appendField(';')
+        .appendField(new Blockly.FieldTextInput('i'),'VAR2')
+        .appendField(new Blockly.FieldDropdown([['<=','LTE'],['>=','GTE']]),'CONDITION');
+      this.appendValueInput('TO').setCheck('Number');
+      this.appendDummyInput()
+        .appendField(';')
+        .appendField(new Blockly.FieldTextInput('i'),'VAR3')
+        .appendField(new Blockly.FieldDropdown([['++','INC'],['--','DEC'],['+= 2','STEP_TWO']]),'UPDATE')
+        .appendField(' {');
+      this.appendStatementInput('DO').appendField('body');
+      this.appendDummyInput().appendField('}');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#d97706');
+    }};
+  }
+  // New blocks for Module 2
+  if (!Blockly.Blocks['cpp_while']) {
+    Blockly.Blocks['cpp_while'] = { init: function() {
+      this.appendValueInput('COND').setCheck('Boolean').appendField('while');
+      this.appendStatementInput('DO').appendField('do');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#d97706');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_do_while']) {
+    Blockly.Blocks['cpp_do_while'] = { init: function() {
+      this.appendDummyInput().appendField('do {');
+      this.appendStatementInput('DO').appendField('body');
+      this.appendValueInput('COND').setCheck('Boolean').appendField('} while');
+      this.appendDummyInput().appendField(';');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#d97706');
+    }};
+  }
+  if (!Blockly.Blocks['cpp_increment']) {
+    Blockly.Blocks['cpp_increment'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldTextInput('i'),'NAME').appendField('++ ;');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#d97706');
+    }};
+  }
+}
+
+function cppToolbox() {
+  return `
+    <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display:none">
+      <category name="BASIC" colour="#004482">
+        <block type="cpp_cout"></block>
+        <block type="cpp_text"></block>
+      </category>
+      <category name="VARIABLES" colour="#8b5cf6">
+        <block type="cpp_variable"></block>
+        <block type="cpp_variable_get"></block>
+      </category>
+      <category name="MATH" colour="#10b981">
+        <block type="cpp_math_operation"></block>
+        <block type="cpp_number"></block>
+      </category>
+      <category name="LOGIC" colour="#f0b84d">
+        <block type="cpp_if"></block>
+        <block type="cpp_compare"></block>
+      </category>
+      <category name="LOOPS" colour="#d97706">
+        <block type="cpp_for"></block>
+        <block type="cpp_while"></block>
+        <block type="cpp_do_while"></block>
+        <block type="cpp_increment"></block>
+      </category>
+    </xml>`;
+}
+
+function registerCppGenerators() {
+  if (!Blockly.JavaScript) return;
+  const J = Blockly.JavaScript;
+  J['cpp_cout'] = function(b){
+    var t = J.valueToCode(b,'TEXT',J.ORDER_ATOMIC) || '""';
+    return 'cout << ' + t + ';\n';
+  };
+  J['cpp_variable'] = function(b){
+    var type = b.getFieldValue('TYPE');
+    var n = b.getFieldValue('NAME');
+    var v = J.valueToCode(b,'VALUE',J.ORDER_ATOMIC) || (type === 'string' ? '""' : (type === 'bool' ? 'false' : '0'));
+    return type + ' ' + n + ' = ' + v + ';\n';
+  };
+  J['cpp_variable_get'] = function(b){ return [b.getFieldValue('NAME'), J.ORDER_ATOMIC]; };
+  J['cpp_text'] = function(b){ return ['"' + (b.getFieldValue('TEXT')||'') + '"', J.ORDER_ATOMIC]; };
+  J['cpp_number'] = function(b){ return [b.getFieldValue('NUM'), J.ORDER_ATOMIC]; };
+  J['cpp_math_operation'] = function(b){
+    var a = J.valueToCode(b,'A',J.ORDER_ATOMIC) || '0';
+    var c = J.valueToCode(b,'B',J.ORDER_ATOMIC) || '0';
+    var op = b.getFieldValue('OP');
+    var s = op === 'ADD' ? '+' : op === 'SUBTRACT' ? '-' : op === 'MULTIPLY' ? '*' : '/';
+    return ['(' + a + ' ' + s + ' ' + c + ')', J.ORDER_ATOMIC];
+  };
+  J['cpp_compare'] = function(b){
+    var a = J.valueToCode(b,'A',J.ORDER_ATOMIC) || '0';
+    var c = J.valueToCode(b,'B',J.ORDER_ATOMIC) || '0';
+    var op = b.getFieldValue('OP');
+    var s = op === 'EQ' ? '==' : op === 'NEQ' ? '!=' : op === 'GT' ? '>' : op === 'LT' ? '<' : op === 'GTE' ? '>=' : '<=';
+    return ['(' + a + ' ' + s + ' ' + c + ')', J.ORDER_ATOMIC];
+  };
+  J['cpp_if'] = function(b){
+    var cond = J.valueToCode(b,'IF0',J.ORDER_ATOMIC) || 'false';
+    var doC = J.statementToCode(b,'DO0') || '';
+    var elC = J.statementToCode(b,'ELSE') || '';
+    var code = 'if (' + cond + ') {\n' + doC + '}';
+    if(elC) code += ' else {\n' + elC + '}';
+    return code + '\n';
+  };
+  J['cpp_for'] = function(b){
+    var vn = b.getFieldValue('VAR');
+    var f = J.valueToCode(b,'FROM',J.ORDER_ATOMIC) || '0';
+    var t = J.valueToCode(b,'TO',J.ORDER_ATOMIC) || '0';
+    var condition = b.getFieldValue('CONDITION') === 'GTE' ? '>=' : '<=';
+    var update = b.getFieldValue('UPDATE') === 'DEC' ? '--' : b.getFieldValue('UPDATE') === 'STEP_TWO' ? ' += 2' : '++';
+    var doC = J.statementToCode(b,'DO') || '';
+    return 'for (int ' + vn + ' = ' + f + '; ' + vn + ' ' + condition + ' ' + t + '; ' + vn + update + ') {\n' + doC + '}\n';
+  };
+  J['cpp_while'] = function(b){
+    var cond = J.valueToCode(b,'COND',J.ORDER_ATOMIC) || 'false';
+    var doC = J.statementToCode(b,'DO') || '';
+    return 'while (' + cond + ') {\n' + doC + '}\n';
+  };
+  J['cpp_do_while'] = function(b){
+    var doC = J.statementToCode(b,'DO') || '';
+    var cond = J.valueToCode(b,'COND',J.ORDER_ATOMIC) || 'false';
+    return 'do {\n' + doC + '} while (' + cond + ');\n';
+  };
+  J['cpp_increment'] = function(b){
+    return b.getFieldValue('NAME') + '++;\n';
+  };
+}
+
+function injectWorkspace(divId) {
+  registerCppBlocks();
+  registerCppGenerators();
+  const ws = Blockly.inject(divId, {
+    toolbox: cppToolbox(),
+    trashcan: true,
+    zoom: { controls: true, wheel: true, startScale: 0.9 },
+    renderer: 'zelos'
+  });
+  Blockly.svgResize(ws);
+  window.addEventListener('resize', () => Blockly.svgResize(ws));
+  return ws;
+}
+
+function initGuided() { guidedWorkspace = injectWorkspace('blocklyDiv'); }
+function initIndependent() { independentWorkspace = injectWorkspace('blocklyDiv2'); }
+function initAssessment() {
+  assessmentWorkspace = injectWorkspace('blocklyDiv3');
+  const starterBlocks = Blockly.Xml.textToDom(`
+    <xml xmlns="https://developers.google.com/blockly/xml">
+      <block type="cpp_for" x="20" y="20">
+        <field name="VAR">i</field>
+        <field name="VAR2">i</field>
+        <field name="CONDITION">LTE</field>
+        <field name="VAR3">i</field>
+        <field name="UPDATE">INC</field>
+        <value name="FROM">
+          <block type="cpp_number"><field name="NUM">1</field></block>
+        </value>
+        <value name="TO">
+          <block type="cpp_number"><field name="NUM">10</field></block>
+        </value>
+        <statement name="DO">
+          <block type="cpp_cout">
+            <value name="TEXT">
+              <block type="cpp_variable_get"><field name="NAME">i</field></block>
+            </value>
+          </block>
+        </statement>
+      </block>
+    </xml>
+  `);
+  Blockly.Xml.domToWorkspace(starterBlocks, assessmentWorkspace);
+}
+
+/* ============================================================
+   RUN CODE
+   ============================================================ */
+function runCppCode(which) {
+  const wsMap = { guided: guidedWorkspace, independent: independentWorkspace, assessment: assessmentWorkspace };
+  const outMap = { guided: 'guidedOutput', independent: 'independentOutput', assessment: 'assessmentOutput' };
+  const ws = wsMap[which];
+  const out = document.getElementById(outMap[which]);
+  if (!ws) return;
+
+  try {
+    let code = Blockly.JavaScript.workspaceToCode(ws);
+    if (!code || !code.trim()) {
+      out.textContent = 'No code to run. Build your solution first!';
+      out.className = 'output-text error';
+      return;
+    }
+    lastGeneratedCode[which] = code;
+    let printed = [];
+    const orig = console.log;
+    console.log = (...args) => printed.push(args.join(' '));
+    
+    // Convert C++ to JS for browser execution
+    let exec = code
+      .replace(/\b(int|double|string|bool)\s+/g, 'let ')
+      .replace(/\bcout\s*<<\s*(.+?);/g, 'console.log($1);')
+      .replace(/\bendl\b/g, '""');
+
+    try { Function(exec)(); } finally { console.log = orig; }
+    
+    if (printed.length) {
+      out.textContent = printed.join('\n');
+      out.className = 'output-text success';
+    } else {
+      out.textContent = 'Code ran successfully but printed nothing.';
+      out.className = 'output-text';
+    }
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+    out.className = 'output-text error';
+  }
+}
+
+function clearWorkspace(which) {
+  if (!confirm('Clear all blocks from workspace?')) return;
+  const wsMap = { guided: guidedWorkspace, independent: independentWorkspace, assessment: assessmentWorkspace };
+  const outMap = { guided: 'guidedOutput', independent: 'independentOutput', assessment: 'assessmentOutput' };
+  const ws = wsMap[which];
+  if (ws) ws.clear();
+  const out = document.getElementById(outMap[which]);
+  if (out) { out.textContent = 'Workspace cleared'; out.className = 'output-text'; }
+}
+
+function showHint() {
+  showToast('Hint: Use the for block, set the start and end values, then add cout inside the loop body.', 'success');
+}
+
+function submitGuided() {
+  submitPracticeOutput('guidedOutput', 'Guided Practice');
+}
+
+function submitPracticeOutput(outputId, practiceName) {
+  const output = document.getElementById(outputId);
+  const panel = output && output.closest('.workspace-panel');
+  const expectedElement = panel && panel.querySelector('.expected-strip .value');
+  const normalize = value => value.replace(/\r\n/g, '\n').split('\n').map(line => line.trim()).join('\n').trim();
+  if (!output || !expectedElement || !output.textContent.trim() ||
+      output.textContent.trim() === 'Run your code to see output') {
+    showToast('Run your code first, then submit your output.', 'error');
+    return;
+  }
+  if (normalize(output.textContent) === normalize(expectedElement.textContent)) {
+    showToast(`✓ ${practiceName} complete! Your output is correct.`, 'success');
+  } else {
+    showToast('Not quite. Compare your output with the expected output and try again.', 'error');
+  }
+}
+
+function submitIndependent() {
+  runCppCode('independent');
+  const out = document.getElementById('independentOutput').textContent.trim();
+  if (out === MODULE.independentExpectedOutput) {
+    showToast('✓ Correct! You can proceed to the quiz.', 'success');
+  } else {
+    showToast('Not quite. Check your loop logic.', 'error');
+  }
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+function renderQuiz() {
+  const c = document.getElementById('quizContainer');
+  c.innerHTML = MODULE.quiz.map((q, i) => `
+    <div class="quiz-q">
+      <div class="q-text">${i + 1}. ${q.q}</div>
+      <div class="quiz-opts">
+        ${q.options.map((opt, j) =>
+          `<button class="quiz-opt" onclick="answerQuiz(${i}, ${j})">${opt}</button>`
+        ).join('')}
+      </div>
+      <div class="quiz-feedback" id="fb-${i}"></div>
+    </div>
+  `).join('');
+}
+
+function answerQuiz(qIdx, optIdx) {
+  const q = MODULE.quiz[qIdx];
+  const btns = document.querySelectorAll(`.quiz-q:nth-child(${qIdx + 1}) .quiz-opt`);
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById(`fb-${qIdx}`);
+  if (optIdx === q.correct) {
+    btns[optIdx].classList.add('correct');
+    fb.className = 'quiz-feedback show ok';
+    fb.innerHTML = `<i class="fas fa-check-circle"></i> ${q.explain}`;
+    quizAnswers[qIdx] = true;
+  } else {
+    btns[optIdx].classList.add('incorrect');
+    btns[q.correct].classList.add('correct');
+    fb.className = 'quiz-feedback show no';
+    fb.innerHTML = `<i class="fas fa-times-circle"></i> ${q.explain}`;
+    quizAnswers[qIdx] = false;
+  }
+  saveProgress();
+  if (quizAnswers.filter(a => a !== undefined).length === MODULE.quiz.length) {
+    document.getElementById('quizNextBtn').disabled = false;
+  }
+}
+
+function finishQuiz() {
+  const correct = quizAnswers.filter(Boolean).length;
+  if (correct < 7) {
+    showToast(`You got ${correct}/10. Review the lesson and retry the quiz.`, 'error');
+    quizAnswers = [];
+    renderQuiz();
+    document.getElementById('quizNextBtn').disabled = true;
+    return;
+  }
+  showToast(`Quiz passed: ${correct}/10. Proceed to the assessment.`, 'success');
+  goStep(6);
+}
+
+/* ============================================================
+   ASSESSMENT SUBMISSION
+   ============================================================ */
+/* Retry rules: pass mark comes from the server (default 75). Below it, the student must retry. */
+function retryMessage(r) {
+  const mark = Math.ceil((r.passMark || 75) / 10);
+  if (r.modulePassed) return `This attempt scored below ${mark}/10, but your earlier pass (best: ${Math.round((r.bestScore || 0) / 10)}/10) is kept. You can retry to improve.`;
+  return `You need at least ${mark}/10 to pass. Review the lesson, fix your blocks and retry. You can't finish this module until you pass.`;
+}
+function isModulePassed(r) { return !!(r && (r.modulePassed || r.passed)); }
+
+async function submitAssessment() {
+  const out = document.getElementById('assessmentOutput').textContent.trim();
+  const expected = MODULE.assessment.expectedOutput;
+  if (!out || out === 'Run your code to see output') {
+    showToast('Run your code first so your output can be scored.', 'error');
+    return;
+  }
+  const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(assessmentWorkspace));
+  const generated = lastGeneratedCode.assessment || '';
+
+  try {
+    const res = await fetch('/submit_module_assessment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: MODULE.language,
+        module_id: MODULE.id,
+        code_blocks: codeBlocks,
+        generated_code: generated,
+        output: out
+      })
+    });
+    const data = await res.json();
+    if (!data.success) { showToast(data.message || 'Failed to save assessment.', 'error'); return; }
+    if (Array.isArray(data.new_badges) && data.new_badges.length) {
+      try { sessionStorage.setItem('new_badges', JSON.stringify(data.new_badges)); } catch (e) {}
+    }
+    const score = data.score;
+    const points = data.points == null ? Math.round(score / 10) : data.points;
+    const passed = data.passed;
+    const modulePassed = data.module_passed !== undefined ? !!data.module_passed : !!passed;
+    assessmentResultData = { score, points, passed, out, expected, modulePassed, bestScore: data.best_score, attempts: data.attempts, passMark: data.pass_mark || 75 };
+    saveProgress();
+    renderAssessmentResult();
+    document.getElementById('completionBtn').disabled = !modulePassed;
+    try { localStorage.setItem('progress_updated', Date.now().toString()); } catch(e) {}
+    if (passed) goStep(7);
+    showToast(passed ? `Score: ${points}/10 · PASSED` : `Score: ${points}/10 · Below the pass mark (8/10). Please retry.`, passed ? 'success' : 'error');
+  } catch (e) {
+    showToast('Could not save your assessment. Check your connection and try again.', 'error');
+  }
+}
+
+function renderAssessmentResult() {
+  const el = document.getElementById('assessmentResult');
+  const r = assessmentResultData;
+  if (!r) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="result-card ${r.passed ? 'pass' : 'fail'}">
+      <div class="score">${r.points == null ? Math.round(r.score / 10) : r.points}<span style="font-size:1rem">/10</span></div>
+      <div class="verdict">${r.passed ? '✓ PASSED' : '✗ BELOW PASS MARK — RETRY REQUIRED'}</div>
+      ${r.attempts ? `<div class="detail" style="margin-bottom:6px">Pass mark: ${Math.ceil((r.passMark || 75) / 10)}/10 · Attempt ${r.attempts}${r.bestScore != null ? ` · Best score: ${Math.round(r.bestScore / 10)}/10` : ''}</div>` : ''}
+      <div class="detail">
+        Your output: <code style="white-space:pre">${r.out || '(empty)'}</code><br>
+        Expected: <code style="white-space:pre">${r.expected}</code><br>
+        ${r.passed
+          ? 'Great work! You can view your completion summary.'
+          : retryMessage(r)}
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-nav secondary" onclick="goStep(1)"><i class="fas fa-book-open"></i> Review Lesson</button>
+        <button class="btn-nav${r.passed ? ' secondary' : ''}" onclick="retryAssessment()"><i class="fas fa-redo"></i> Retry Assessment</button>
+      </div>
+    </div>`;
+}
+
+function retryAssessment() {
+  document.getElementById('assessmentOutput').textContent = 'Run your code to see output';
+  document.getElementById('assessmentResult').innerHTML = '';
+  document.getElementById('completionBtn').disabled = true;
+  assessmentResultData = null;
+  saveProgress();
+  showToast('Fix your blocks, run the code again, then submit.', 'success');
+}
+
+/* ============================================================
+   COMPLETION
+   ============================================================ */
+function renderCompletion() {
+  const r = assessmentResultData;
+  if (!r) return;
+  const el = document.getElementById('completionContent');
+  const dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+  el.innerHTML = `
+    <div class="completion-card">
+      <div class="trophy">${r.passed ? '🏆' : '📘'}</div>
+      <h3>${r.passed ? 'Module 2 Complete!' : 'Module 2 — Needs Retry'}</h3>
+      <div class="stat">Module: <strong>${MODULE.title}</strong></div>
+      <div class="stat">Final Score: <strong>${r.points == null ? Math.round(r.score / 10) : r.points}/10</strong> (${r.passed ? 'Passed' : 'Failed'})</div>
+      <div class="stat">Completion Date: <strong>${dateStr}</strong></div>
+      <div class="stat">Language: <strong>C++</strong></div>
+      <div style="margin-top:18px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-nav secondary" onclick="window.location.href='/student_progress'">
+          <i class="fas fa-chart-line"></i> View Progress
+        </button>
+        ${r.passed
+          ? `<button class="btn-nav" onclick="window.location.href='/student_activities_cpp'">
+               Open C++ Activities <i class="fas fa-arrow-right"></i>
+             </button>`
+          : `<button class="btn-nav" onclick="goStep(6)"><i class="fas fa-redo"></i> Retry Assessment</button>`}
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg, type) {
+  const box = document.getElementById('toastBox');
+  const t = document.createElement('div');
+  t.className = 'toast-msg ' + (type || 'success');
+  t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${msg}`;
+  box.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(40px)';
+    setTimeout(() => t.remove(), 300);
+  }, 3200);
+}
+
+async function restoreModuleCompletion() {
+  try {
+    const res = await fetch(`/get_module_assessment_score?module_id=${encodeURIComponent(MODULE.id)}`);
+    if (!res.ok) throw new Error(`Module score request failed (${res.status})`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Could not load module completion');
+    if (data.attempt?.status !== 'passed') return;
+
+    assessmentResultData = {
+      score: Number(data.attempt.score),
+      passed: true,
+      out: MODULE.assessment.expectedOutput,
+      expected: MODULE.assessment.expectedOutput
+    };
+    currentStep = 7;
+    saveProgress();
+  } catch (error) {
+    console.error('Could not restore module completion:', error);
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', async function() {
+  loadProgress();
+  await restoreModuleCompletion();
+  renderStepper();
+  renderQuiz();
+  if (assessmentResultData) {
+    renderAssessmentResult();
+    document.getElementById('completionBtn').disabled = !isModulePassed(assessmentResultData);
+  }
+  goStep(currentStep);
+});
+</script>
+<script src="{{ url_for('static', filename='js/lesson_completion.js') }}"></script>
+<script src="{{ url_for('static', filename='js/module_quiz_randomizer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/module_score_display.js') }}"></script>
+</body>
+</html>

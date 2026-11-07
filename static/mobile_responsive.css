@@ -1,0 +1,152 @@
+@import url("/static/portal_consistency.css");
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+pre,
+code {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .main-content,
+  .content,
+  .page-content,
+  .container-custom {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .main-content {
+    min-height: 100vh;
+  }
+
+  .top-bar,
+  .topbar,
+  .page-header,
+  .workspace-toolbar {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .workspace-toolbar .actions,
+  .btn-row,
+  .toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .workspace-toolbar button,
+  .btn-row button,
+  .toolbar-actions button {
+    min-height: 40px;
+  }
+
+  .stepper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .step-chip {
+    flex: 0 1 auto;
+  }
+
+  #blocklyDiv,
+  #blocklyDiv2,
+  #blocklyDiv3 {
+    min-height: 250px;
+    height: min(48vh, 380px);
+  }
+
+  .language-section,
+  .section,
+  .card,
+  .panel,
+  .workspace-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .grid,
+  .activity-grid,
+  .assessment-grid,
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  }
+
+  .reg-wrapper {
+    width: min(100%, 560px);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .container-custom {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .workspace-toolbar {
+    align-items: stretch;
+  }
+
+  .workspace-toolbar .actions,
+  .btn-row,
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .workspace-toolbar .actions button,
+  .btn-row button,
+  .toolbar-actions button {
+    flex: 1 1 120px;
+  }
+
+  .stepper {
+    gap: 5px;
+  }
+
+  .step-chip {
+    max-width: 100%;
+    font-size: 0.72rem;
+  }
+
+  .module-hero,
+  .section,
+  .card,
+  .panel {
+    overflow-wrap: anywhere;
+  }
+
+  .reg-wrapper {
+    border-radius: 20px;
+  }
+}

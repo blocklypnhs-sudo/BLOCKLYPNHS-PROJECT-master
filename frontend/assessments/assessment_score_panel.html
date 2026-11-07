@@ -1,0 +1,175 @@
+<div class="assessment-score-anchor">
+    <button class="assessment-score-button" id="assessmentScoreButton" type="button" aria-expanded="false" aria-controls="assessmentScorePanel">
+        <i class="fas fa-chart-simple" aria-hidden="true"></i>
+        View Score
+    </button>
+    <section class="assessment-score-panel" id="assessmentScorePanel" aria-label="{{ score_language_name }} assessment scores" hidden>
+        <div class="assessment-score-heading">
+            <div>
+                <h2>{{ score_language_name }} Score</h2>
+                <p>Completed assessment scores</p>
+            </div>
+            <button class="assessment-score-close" id="assessmentScoreClose" type="button" aria-label="Close score summary">&times;</button>
+        </div>
+        <div class="assessment-score-total"><span>Total Score</span><strong id="assessmentScoreTotal">0 / 50</strong></div>
+        <p class="assessment-score-empty" id="assessmentScoreEmpty" hidden>No scores yet</p>
+        <dl class="assessment-score-list" id="assessmentScoreList" aria-live="polite">
+            <div><dt>Assessment #1</dt><dd id="assessmentScore1">0 / 10</dd></div>
+            <div><dt>Assessment #2</dt><dd id="assessmentScore2">0 / 10</dd></div>
+            <div><dt>Assessment #3</dt><dd id="assessmentScore3">0 / 10</dd></div>
+            <div><dt>Assessment #4</dt><dd id="assessmentScore4">0 / 10</dd></div>
+            <div><dt>Assessment #5</dt><dd id="assessmentScore5">0 / 10</dd></div>
+        </dl>
+    </section>
+</div>
+
+<style>
+    .tabs-wrapper { position: relative; z-index: 1101; }
+
+    .assessment-header-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+
+    .assessment-score-anchor { position: relative; display: inline-flex; align-items: center; }
+    .assessment-score-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 38px;
+        padding: 0.5rem 1rem;
+        border: 1.5px solid var(--green-main, #145a42);
+        border-radius: 40px;
+        background: var(--card-glass, #ffffff);
+        color: var(--green-deep, #145a42);
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .assessment-score-button:hover,
+    .assessment-score-button[aria-expanded="true"] { background: var(--green-main, #145a42); color: #fff; transform: translateY(-1px); }
+    .assessment-score-panel {
+        position: absolute;
+        z-index: 1103;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        width: min(330px, calc(100vw - 2rem));
+        padding: 1rem 1.1rem;
+        border: 1px solid var(--glass-border, #dde9e3);
+        border-radius: var(--radius-lg);
+        background: var(--card-white, #fff);
+        color: var(--text-primary, #1a463a);
+        box-shadow: var(--shadow-xl, 0 16px 48px rgba(20, 90, 66, 0.12));
+        opacity: 1;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+    .assessment-score-panel[hidden], .assessment-score-empty[hidden] { display: none; }
+    .assessment-score-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.65rem; }
+    .assessment-score-heading h2 { margin: 0; color: var(--text-primary, #1a463a); font-size: 0.95rem; font-weight: 800; }
+    .assessment-score-heading p { margin: 0.15rem 0 0; color: var(--stone, #7f9e92); font-size: 0.68rem; }
+    .assessment-score-close {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: var(--green-soft, #e2f3ed);
+        color: var(--green-deep, #145a42);
+        font-size: 1.2rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+    .assessment-score-empty { margin: 0.55rem 0; padding: 0.55rem 0.65rem; border-radius: 9px; background: var(--green-soft, #e2f3ed); color: var(--green-deep, #145a42); font-size: 0.72rem; font-weight: 650; }
+    .assessment-score-list { display: grid; gap: 0; margin: 0; }
+    .assessment-score-list > div, .assessment-score-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.48rem 0;
+        border-bottom: 1px solid var(--glass-border, #dde9e3);
+        font-size: 0.78rem;
+    }
+    .assessment-score-list dt { color: var(--text-secondary, #4a6b5e); font-weight: 600; }
+    .assessment-score-list dd { margin: 0; color: var(--text-primary, #1a463a); font-weight: 750; font-variant-numeric: tabular-nums; }
+    .assessment-score-total { padding-top: 0.65rem; border-bottom: 0; color: var(--green-deep, #145a42); font-weight: 800; }
+    .assessment-score-total strong { font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+    @media (max-width: 992px) {
+        .assessment-header-actions { width: 100%; align-items: flex-end; }
+        .assessment-score-panel { max-width: calc(100vw - 2rem); }
+    }
+</style>
+
+<script>
+    (function() {
+        var language = '{{ score_language }}';
+        var button = document.getElementById('assessmentScoreButton');
+        var panel = document.getElementById('assessmentScorePanel');
+        var closeButton = document.getElementById('assessmentScoreClose');
+        var empty = document.getElementById('assessmentScoreEmpty');
+        if (!button || !panel || !closeButton || !empty) return;
+
+        function loadScores() {
+            fetch('/get_assessment_statuses?language=' + encodeURIComponent(language), {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (!data.success) throw new Error(data.message || 'Unable to load scores');
+                    var scores = [0, 0, 0, 0, 0];
+                    var completedCount = 0;
+
+                    (data.statuses || []).forEach(function(item) {
+                        var number = Number(item.assessment_number);
+                        if (!Number.isInteger(number) || number < 1 || number > scores.length) return;
+                        var completed = item.status === 'passed' || item.status === 'failed';
+                        if (!completed) return;
+                        scores[number - 1] = Math.max(0, Math.min(10, (Number(item.score) || 0) / 10));
+                        completedCount += 1;
+                    });
+
+                    var total = 0;
+                    scores.forEach(function(score, index) {
+                        total += score;
+                        document.getElementById('assessmentScore' + (index + 1)).textContent =
+                            Number(score.toFixed(1)) + ' / 10';
+                    });
+                    document.getElementById('assessmentScoreTotal').textContent =
+                        Number(total.toFixed(1)) + ' / 50';
+                    empty.hidden = completedCount !== 0;
+                    empty.textContent = 'No scores yet';
+                })
+                .catch(function(error) {
+                    empty.hidden = false;
+                    empty.textContent = 'Unable to load scores. Please try again.';
+                    console.error('Assessment score lookup failed:', error);
+                });
+        }
+
+        button.addEventListener('click', function() {
+            var open = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', String(!open));
+            panel.hidden = open;
+            if (!open) loadScores();
+        });
+        closeButton.addEventListener('click', function() {
+            panel.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+            button.focus();
+        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !panel.hidden) {
+                panel.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            }
+        });
+    })();
+</script>

@@ -1,0 +1,303 @@
+<!-- ═══ SCORE SUMMARY WIDGET ═══ -->
+<section class="score-summary-widget" id="scoreSummary">
+    <div class="ss-header">
+        <div class="ss-title">
+            <span class="ss-icon">📊</span>
+            <div>
+                <h3>Your Progress</h3>
+                <p class="ss-sub">Total scores across all languages</p>
+            </div>
+        </div>
+        <button class="ss-refresh" onclick="loadScoreSummary()" title="Refresh">
+            <span>↻</span>
+        </button>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div id="ssLoading" class="ss-loading">
+        <div class="ss-skel ss-skel-lg"></div>
+        <div class="ss-skel ss-skel-sm"></div>
+        <div class="ss-skel ss-skel-sm"></div>
+    </div>
+
+    <!-- Actual content -->
+    <div id="ssContent" style="display:none">
+        <!-- Overall -->
+        <div class="ss-overall">
+            <div class="ss-overall-info">
+                <span class="ss-overall-label">Overall Score</span>
+                <div class="ss-overall-score">
+                    <strong id="ssOverallTotal">0</strong>
+                    <span class="ss-overall-max">/ <span id="ssOverallMax">250</span></span>
+                </div>
+                <span class="ss-overall-pct" id="ssOverallPct">0%</span>
+            </div>
+            <div class="ss-overall-bar">
+                <div class="ss-bar-fill" id="ssOverallBar" style="width:0%"></div>
+            </div>
+        </div>
+
+        <!-- Per language -->
+        <div class="ss-languages" id="ssLanguages"></div>
+    </div>
+
+    <!-- Error state -->
+    <div id="ssError" class="ss-error" style="display:none">
+        <p>Unable to load your scores.</p>
+        <button onclick="loadScoreSummary()">Try Again</button>
+    </div>
+</section>
+
+<style>
+.score-summary-widget {
+    background: var(--card-white, #fff);
+    border: 1px solid var(--border-fresh, #dde9e3);
+    border-radius: 20px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 16px rgba(20,90,66,.06);
+    font-family: 'Inter', system-ui, sans-serif;
+}
+.ss-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.ss-title { display: flex; align-items: center; gap: 12px; }
+.ss-icon { font-size: 1.5rem; }
+.ss-title h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-primary, #1a463a);
+}
+.ss-sub {
+    margin: 2px 0 0;
+    font-size: .7rem;
+    color: var(--stone-light, #a8bfb4);
+}
+.ss-refresh {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-fresh, #dde9e3);
+    background: var(--card-white, #fff);
+    color: var(--stone, #7f9e92);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+    font-size: 16px;
+}
+.ss-refresh:hover {
+    border-color: var(--green-main, #1f8a64);
+    color: var(--green-main, #1f8a64);
+}
+.ss-overall {
+    background: linear-gradient(135deg, #f0f6f3, #e2f3ed);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+.ss-overall-info {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: .6rem;
+}
+.ss-overall-label {
+    font-size: .6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--stone, #7f9e92);
+    width: 100%;
+}
+.ss-overall-score { display: flex; align-items: baseline; gap: 4px; }
+.ss-overall-score strong {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--text-primary, #1a463a);
+}
+.ss-overall-max { font-size: .95rem; color: var(--stone, #7f9e92); font-weight: 600; }
+.ss-overall-pct {
+    margin-left: auto;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: #fff;
+    color: var(--green-deep, #145a42);
+}
+.ss-overall-bar {
+    height: 10px;
+    background: rgba(20,90,66,.08);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.ss-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width .8s cubic-bezier(.4,0,.2,1), background .3s;
+}
+.ss-languages { display: flex; flex-direction: column; gap: 8px; }
+.ss-lang {
+    display: grid;
+    grid-template-columns: 130px 1fr 70px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--nested, rgba(255,255,255,.55));
+    border: 1px solid var(--border-fresh, #dde9e3);
+    transition: all .2s;
+}
+.ss-lang:hover {
+    background: var(--green-soft, #e2f3ed);
+    border-color: var(--green-main, #1f8a64);
+}
+.ss-lang-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a463a);
+}
+.ss-lang-name span:first-child { font-size: 1.1rem; }
+.ss-lang-bar {
+    height: 8px;
+    background: rgba(20,90,66,.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.ss-lang-bar > div {
+    height: 100%;
+    border-radius: 8px;
+    transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+.ss-lang-score {
+    text-align: right;
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--text-secondary, #4a6b5e);
+    font-variant-numeric: tabular-nums;
+}
+.ss-level-excellent .ss-bar-fill,
+.ss-level-excellent .ss-lang-bar > div { background: linear-gradient(90deg,#1f8a64,#28a87a); }
+.ss-level-good .ss-bar-fill,
+.ss-level-good .ss-lang-bar > div      { background: linear-gradient(90deg,#4a90d9,#6ba8e8); }
+.ss-level-fair .ss-bar-fill,
+.ss-level-fair .ss-lang-bar > div      { background: linear-gradient(90deg,#e8a838,#f0c060); }
+.ss-level-low .ss-bar-fill,
+.ss-level-low .ss-lang-bar > div       { background: linear-gradient(90deg,#e06050,#f08070); }
+.ss-loading { display: flex; flex-direction: column; gap: 10px; }
+.ss-skel {
+    background: linear-gradient(90deg,#e8f0ec 25%,#f0f6f3 50%,#e8f0ec 75%);
+    background-size: 200% 100%;
+    animation: ssSk 1.2s infinite;
+    border-radius: 8px;
+}
+.ss-skel-lg { height: 70px; }
+.ss-skel-sm { height: 38px; }
+@keyframes ssSk { to { background-position: -200% 0; } }
+.ss-error {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--stone-light, #a8bfb4);
+    font-size: .82rem;
+}
+.ss-error button {
+    margin-top: .6rem;
+    padding: .4rem 1rem;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-fresh, #dde9e3);
+    background: #fff;
+    color: var(--green-main, #1f8a64);
+    font-weight: 700;
+    font-size: .74rem;
+    cursor: pointer;
+}
+@media (max-width: 600px) {
+    .ss-lang { grid-template-columns: 100px 1fr 60px; gap: 8px; }
+    .ss-lang-name { font-size: .72rem; }
+    .ss-overall-score strong { font-size: 1.6rem; }
+}
+</style>
+
+<script>
+const LANG_META = {
+    python:     { icon: '🐍', name: 'Python' },
+    java:       { icon: '☕', name: 'Java' },
+    php:        { icon: '🐘', name: 'PHP' },
+    javascript: { icon: '⚡', name: 'JavaScript' },
+    cpp:        { icon: '⚙️', name: 'C++' },
+};
+
+function scoreLevel(pct) {
+    if (pct >= 90) return 'ss-level-excellent';
+    if (pct >= 75) return 'ss-level-good';
+    if (pct >= 60) return 'ss-level-fair';
+    return 'ss-level-low';
+}
+
+function loadScoreSummary() {
+    const loading = document.getElementById('ssLoading');
+    const content = document.getElementById('ssContent');
+    const error   = document.getElementById('ssError');
+
+    if (!loading || !content || !error) return;
+
+    loading.style.display = 'flex';
+    content.style.display = 'none';
+    error.style.display = 'none';
+
+    fetch('/get_score_summary', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) throw new Error(data.message || 'Failed');
+
+            const o = data.overall;
+            document.getElementById('ssOverallTotal').textContent = o.total;
+            document.getElementById('ssOverallMax').textContent = o.max;
+            document.getElementById('ssOverallPct').textContent = o.percentage + '%';
+            document.getElementById('ssOverallBar').style.width = o.percentage + '%';
+
+            const overallBlock = document.querySelector('.ss-overall');
+            overallBlock.className = 'ss-overall ' + scoreLevel(o.percentage);
+
+            const langWrap = document.getElementById('ssLanguages');
+            langWrap.innerHTML = Object.entries(data.by_language).map(([key, lang]) => {
+                const meta = LANG_META[key] || { icon: '📦', name: key };
+                const lvl = scoreLevel(lang.percentage);
+                return `
+                    <div class="ss-lang ${lvl}">
+                        <div class="ss-lang-name">
+                            <span>${meta.icon}</span>
+                            <span>${meta.name}</span>
+                        </div>
+                        <div class="ss-lang-bar">
+                            <div style="width:${lang.percentage}%"></div>
+                        </div>
+                        <div class="ss-lang-score">
+                            ${lang.total}/${lang.max}
+                            <br>
+                            <span style="opacity:.7;font-size:.66rem">${lang.percentage}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            loading.style.display = 'none';
+            content.style.display = 'block';
+        })
+        .catch(err => {
+            console.error('[score-summary]', err);
+            loading.style.display = 'none';
+            error.style.display = 'block';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', loadScoreSummary);
+</script>

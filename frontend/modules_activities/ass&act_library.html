@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockLearn · Modules</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== DESIGN TOKENS (compact, matches Dashboard / Help & FAQ) ===== */
+        :root {
+            --green-deep: #0c3b2d;
+            --green-main: #12604a;
+            --green-bright: #1d8a5f;
+            --green-soft: #e3f4ec;
+            --gold-warm: #e8b93c;
+            --gold-light: #fbeecb;
+            --coral: #e5604f;
+            --coral-soft: #fce8e5;
+            --blue: #4a90d9;
+            --blue-soft: #e4eefb;
+            --stone: #52705f;
+            --stone-light: #6d8a7c;
+            --border-fresh: #e0ebe4;
+            --card-white: #ffffff;
+            --card-tint: #f7fbf9;
+            --tile-bg: #e3f4ec;
+            --tile-color: #147a54;
+            --bg-main: #eef6f1;
+            --text-primary: #10382c;
+            --text-secondary: #3f5f52;
+            --shadow-xs: 0 2px 8px rgba(16,56,44,0.05);
+            --shadow-sm: 0 4px 14px rgba(16,56,44,0.06);
+            --shadow-md: 0 8px 24px rgba(16,56,44,0.10);
+            --shadow-lg: 0 14px 40px rgba(16,56,44,0.14);
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+            --grid-line: rgba(150,195,175,0.26);
+            --gold-text: #9a7020;
+            --green-accent: #147a54;
+            --btn-dark: #0d4534;
+            --btn-dark-hover: #093626;
+        }
+
+        /* ===== DARK MODE ===== */
+        [data-theme="dark"] {
+            --bg-main: #0e1f18;
+            --text-primary: #dcefe6;
+            --text-secondary: #9fc0b1;
+            --border-fresh: #20402f;
+            --card-white: #14291f;
+            --card-tint: #11231a;
+            --tile-bg: #1c3a2c;
+            --tile-color: #4ade80;
+            --green-soft: #163328;
+            --gold-light: #2e2510;
+            --coral-soft: #2e1a16;
+            --blue-soft: #152535;
+            --stone: #7fa895;
+            --stone-light: #8fb8a8;
+            --shadow-xs: 0 2px 8px rgba(0,0,0,0.18);
+            --shadow-sm: 0 4px 14px rgba(0,0,0,0.22);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.28);
+            --shadow-lg: 0 14px 40px rgba(0,0,0,0.32);
+            --grid-line: rgba(45,85,65,0.22);
+            --gold-text: #e0b45c;
+            --green-accent: #4ade80;
+            --btn-dark: #17754f;
+            --btn-dark-hover: #12603f;
+        }
+
+        html { height: 100%; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-main);
+            line-height: 1.5;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        :focus-visible { outline: 2px solid var(--green-accent); outline-offset: 2px; }
+
+        .student-sidebar {
+            position: fixed; inset: 0 auto 0 0; z-index: 20; width: 232px; min-width: 0;
+            display: flex; flex-direction: column; overflow-y: auto;
+            background: linear-gradient(178deg, #0a382a 0%, #0e4a37 55%, #0c4332 100%);
+            color: #a9d3c0; border-right: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 5px 0 26px rgba(8,40,30,0.22);
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.16) transparent;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .student-sidebar::-webkit-scrollbar { width: 3px; }
+        .student-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .student-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+        .student-sidebar-brand {
+            min-height: 88px; display: flex; align-items: center; justify-content: center; gap: 0;
+            padding: 0.4rem 0.15rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: white; text-decoration: none; overflow: hidden; flex-shrink: 0; position: relative;
+        }
+        .student-sidebar-brand-link {
+            display: flex; align-items: center; justify-content: center; flex: 1; min-width: 0;
+            color: white; text-decoration: none; overflow: hidden;
+        }
+        .student-sidebar-logo-image { width: 76px; height: 76px; object-fit: contain; flex-shrink: 0; }
+        .student-sidebar-wordmark {
+            display: flex; flex-direction: column; align-items: flex-start; flex: 1; min-width: 0;
+            margin-left: -8px;
+        }
+        .student-sidebar-wordmark strong {
+            color: #ffffff; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;
+            line-height: 1.15; white-space: nowrap;
+        }
+        .student-sidebar-wordmark em { color: #b8e34e; font-style: normal; }
+        .student-sidebar-wordmark small {
+            display: block; margin-top: 1px; color: #d6f0e4; opacity: 0.55;
+            font-size: 0.53rem; font-weight: 600; letter-spacing: 1.4px;
+            text-transform: uppercase; white-space: nowrap;
+        }
+        .student-sidebar-brand-mono {
+            display: none; width: 40px; min-width: 40px; text-align: center;
+            flex-shrink: 0; align-items: center; justify-content: center;
+        }
+        .student-sidebar-brand-mono img { display: block; width: 40px; height: 40px; object-fit: contain; }
+        .student-sidebar-collapse {
+            position: absolute; top: 50%; right: 8px; transform: translateY(-65%);
+            display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.06); border-radius: 9px;
+            color: #d8efe5; background: rgba(255,255,255,0.08);
+            font-size: 0.82rem; cursor: pointer; transition: all 0.3s ease;
+        }
+        .student-sidebar-collapse:hover {
+            background: rgba(255,255,255,0.16); transform: translateY(-65%) rotate(90deg);
+        }
+        .student-sidebar-expand-wrap {
+            display: none; justify-content: center; padding: 0.35rem 0 0.15rem; flex-shrink: 0;
+        }
+        .student-sidebar-expand {
+            display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 9px; color: #d8efe5; background: rgba(255,255,255,0.08);
+            font-size: 0.82rem; cursor: pointer; transition: all 0.3s ease;
+        }
+        .student-sidebar-expand:hover { background: rgba(255,255,255,0.16); }
+        .student-sidebar.collapsed { width: 70px; }
+        .student-sidebar.collapsed .student-sidebar-brand { justify-content: center; padding: 10px 0; min-height: 62px; }
+        .student-sidebar.collapsed .student-sidebar-collapse { display: none; }
+        .student-sidebar.collapsed .student-sidebar-logo-image,
+        .student-sidebar.collapsed .student-sidebar-wordmark,
+        .student-sidebar.collapsed .nav-text,
+        .student-sidebar.collapsed .nav-section-label { display: none; }
+        .student-sidebar.collapsed .activities-submenu,
+        .student-sidebar.collapsed .activities-chevron { display: none; }
+        .student-sidebar.collapsed .student-sidebar-brand-mono { display: flex; }
+        .student-sidebar.collapsed .student-sidebar-expand-wrap { display: flex; }
+        .student-sidebar.collapsed .nav-link-custom {
+            width: calc(100% - 0.6rem); justify-content: center;
+            padding: 0.55rem 0; margin: 0 0.3rem;
+        }
+        .student-sidebar.collapsed .nav-link-custom i { font-size: 1.15rem; }
+        .student-sidebar.collapsed .nav-link-custom iconify-icon { font-size: 1.05rem; }
+        .student-sidebar.collapsed ~ .page-shell {
+            margin-left: calc(70px + max(0px, (100vw - 70px - 1180px) / 2));
+        }
+        .sidebar-nav {
+            flex: 1;
+            min-height: 0;
+            padding: 0.3rem 0 0.4rem;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.12) transparent;
+        }
+        .nav-item { position: relative; margin-bottom: 3px; }
+        .nav-section-label {
+            padding: 0.9rem 1.15rem 0.3rem; color: rgba(190,225,208,0.45);
+            font-size: 0.56rem; font-weight: 700; letter-spacing: 1.4px;
+            text-transform: uppercase; white-space: nowrap;
+        }
+        .student-sidebar .nav-link-custom {
+            display: flex; align-items: center; gap: 11px; width: calc(100% - 1rem);
+            margin: 0 0.5rem; padding: 0.5rem 0.85rem;
+            border: 0; border-radius: 999px; background: transparent;
+            color: #a9d3c0; text-align: left; text-decoration: none;
+            font-size: 0.82rem; font-weight: 600; line-height: 1.35;
+            white-space: nowrap; cursor: pointer; transition: all 0.25s ease;
+        }
+        .student-sidebar .nav-link-custom i,
+        .student-sidebar .nav-link-custom iconify-icon {
+            display: block; width: 20px; flex-shrink: 0; text-align: center;
+            transition: all 0.25s ease;
+        }
+        .student-sidebar .nav-link-custom i { font-size: 0.85rem; }
+        .student-sidebar .nav-link-custom iconify-icon { font-size: 1rem; }
+        .student-sidebar .nav-link-custom:hover { background: rgba(255,255,255,0.08); color: white; }
+        .student-sidebar .nav-link-custom:hover i,
+        .student-sidebar .nav-link-custom:hover iconify-icon { transform: scale(1.08); }
+        .student-sidebar .nav-link-custom.active {
+            background: #ffffff; color: #0c3b2d; font-weight: 700;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .student-sidebar .nav-link-custom.active i,
+        .student-sidebar .nav-link-custom.active iconify-icon { color: #12604a; }
+        .student-sidebar .activities-chevron {
+            margin-left: auto; font-size: 0.62rem !important; transition: transform 0.25s ease;
+        }
+        .student-sidebar .activities-toggle.open .activities-chevron { transform: rotate(180deg); }
+        .activities-submenu { display: none; padding: 0.1rem 0 0.25rem 2.35rem; }
+        .activities-submenu.open { display: block; }
+        .activities-submenu-label {
+            padding: 0.4rem 0.6rem 0.15rem; color: rgba(190,225,208,0.45);
+            font-size: 0.5rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+        }
+        .activities-submenu a {
+            display: flex; align-items: center; gap: 9px; padding: 0.36rem 0.6rem;
+            border-radius: 9px; color: #a9d3c0; text-decoration: none;
+            font-size: 0.74rem; font-weight: 500; transition: all 0.2s ease;
+        }
+        .activities-submenu a:hover { background: rgba(255,255,255,0.08); color: white; }
+        .activities-submenu iconify-icon { font-size: 0.95rem; }
+        .module-language-nav {
+            display: grid;
+            gap: 2px;
+            padding: 0.15rem 0.5rem 0.65rem 2.45rem;
+        }
+        .module-language-nav a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 31px;
+            padding: 0.3rem 0.65rem;
+            border-radius: 9px;
+            color: #a9d3c0;
+            text-decoration: none;
+            font-size: 0.73rem;
+            font-weight: 600;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .module-language-nav a:hover,
+        .module-language-nav a.active {
+            background: rgba(255,255,255,0.11);
+            color: #fff;
+        }
+        .module-language-nav a.active { box-shadow: inset 2px 0 #b8e34e; }
+        .module-language-nav iconify-icon,
+        .module-language-nav i {
+            width: 15px;
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .module-language-nav .language-python { color: #79b8f3; }
+        .module-language-nav .language-java { color: #ffad54; }
+        .module-language-nav .language-php { color: #aab4ff; }
+        .module-language-nav .language-javascript { color: #f7d154; }
+        .module-language-nav .language-cpp { color: #71c7f1; }
+        .php-logo-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 23px;
+            min-width: 23px;
+            height: 15px;
+            padding: 0 3px;
+            border: 1px solid rgba(184,190,228,0.75);
+            border-radius: 999px;
+            background: #f7f8ff;
+            color: #39478b;
+            font: italic 900 0.62rem/1 Inter, sans-serif;
+            letter-spacing: -0.7px;
+            text-transform: lowercase;
+            vertical-align: middle;
+        }
+        .module-language-nav .php-logo-mark { width: 21px; min-width: 21px; height: 14px; font-size: 0.58rem; }
+        .language-section .section-header h2 .php-logo-mark {
+            width: 27px;
+            min-width: 27px;
+            height: 18px;
+            font-size: 0.7rem;
+        }
+        .student-sidebar.collapsed .module-language-nav { display: none; }
+        .student-sidebar:not(.collapsed) .student-sidebar-collapse { display: flex; }
+        .student-sidebar:not(.collapsed) .student-sidebar-expand-wrap { display: none; }
+        .student-sidebar:not(.collapsed) .nav-link-custom { justify-content: flex-start; }
+        .sidebar-deco {
+            position: relative; height: 46px; flex-shrink: 0;
+            pointer-events: none; overflow: hidden; margin-top: auto;
+        }
+        .sidebar-deco > svg:first-child {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; display: block;
+        }
+        .sidebar-deco .deco-sprout-svg {
+            position: absolute; left: 16px; bottom: 6px; width: 30px; height: 30px; opacity: 0.6;
+        }
+
+        /* ===== BACKGROUND: light mint + subtle grid ===== */
+        .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-layer::before {
+            content: ''; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 44px 44px;
+            transition: background-image 0.4s ease;
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            max-width: 1180px;
+            margin: 0 auto 0 calc(232px + max(0px, (100vw - 232px - 1180px) / 2));
+            padding: 24px clamp(14px, 3vw, 36px) 56px;
+            transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ----- TOP BAR (matches the assessment page) ----- */
+        .topbar {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            padding: 0.1rem 0.1rem;
+            margin-bottom: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 100;
+        }
+        .title-wrap { display: flex; align-items: center; gap: 12px; }
+        .title-wrap h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.18rem;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            transition: color 0.4s ease;
+        }
+        .title-wrap h1 i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: var(--tile-bg);
+            color: var(--tile-color);
+            font-size: 0.88rem;
+        }
+        .topbar-actions { display: flex; align-items: center; gap: 8px; }
+        .library-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-height: 36px;
+            padding: 0 0.85rem;
+            border: 1px solid var(--border-fresh);
+            border-radius: 999px;
+            color: var(--text-secondary);
+            background: var(--card-white);
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+        .library-switch:hover, .library-switch.active {
+            color: var(--green-accent);
+            background: var(--green-soft);
+            border-color: var(--green-accent);
+        }
+        .theme-btn, .notification-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border-fresh);
+            border-radius: 11px;
+            color: var(--text-secondary);
+            background: var(--card-white);
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-xs);
+            transition: all 0.25s ease;
+        }
+        .theme-btn:hover, .notification-btn:hover {
+            background: var(--green-soft);
+            color: var(--green-accent);
+            border-color: var(--green-accent);
+        }
+        .module-profile {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 40px;
+            padding: 4px 12px 4px 5px;
+            border: 1px solid var(--border-fresh);
+            border-radius: 999px;
+            color: var(--text-primary);
+            background: var(--card-white);
+            box-shadow: var(--shadow-xs);
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .module-profile:hover {
+            color: var(--text-primary);
+            border-color: var(--green-accent);
+            box-shadow: var(--shadow-sm);
+        }
+        .module-profile-avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 31px;
+            height: 31px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            color: white;
+            background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+            font-size: 0.72rem;
+        }
+        .module-profile-info { display: flex; flex-direction: column; min-width: 0; }
+        .module-profile-name {
+            max-width: 160px;
+            overflow: hidden;
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .module-profile-grade {
+            color: var(--text-secondary);
+            font-size: 0.62rem;
+            line-height: 1.25;
+            white-space: nowrap;
+        }
+        .module-profile-chevron {
+            margin-left: 2px;
+            color: var(--stone-light);
+            font-size: 0.6rem;
+        }
+        [data-theme="dark"] .module-profile-name { color: var(--text-primary); }
+
+        @media (max-width: 768px) {
+            .module-profile-info { display: none; }
+            .module-profile { padding: 4px; }
+        }
+        .theme-btn .icon-sun { display: none; }
+        [data-theme="dark"] .theme-btn .icon-moon { display: none; }
+        [data-theme="dark"] .theme-btn .icon-sun { display: inline-block; }
+        @media (max-width: 640px) {
+            .topbar { flex-wrap: wrap; gap: 8px; }
+            .title-wrap h1 { font-size: 1.02rem; }
+            .title-wrap h1 i { width: 32px; height: 32px; font-size: 0.8rem; }
+            .topbar-actions { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+            .theme-btn, .notification-btn { width: 34px; height: 34px; }
+        }
+
+        /* ----- SECTION HEADERS (matches dashboard) ----- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin: 26px 0 14px;
+        }
+        .section-header h2 {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin: 0;
+        }
+        .section-header h2 i {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: var(--tile-bg); color: var(--tile-color);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; flex-shrink: 0;
+        }
+        .section-header h2 i.gold {
+            background: var(--gold-light); color: var(--gold-text);
+        }
+        .section-header .badge-count {
+            background: var(--green-soft);
+            color: var(--green-deep);
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .section-header .badge-count { color: var(--green-accent); }
+        .section-header .divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-fresh), transparent);
+            border-radius: 2px;
+        }
+        .language-section {
+            margin-top: 22px;
+            padding: 8px 18px 18px;
+            border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-xl);
+            background: var(--card-tint);
+            scroll-margin-top: 22px;
+        }
+        .language-section:first-of-type { margin-top: 0; }
+        .language-section .section-header { margin-top: 4px; }
+        .language-section .section-header h2 { font-size: 1rem; }
+        .language-section .section-header h2 i {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .language-section .section-header h2 iconify-icon {
+            width: 38px;
+            height: 38px;
+            padding: 9px;
+            border-radius: 12px;
+            color: #fff;
+        }
+        .language-section .section-header h2 i.python { background: linear-gradient(135deg, #4a90d9, #1e5dbb); }
+        .language-section .section-header h2 i.java { background: linear-gradient(135deg, #ff8a00, #c75d00); }
+        .language-section .section-header h2 i.php { background: linear-gradient(135deg, #6b7ae8, #3d4cc2); }
+        .language-section .section-header h2 i.javascript { background: linear-gradient(135deg, #f7d154, #d99d00); color: #3a2b00; }
+        .language-section .section-header h2 i.cpp { background: linear-gradient(135deg, #0074b8, #004f7a); }
+        .language-section .section-header h2 iconify-icon.php { background: linear-gradient(135deg, #6b7ae8, #3d4cc2); }
+        .language-section .section-header h2 iconify-icon.javascript { background: linear-gradient(135deg, #f7d154, #d99d00); color: #3a2b00; }
+        .language-section .section-header h2 iconify-icon.cpp { background: linear-gradient(135deg, #0074b8, #004f7a); }
+
+        /* ----- GRID LAYOUT ----- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        /* ----- CARD STYLES (matches dashboard cards) ----- */
+        .card {
+            background: var(--card-white);
+            border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            padding: 1.1rem 1.15rem 1rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+            border-radius: 3px 3px 0 0; opacity: 0; transition: opacity 0.3s;
+        }
+        .card--assessment::before { background: linear-gradient(90deg, var(--green-bright), var(--green-main)); }
+        .card--activity::before { background: linear-gradient(90deg, var(--gold-warm), #f0c060); }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--green-accent);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .lang-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            color: white;
+            margin-bottom: 0.85rem;
+            flex-shrink: 0;
+        }
+        .python { background: linear-gradient(135deg, #4a90d9, #1e5dbb); }
+        .java { background: linear-gradient(135deg, #ff8a00, #c75d00); }
+        .javascript { background: linear-gradient(135deg, #f7d154, #d99d00); color: #3a2b00; }
+        .php { background: linear-gradient(135deg, #6b7ae8, #3d4cc2); }
+        .cpp { background: linear-gradient(135deg, #0074b8, #004f7a); }
+
+        .card h3 {
+            margin: 0 0 5px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+
+        .card p {
+            margin: 0 0 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.76rem;
+            flex: 1;
+        }
+
+        .meta {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 0.58rem;
+            color: var(--stone);
+            font-weight: 700;
+            margin-bottom: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            background: var(--card-tint);
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border-fresh);
+            align-self: flex-start;
+        }
+        .meta i { font-size: 0.68rem; color: var(--green-accent); }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.76rem;
+            transition: all 0.25s ease;
+            margin-top: auto;
+            gap: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .card--assessment .card-link {
+            background: var(--green-soft);
+            color: var(--green-deep);
+        }
+        [data-theme="dark"] .card--assessment .card-link { color: var(--green-accent); }
+        .card--assessment .card-link:hover {
+            background: var(--green-main);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .card--activity .card-link {
+            background: var(--gold-light);
+            color: var(--gold-text);
+        }
+        [data-theme="dark"] .card--activity .card-link { color: var(--gold-text); }
+        .card--activity .card-link:hover {
+            background: var(--gold-warm);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .card-link i { transition: transform 0.25s ease; }
+        .card-link:hover i { transform: translateX(3px); }
+        .card-link.locked {
+            background: var(--card-tint);
+            color: var(--stone-light);
+            cursor: not-allowed;
+            border: 1px solid var(--border-fresh);
+            pointer-events: none;
+            pointer-events: none;
+        }
+        .activities-lock-notice {
+            margin: 0 0 20px;
+            padding: 14px 18px;
+            border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-md);
+            background: var(--gold-light);
+            color: var(--text-primary);
+            font-size: 0.82rem;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 900px) {
+            .page-shell { padding: 18px 18px 40px; }
+        }
+        @media (max-width: 768px) {
+            .student-sidebar { width: 70px; }
+            .student-sidebar-brand { justify-content: center; padding: 0.75rem 0.4rem; min-height: 62px; }
+            .student-sidebar-logo-image, .student-sidebar-wordmark,
+            .student-sidebar .nav-text, .student-sidebar .nav-section-label { display: none; }
+            .student-sidebar-brand-mono { display: flex; }
+            .student-sidebar-collapse { display: none !important; }
+            .student-sidebar-expand-wrap { display: flex !important; }
+            .student-sidebar .nav-link-custom {
+                width: calc(100% - 0.6rem); justify-content: center;
+                padding: 0.55rem 0; margin: 0 0.3rem;
+            }
+            .student-sidebar .nav-link-custom i { font-size: 1.15rem; }
+            .student-sidebar .nav-link-custom iconify-icon { font-size: 1.05rem; }
+            .page-shell { margin-left: 70px; }
+            .student-sidebar:not(.collapsed) { width: min(232px, 85vw); }
+            .student-sidebar:not(.collapsed) .student-sidebar-brand { justify-content: center; padding: 0.4rem 0.15rem; }
+            .student-sidebar:not(.collapsed) .student-sidebar-logo-image { display: block; }
+            .student-sidebar:not(.collapsed) .student-sidebar-wordmark { display: flex; }
+            .student-sidebar:not(.collapsed) .student-sidebar-brand-mono { display: none; }
+            .student-sidebar:not(.collapsed) .nav-text,
+            .student-sidebar:not(.collapsed) .nav-section-label { display: block; }
+            .student-sidebar:not(.collapsed) .nav-link-custom {
+                justify-content: flex-start; width: calc(100% - 1rem);
+                margin: 0 0.5rem; padding: 0.5rem 0.85rem;
+            }
+            .student-sidebar.collapsed { width: 70px; }
+        }
+        @media (max-width: 640px) {
+            .page-shell { padding: 14px 12px 36px; }
+            .grid { grid-template-columns: 1fr; }
+            .section-header h2 { font-size: 0.85rem; }
+            .topbar-actions { justify-content: flex-end; }
+            .language-section { padding: 7px 10px 12px; margin-top: 14px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+    <script>
+        /* Apply saved theme before first paint (matches dashboard) */
+        try {
+            if (localStorage.getItem('blocklearn-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        } catch (e) {}
+    </script>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="bg-layer" aria-hidden="true"></div>
+
+    <aside class="student-sidebar" aria-label="Student navigation">
+        <div class="student-sidebar-brand">
+            <a class="student-sidebar-brand-link" href="/student_dashboard" title="Student dashboard">
+                <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="student-sidebar-logo-image">
+                <span class="student-sidebar-wordmark"><strong>Block<em>Learn</em></strong><small>PNHS · ICT Students</small></span>
+                <span class="student-sidebar-brand-mono"><img src="/static/BL-LOGO.png" alt="BlockLearn Logo"></span>
+            </a>
+            <button class="student-sidebar-collapse" type="button" onclick="collapseLibrarySidebar()" aria-label="Collapse sidebar" title="Collapse sidebar">
+                <iconify-icon icon="lucide:panel-left-close"></iconify-icon>
+            </button>
+        </div>
+        <div class="student-sidebar-expand-wrap">
+            <button class="student-sidebar-expand" type="button" onclick="expandLibrarySidebar()" aria-label="Expand sidebar" title="Expand sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <div class="nav-item"><a href="/student_dashboard" class="nav-link-custom"><iconify-icon icon="lucide:house"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
+            <div class="nav-item"><a href="/assessments" class="nav-link-custom"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a></div>
+            <div class="nav-item"><a href="/student_modules" class="nav-link-custom active" aria-current="page"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a></div>
+            <div class="module-language-nav" aria-label="Module languages">
+                <a href="#python-modules" class="active" aria-current="location"><i class="fab fa-python language-python"></i><span>Python</span></a>
+                <a href="#java-modules"><i class="fab fa-java language-java"></i><span>Java</span></a>
+                <a href="#php-modules"><span class="php-logo-mark" aria-hidden="true">php</span><span>PHP</span></a>
+                <a href="#javascript-modules"><iconify-icon icon="logos:javascript" class="language-javascript"></iconify-icon><span>JavaScript</span></a>
+                <a href="#cpp-modules"><iconify-icon icon="simple-icons:cplusplus" class="language-cpp"></iconify-icon><span>C++</span></a>
+            </div>
+            <div class="nav-item"><a href="/student_progress" class="nav-link-custom"><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon><span class="nav-text">Progress</span></a></div>
+            <div class="nav-section-label">Activities</div>
+            <div class="nav-item">
+                <button type="button" class="nav-link-custom activities-toggle" id="activitiesToggle" onclick="toggleActivitiesNav()" aria-expanded="false" aria-controls="activitiesSubmenu">
+                    <iconify-icon icon="lucide:code"></iconify-icon><span class="nav-text">Activities</span><i class="fas fa-chevron-down activities-chevron"></i>
+                </button>
+                <div class="activities-submenu" id="activitiesSubmenu">
+                    <a href="/student_activities">All Activities</a>
+                    <div class="activities-submenu-label">Languages</div>
+                    <a href="/student_activities_php"><span class="php-logo-mark" aria-hidden="true">php</span>PHP</a>
+                    <a href="/student_activities_javascript"><iconify-icon icon="logos:javascript"></iconify-icon>JavaScript</a>
+                    <a href="/student_activities_cpp"><iconify-icon icon="simple-icons:cplusplus"></iconify-icon>C++</a>
+                </div>
+            </div>
+            <div class="nav-section-label">Account</div>
+            <div class="nav-item"><a href="/student_profile" class="nav-link-custom"><iconify-icon icon="lucide:circle-user-round"></iconify-icon><span class="nav-text">Profile</span></a></div>
+            <div class="nav-item"><a href="/student_settings" class="nav-link-custom"><iconify-icon icon="lucide:sliders-horizontal"></iconify-icon><span class="nav-text">Settings</span></a></div>
+            <div class="nav-section-label">Support</div>
+            <div class="nav-item"><a href="/student_help" class="nav-link-custom"><iconify-icon icon="lucide:circle-help"></iconify-icon><span class="nav-text">Help &amp; FAQ</span></a></div>
+            <div class="nav-item"><a href="/student_tickets" class="nav-link-custom"><iconify-icon icon="lucide:ticket"></iconify-icon><span class="nav-text">Support Tickets</span></a></div>
+            <div class="nav-item"><a href="/logout" class="nav-link-custom"><iconify-icon icon="lucide:log-out"></iconify-icon><span class="nav-text">Sign out</span></a></div>
+        </nav>
+        <div class="sidebar-deco" aria-hidden="true">
+            <svg viewBox="0 0 232 46" preserveAspectRatio="none" focusable="false">
+                <path d="M0,20 C62,38 130,8 232,24 L232,46 L0,46 Z" fill="rgba(255,255,255,0.05)"/>
+                <path d="M0,32 C76,44 148,20 232,34 L232,46 L0,46 Z" fill="rgba(255,255,255,0.045)"/>
+            </svg>
+            <svg class="deco-sprout-svg" viewBox="0 0 48 48" focusable="false">
+                <path d="M24 44 V26" stroke="rgba(190,235,205,0.55)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                <path d="M24 30 C14 30 8 24 8 14 C18 14 24 20 24 30 Z" fill="rgba(190,235,205,0.38)"/>
+                <path d="M24 26 C24 16 30 10 40 10 C40 20 34 26 24 26 Z" fill="rgba(190,235,205,0.52)"/>
+            </svg>
+        </div>
+    </aside>
+
+    <div class="page-shell">
+
+        <!-- ===== TOP BAR ===== -->
+        <div class="topbar">
+            <div class="title-wrap">
+                <h1><i class="fas fa-layer-group"></i>Modules</h1>
+            </div>
+            <div class="topbar-actions">
+                <a class="library-switch" href="/assessments"><i class="fas fa-clipboard-check"></i>Assessments</a>
+                <a class="library-switch active" href="/student_modules" aria-current="page"><i class="fas fa-layer-group"></i>Modules</a>
+                <button class="theme-btn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle light/dark mode">
+                    <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
+                </button>
+                <a class="notification-btn" href="/notifications" aria-label="Notifications" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                </a>
+                <a class="module-profile" href="/student_profile" aria-label="Open student profile">
+                    <span class="module-profile-avatar"><i class="fas fa-user"></i></span>
+                    <span class="module-profile-info">
+                        <span class="module-profile-name">{{ full_name or username or 'Student' }}</span>
+                        <span class="module-profile-grade">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                    </span>
+                    <i class="fas fa-chevron-down module-profile-chevron" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+
+        {% if library_mode == 'modules' and activities_unlocked is defined and not activities_unlocked %}
+        <div class="activities-lock-notice" role="status">
+            <i class="fas fa-lock me-2"></i>
+            {% if activities_locked_notice %}
+            Activities are locked. Complete both Python and Java modules: finish 2 lessons and pass all 5 graded assessments in each module.
+            {% else %}
+            Activities unlock after completing both Python and Java modules: 2 lessons and all 5 graded assessments in each.
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <section class="language-section" id="python-modules" aria-labelledby="python-modules-heading">
+            <div class="section-header">
+                <h2 id="python-modules-heading"><i class="fab fa-python python"></i> Python</h2>
+                <span class="badge-count">2 modules</span>
+                <div class="divider-line"></div>
+            </div>
+            <div class="grid">
+                <div class="card card--activity">
+                    <div class="lang-tag python"><i class="fab fa-python"></i></div>
+                    <h3>Python Module 1: Basics</h3>
+                    <p>Learn Python fundamentals, variables, and how to create your first program.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/python/1" class="card-link module-link" data-module-language="python" data-module-number="1"><i class="fas fa-arrow-right"></i> Open Python Module 1</a>
+                </div>
+                <div class="card card--activity">
+                    <div class="lang-tag python"><i class="fab fa-python"></i></div>
+                    <h3>Python Module 2: Loops</h3>
+                    <p>Learn to repeat code with <code>for</code>, <code>while</code>, and <code>range()</code>.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/python/2" class="card-link module-link" data-module-language="python" data-module-number="2"><i class="fas fa-arrow-right"></i> Open Python Module 2</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="language-section" id="java-modules" aria-labelledby="java-modules-heading">
+            <div class="section-header">
+                <h2 id="java-modules-heading"><i class="fab fa-java java"></i> Java</h2>
+                <span class="badge-count">2 modules</span>
+                <div class="divider-line"></div>
+            </div>
+            <div class="grid">
+                <div class="card card--activity">
+                    <div class="lang-tag java"><i class="fab fa-java"></i></div>
+                    <h3>Java Module 1: Basics</h3>
+                    <p>Build Java fundamentals and learn variables and output.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/java/1" class="card-link module-link" data-module-language="java" data-module-number="1"><i class="fas fa-arrow-right"></i> Open Java Module 1</a>
+                </div>
+                <div class="card card--activity">
+                    <div class="lang-tag java"><i class="fab fa-java"></i></div>
+                    <h3>Java Module 2: Loops</h3>
+                    <p>Learn to repeat code using <code>for</code> and <code>while</code> loops.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/java/2" class="card-link module-link" data-module-language="java" data-module-number="2"><i class="fas fa-arrow-right"></i> Open Java Module 2</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="language-section" id="php-modules" aria-labelledby="php-modules-heading">
+            <div class="section-header">
+                <h2 id="php-modules-heading"><span class="php-logo-mark" aria-hidden="true">php</span> PHP</h2>
+                <span class="badge-count">2 modules</span>
+                <div class="divider-line"></div>
+            </div>
+            <div class="grid">
+                <div class="card card--activity">
+                    <div class="lang-tag php"><span class="php-logo-mark" aria-hidden="true">php</span></div>
+                    <h3>PHP Module 1: Variables</h3>
+                    <p>Start with PHP fundamentals, variables, and output.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/php/1" class="card-link module-link" data-module-language="php" data-module-number="1"><i class="fas fa-arrow-right"></i> Open PHP Module 1</a>
+                </div>
+                <div class="card card--activity">
+                    <div class="lang-tag php"><span class="php-logo-mark" aria-hidden="true">php</span></div>
+                    <h3>PHP Module 2: Conditionals</h3>
+                    <p>Practice decision-making with <code>if</code>, <code>elseif</code>, and <code>else</code>.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/php/2" class="card-link module-link" data-module-language="php" data-module-number="2"><i class="fas fa-arrow-right"></i> Open PHP Module 2</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="language-section" id="javascript-modules" aria-labelledby="javascript-modules-heading">
+            <div class="section-header">
+                <h2 id="javascript-modules-heading"><iconify-icon icon="logos:javascript" class="javascript"></iconify-icon> JavaScript</h2>
+                <span class="badge-count">2 modules</span>
+                <div class="divider-line"></div>
+            </div>
+            <div class="grid">
+                <div class="card card--activity">
+                    <div class="lang-tag javascript"><iconify-icon icon="logos:javascript"></iconify-icon></div>
+                    <h3>JavaScript Module 1: Variables</h3>
+                    <p>Practice JavaScript values, variables, and expressions.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/javascript/1" class="card-link module-link" data-module-language="javascript" data-module-number="1"><i class="fas fa-arrow-right"></i> Open JavaScript Module 1</a>
+                </div>
+                <div class="card card--activity">
+                    <div class="lang-tag javascript"><iconify-icon icon="logos:javascript"></iconify-icon></div>
+                    <h3>JavaScript Module 2: Functions</h3>
+                    <p>Learn reusable functions, parameters, and return values.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/javascript/2" class="card-link module-link" data-module-language="javascript" data-module-number="2"><i class="fas fa-arrow-right"></i> Open JavaScript Module 2</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="language-section" id="cpp-modules" aria-labelledby="cpp-modules-heading">
+            <div class="section-header">
+                <h2 id="cpp-modules-heading"><iconify-icon icon="simple-icons:cplusplus" class="cpp"></iconify-icon> C++</h2>
+                <span class="badge-count">2 modules</span>
+                <div class="divider-line"></div>
+            </div>
+            <div class="grid">
+                <div class="card card--activity">
+                    <div class="lang-tag cpp"><iconify-icon icon="simple-icons:cplusplus"></iconify-icon></div>
+                    <h3>C++ Module 1: Basics</h3>
+                    <p>Learn C++ fundamentals, variables, and program output.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/cpp/1" class="card-link module-link" data-module-language="cpp" data-module-number="1"><i class="fas fa-arrow-right"></i> Open C++ Module 1</a>
+                </div>
+                <div class="card card--activity">
+                    <div class="lang-tag cpp"><iconify-icon icon="simple-icons:cplusplus"></iconify-icon></div>
+                    <h3>C++ Module 2: Loops</h3>
+                    <p>Practice repetition with <code>for</code>, <code>while</code>, and <code>do-while</code>.</p>
+                    <div class="meta"><i class="fas fa-book-open"></i> Learning module</div>
+                    <a href="/student_modules/cpp/2" class="card-link module-link" data-module-language="cpp" data-module-number="2"><i class="fas fa-arrow-right"></i> Open C++ Module 2</a>
+                </div>
+            </div>
+        </section>
+
+    <!-- Bootstrap JS (optional, for any interactive components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleTheme() {
+            var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+            if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+            else document.documentElement.removeAttribute('data-theme');
+            try { localStorage.setItem('blocklearn-theme', dark ? 'dark' : 'light'); } catch (e) {}
+        }
+        function setLibrarySidebarCollapsed(collapsed) {
+            var sidebar = document.querySelector('.student-sidebar');
+            sidebar.classList.toggle('collapsed', collapsed);
+            try { localStorage.setItem('blocklearn-sidebar', collapsed ? 'collapsed' : 'expanded'); } catch (e) {}
+        }
+        function collapseLibrarySidebar() { setLibrarySidebarCollapsed(true); }
+        function expandLibrarySidebar() { setLibrarySidebarCollapsed(false); }
+        function toggleActivitiesNav() {
+            var toggle = document.getElementById('activitiesToggle');
+            var submenu = document.getElementById('activitiesSubmenu');
+            var isOpen = submenu.classList.toggle('open');
+            toggle.classList.toggle('open', isOpen);
+            toggle.setAttribute('aria-expanded', String(isOpen));
+        }
+        document.addEventListener('DOMContentLoaded', async function () {
+            var moduleLinks = Array.from(document.querySelectorAll('.module-link'));
+            function setLocked(link, locked, number) {
+                if (!link.dataset.originalContent) link.dataset.originalContent = link.innerHTML;
+                link.classList.toggle('locked', locked);
+                if (locked) {
+                    link.setAttribute('aria-disabled', 'true');
+                    link.setAttribute('title', 'Pass Module ' + (number - 1) + ' first to unlock this module.');
+                    link.setAttribute('tabindex', '-1');
+                    link.innerHTML = '<i class="fas fa-lock"></i> Locked · Pass Module ' + (number - 1) + ' first';
+                } else {
+                    link.removeAttribute('aria-disabled');
+                    link.removeAttribute('title');
+                    link.removeAttribute('tabindex');
+                    link.innerHTML = link.dataset.originalContent;
+                }
+            }
+
+            moduleLinks.forEach(function (link) {
+                var number = Number(link.dataset.moduleNumber);
+                if (number > 1) setLocked(link, true, number);
+            });
+
+            try {
+                var response = await fetch('/get_module_statuses');
+                var data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Unable to load module statuses');
+                }
+                moduleLinks.forEach(function (link) {
+                    var language = link.dataset.moduleLanguage;
+                    var number = Number(link.dataset.moduleNumber);
+                    var languageStatuses = data.statuses[language] || [];
+                    var status = languageStatuses.find(function (item) { return item.number === number; });
+                    setLocked(link, number > 1 && (!status || status.locked), number);
+                });
+            } catch (error) {
+                console.error('Unable to load module statuses:', error);
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            var sections = Array.from(document.querySelectorAll('.language-section'));
+            var languageLinks = Array.from(document.querySelectorAll('.module-language-nav a'));
+            if (!('IntersectionObserver' in window)) return;
+
+            var linkBySection = new Map(
+                languageLinks.map(function (link) {
+                    return [document.querySelector(link.getAttribute('href')), link];
+                })
+            );
+            var observer = new IntersectionObserver(function (entries) {
+                var visibleSections = entries
+                    .filter(function (entry) { return entry.isIntersecting; })
+                    .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+                if (!visibleSections.length) return;
+                languageLinks.forEach(function (link) {
+                    link.classList.remove('active');
+                    link.removeAttribute('aria-current');
+                });
+                var activeLink = linkBySection.get(visibleSections[0].target);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    activeLink.setAttribute('aria-current', 'location');
+                }
+            }, {
+                rootMargin: '-18% 0px -65% 0px',
+                threshold: 0
+            });
+            sections.forEach(function (section) { observer.observe(section); });
+        });
+        try {
+            if (window.innerWidth <= 768 || localStorage.getItem('blocklearn-sidebar') === 'collapsed')
+                document.querySelector('.student-sidebar').classList.add('collapsed');
+        } catch (e) {}
+    </script>
+</body>
+</html>

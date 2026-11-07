@@ -1,0 +1,167 @@
+/* =====================================================================
+   BlockLearn mobile layout (phones <= 768px)
+   Shared by all student pages. Replaces the cramped icon-only sidebar with
+   a bottom tab bar + "More" menu, and tidies headers, cards and forms.
+   Desktop (> 768px) is not affected by anything in this file.
+   ===================================================================== */
+
+/* The bottom bar and sheet only exist on phones */
+.bl-bottom-nav, .bl-sheet, .bl-sheet-backdrop { display: none; }
+
+@media (max-width: 768px) {
+  :root {
+    --bl-nav-h: 64px;
+    --bl-green: var(--green-accent, #147a54);
+    --bl-green-deep: var(--btn-dark, #0d4534);
+    --bl-surface: var(--card-white, #ffffff);
+    --bl-text: var(--text-primary, #10382c);
+    --bl-muted: var(--text-secondary, #3f5f52);
+    --bl-border: var(--border-fresh, #d4e6dc);
+  }
+
+  html, body { max-width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  body.bl-has-nav { padding-bottom: calc(var(--bl-nav-h) + env(safe-area-inset-bottom, 0px)); }
+
+  /* ---- Old desktop sidebar is replaced by the bottom bar ---- */
+  body .sidebar,
+  body .sidebar-overlay,
+  body .sidebar-restore-btn { display: none !important; }
+  body .main-content,
+  body .main-content.shifted {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 12px 14px 20px !important;
+  }
+
+  /* ---- Header: one tidy row ---- */
+  body .top-bar {
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+  body .top-bar > div:first-child { min-width: 0; flex: 1 1 auto; }
+  body .page-title {
+    font-size: 1.05rem !important;
+    display: flex; align-items: center; gap: 8px;
+    min-width: 0; margin: 0;
+  }
+  body .page-title > :not(i):not(iconify-icon):not(svg) {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  body .top-bar-right {
+    flex: 0 0 auto; flex-wrap: nowrap !important;
+    margin-left: auto; gap: 6px !important;
+  }
+  body .profile-trigger-info, body .profile-trigger > i.fa-chevron-down { display: none !important; }
+  body .notif-dropdown, body .profile-dropdown {
+    width: min(92vw, 340px) !important;
+    right: 0 !important; left: auto !important;
+  }
+
+  /* ---- Cards and grids ---- */
+  body .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  body .stat-card { padding: 0.8rem 0.85rem !important; min-width: 0; }
+  body .stat-value { font-size: 1.35rem !important; }
+  body .stats-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+  body .greeting-banner { padding: 1.1rem 1.15rem !important; border-radius: 18px !important; }
+  body .dashboard-module-arrow { grid-column: 3; grid-row: 1; align-self: center; }
+
+  /* ---- Text, media and tables never push the page sideways ---- */
+  body .main-content :is(h1, h2, h3, h4, p, span, div, td, th, li, a, label) { overflow-wrap: break-word; }
+  body .main-content img, body .main-content video, body .main-content canvas { max-width: 100%; height: auto; }
+  .bl-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+
+  /* ---- Touch-friendly forms (16px stops iOS zooming on focus) ---- */
+  body input:not([type=checkbox]):not([type=radio]):not([type=range]),
+  body select, body textarea { font-size: 16px !important; }
+  body .main-content :is(button, .btn, [role=button]) { min-height: 40px; }
+
+  /* ---- Bottom tab bar ---- */
+  .bl-bottom-nav {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 2000;
+    height: calc(var(--bl-nav-h) + env(safe-area-inset-bottom, 0px));
+    padding: 6px 6px env(safe-area-inset-bottom, 0px);
+    background: var(--bl-surface);
+    border-top: 1px solid var(--bl-border);
+    box-shadow: 0 -6px 22px rgba(10, 40, 30, 0.10);
+  }
+  .bl-tab {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; min-width: 0; padding: 4px 2px;
+    border: 0; background: transparent; cursor: pointer;
+    color: var(--bl-muted); text-decoration: none;
+    font-family: inherit; font-size: 0.66rem; font-weight: 600; line-height: 1.1; letter-spacing: 0.01em;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bl-tab svg { width: 22px; height: 22px; display: block; }
+  .bl-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .bl-tab .bl-pill {
+    display: flex; align-items: center; justify-content: center;
+    width: 50px; height: 28px; border-radius: 14px; transition: background .2s, color .2s;
+  }
+  .bl-tab.active { color: var(--bl-green); }
+  .bl-tab.active .bl-pill { background: color-mix(in srgb, var(--bl-green) 16%, transparent); }
+  .bl-tab:active .bl-pill { background: color-mix(in srgb, var(--bl-green) 10%, transparent); }
+
+  /* ---- "More" sheet ---- */
+  .bl-sheet-backdrop {
+    display: block; position: fixed; inset: 0; z-index: 2100;
+    background: rgba(6, 30, 22, 0.45);
+    opacity: 0; pointer-events: none; transition: opacity .22s;
+  }
+  .bl-sheet {
+    display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 2200;
+    max-height: 86vh; overflow-y: auto;
+    background: var(--bl-surface); color: var(--bl-text);
+    border-radius: 22px 22px 0 0;
+    padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(105%); transition: transform .26s cubic-bezier(.4, 0, .2, 1);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  }
+  body.bl-sheet-open .bl-sheet { transform: translateY(0); }
+  body.bl-sheet-open .bl-sheet-backdrop { opacity: 1; pointer-events: auto; }
+  body.bl-sheet-open { overflow: hidden; }
+  .bl-sheet-grab { width: 42px; height: 5px; border-radius: 3px; background: var(--bl-border); margin: 2px auto 12px; }
+  .bl-sheet-user { display: flex; align-items: center; gap: 12px; padding: 4px 4px 14px; }
+  .bl-avatar {
+    width: 44px; height: 44px; border-radius: 14px; flex: 0 0 44px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bl-green-deep); color: #fff; font-weight: 800; font-size: 1.05rem;
+  }
+  .bl-sheet-user strong { display: block; font-size: 0.98rem; }
+  .bl-sheet-user small { color: var(--bl-muted); font-size: 0.78rem; }
+  .bl-sheet-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bl-sheet-link {
+    display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 12px;
+    border: 1px solid var(--bl-border); border-radius: 14px;
+    background: transparent; color: var(--bl-text); text-decoration: none; cursor: pointer;
+    font-family: inherit; font-size: 0.86rem; font-weight: 600; line-height: 1.2; text-align: left;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bl-sheet-link svg { width: 20px; height: 20px; flex: 0 0 20px; color: var(--bl-green); }
+  .bl-sheet-link.active { border-color: var(--bl-green); background: color-mix(in srgb, var(--bl-green) 10%, transparent); }
+  .bl-sheet-link.danger { grid-column: 1 / -1; justify-content: center; color: #c0392b; border-color: color-mix(in srgb, #c0392b 35%, transparent); }
+  .bl-sheet-link.danger svg { color: #c0392b; }
+
+  /* Toasts and floating buttons should sit above the bottom bar */
+  body .toast-container, body #toastContainer, body .toast { bottom: calc(var(--bl-nav-h) + 14px + env(safe-area-inset-bottom, 0px)) !important; }
+}
+
+@media (max-width: 400px) {
+  body .page-title { font-size: 0.95rem !important; }
+  body .page-title > i, body .page-title > iconify-icon { display: none !important; }
+}
+
+@media (max-width: 380px) {
+  .bl-sheet-list { grid-template-columns: 1fr; }
+  .bl-tab span { font-size: 0.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bl-sheet, .bl-sheet-backdrop, .bl-tab .bl-pill { transition: none; }
+}

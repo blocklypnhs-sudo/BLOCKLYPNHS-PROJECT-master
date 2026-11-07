@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About — BlockLearn</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; color: #1f2937; background: #f7faf8; }
+
+    .page-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #2e6f40;
+      color: white;
+      padding: 22px 24px;
+      border-bottom: 4px solid #1f4f2e;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .pup-logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      display: block;
+      margin: 0;
+    }
+    .pnhs-logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      display: block;
+      margin: 0;
+    }
+    .header-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 14px;
+    }
+    .header-content {
+      text-align: center;
+    }
+    .header p {
+      margin-top: 8px;
+      font-size: 0.98rem;
+      color: #d4e8d6;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 42px 0 56px;
+      flex: 1;
+    }
+
+    .about-hero,
+    .mv-section,
+    .team-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(46, 111, 64, 0.07);
+      border: 1px solid #e8edea;
+      padding: 44px 48px;
+      margin-bottom: 32px;
+    }
+
+    .about-hero h2 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #1f4f2e;
+      margin-bottom: 18px;
+      line-height: 1.05;
+    }
+    .about-hero p {
+      font-size: 1.05rem;
+      color: #414f45;
+      max-width: 760px;
+      line-height: 1.85;
+    }
+
+    .mv-section h3,
+    .team-section h3 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #1f4f2e;
+      margin-bottom: 14px;
+    }
+    .team-section {
+      text-align: center;
+    }
+    .team-sub {
+      color: #536356;
+      font-size: 1rem;
+      margin-bottom: 24px;
+      max-width: 740px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .mv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 26px;
+    }
+    .mv-item {
+      background: #f4f8f6;
+      padding: 28px 30px;
+      border-radius: 14px;
+      border-left: 5px solid #2e6f40;
+    }
+    .mv-item h4 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #2e6f40;
+      margin-bottom: 10px;
+    }
+    .mv-item p {
+      font-size: 0.98rem;
+      color: #3c4f46;
+      line-height: 1.8;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .team-card {
+      background: #fbfdf8;
+      border-radius: 16px;
+      padding: 26px 18px 22px;
+      text-align: center;
+      border: 1px solid #e8edea;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 30px rgba(46, 111, 64, 0.12);
+      border-color: #2e6f40;
+    }
+    .team-frame {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #eaf3ec, #f9fcf9);
+      border: 3px solid #2e6f40;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #2e6f40;
+      letter-spacing: 0.4px;
+    }
+    .team-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .team-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #233226;
+      margin-bottom: 6px;
+    }
+    .team-role {
+      font-size: 0.92rem;
+      color: #546257;
+      line-height: 1.5;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px 0 26px;
+      color: #6b7d73;
+      font-size: 0.92rem;
+      border-top: 1px solid #e3ebe3;
+    }
+    .footer span { color: #2e6f40; font-weight: 700; }
+
+    @media (max-width: 980px) {
+      .mv-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .header-logos { gap: 18px; margin-bottom: 12px; }
+      .pup-logo, .pnhs-logo { width: 72px; height: 72px; }
+      .about-hero,
+      .mv-section,
+      .team-section { padding: 32px 24px; }
+      .team-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="header">
+      <div class="header-logos">
+        <img class="pup-logo" src="/static/pup_logo.png" alt="PUP logo">
+        <img class="pnhs-logo" src="/static/pnhs-logo.png" alt="PNHS logo">
+      </div>
+      <div class="header-content">
+        <h1>About BlockLearn</h1>
+        <p>BlockLearn is a learner-first coding platform designed to make programming intuitive, engaging, and accessible through visual block-based activities.</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="mv-section">
+        <h3>Mission &amp; Vision</h3>
+        <div class="mv-grid">
+          <div class="mv-item">
+            <h4>Mission</h4>
+            <p>To empower students and educators with a safe, intuitive programming environment that builds logic, creativity, and real-world digital skills.</p>
+          </div>
+          <div class="mv-item">
+            <h4>Vision</h4>
+            <p>To become the go-to entry point for young learners who want to create code confidently — transforming classrooms into places where technology is made, not just consumed.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="team-section">
+        <h3>Meet the Team</h3>
+        <p class="team-sub">Four developers united by a shared passion for education, design, and reliable learning experiences.</p>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-frame">
+              <img src="/static/image_1.jpg" alt="Franceska Yumi F. Felonia">
+            </div>
+            <div class="team-name">Franceska Yumi F. Felonia</div>
+            <div class="team-role"></div>
+          </div>
+          <div class="team-card">
+            <div class="team-frame">
+              <img src="/static/image_2.jpg" alt="Nathaniel N. Geralao">
+            </div>
+            <div class="team-name">Nathaniel N. Generalao </div>
+            <div class="team-role"></div>
+          </div>
+          <div class="team-card">
+            <div class="team-frame">
+              <img src="/static/image_3.jpg" alt="Roxanne O. Magtabog">
+            </div>
+            <div class="team-name">Roxanne O. Magtabog</div>
+            <div class="team-role"></div>
+          </div>
+          <div class="team-card">
+            <div class="team-frame">
+              <img src="/static/image_4.jpg" alt="Caryll G. Ybañez">
+            </div>
+            <div class="team-name">Caryll G. Ybañez</div>
+            <div class="team-role"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      &copy; 2026 <span>BlockLearn</span> — Building the future of learning, one block at a time.
+    </footer>
+  </div>
+</body>
+</html>

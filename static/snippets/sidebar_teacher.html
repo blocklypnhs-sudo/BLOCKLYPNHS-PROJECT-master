@@ -1,0 +1,30 @@
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<button class="sidebar-restore-btn" id="sidebarRestoreBtn" onclick="toggleSidebar()" title="Show Sidebar">
+    <i class="fas fa-chevron-right"></i>
+</button>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar" style="padding: 4px 8px; font-size: 14px;">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div>
+                <h2 style="margin: 0;">Block<span>Learn</span></h2>
+                <p style="margin: 2px 0 0 0; font-size: 12px;">PNHS · ICT Studio</p>
+            </div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-item"><a href="/teacher_dashboard" class="nav-link-custom"><i class="fas fa-th-large"></i> Dashboard</a></div>
+        <div class="nav-item"><a href="/teacher_students" class="nav-link-custom"><i class="fas fa-users"></i> Students</a></div>
+        <div class="nav-item"><a href="/teacher_score_results" class="nav-link-custom"><i class="fas fa-star"></i> Student Scores</a></div>
+        <div class="nav-item"><a href="/teacher_reports_analytics" class="nav-link-custom"><i class="fas fa-file-alt"></i> Reports</a></div>
+        <div class="nav-item"><a href="/teacher_profile" class="nav-link-custom"><i class="fas fa-user"></i> Profile</a></div>
+        <div class="nav-item"><a href="/teacher_settings" class="nav-link-custom"><i class="fas fa-sliders-h"></i> Settings</a></div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+    </div>
+</aside>

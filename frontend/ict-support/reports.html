@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports · ICT Tech Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>(function(){ try { if (localStorage.getItem('bl-theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e){} })();</script>
+<style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    /* ===== SAME TOKENS AS TEACHER DASHBOARD ===== */
+    :root {
+        --green-deep:#0c3b2d; --green-main:#12604a; --green-bright:#1d8a5f; --green-soft:#e3f4ec;
+        --gold-warm:#e8b93c; --gold-light:#fbeecb; --coral:#e5604f; --coral-soft:#fce8e5;
+        --blue:#4a90d9; --blue-soft:#e4eefb;
+        --stone:#52705f; --stone-light:#6d8a7c;
+        --border-fresh:#e0ebe4; --card-white:#ffffff; --card-tint:#f7fbf9;
+        --row-bg:#ffffff; --row-border:#e3eee7;
+        --tile-bg:#e3f4ec; --tile-color:#147a54;
+        --bg-main:#eef6f1; --text-primary:#10382c; --text-secondary:#3f5f52;
+        --shadow-xs:0 2px 8px rgba(16,56,44,.05); --shadow-sm:0 4px 14px rgba(16,56,44,.06);
+        --shadow-md:0 8px 24px rgba(16,56,44,.10); --shadow-lg:0 14px 40px rgba(16,56,44,.14);
+        --sidebar-w:232px; --sidebar-collapsed-w:70px;
+        --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:22px;
+        --input-bg:#ffffff;
+        --grid-line:rgba(150,195,175,.26); --blob-opacity:.12;
+        --logo-accent:#b8e34e;
+        --sidebar-text:#a9d3c0; --sidebar-text-hover:#ffffff;
+        --sidebar-section:rgba(190,225,208,.45); --sidebar-hover-bg:rgba(255,255,255,.07);
+        --sidebar-icon-toggle:rgba(255,255,255,.08); --sidebar-icon-toggle-hover:rgba(255,255,255,.16);
+        --dropdown-bg:#ffffff; --dropdown-link-hover:var(--green-soft); --dropdown-link-hover-text:var(--green-deep);
+        --pd-sep:var(--border-fresh);
+        --chart-grid:#e8f0ec; --chart-tick:#a8bfb4;
+        --greeting-overlay:rgba(6,44,32,.35);
+        --search-bg:var(--card-white); --dropdown-z-index:99999;
+        --green-on-soft:#0d4d38; --gold-text:#9a7020; --green-accent:#147a54;
+        --toast-bg:#10382c; --btn-dark:#0d4534; --btn-dark-hover:#093626;
+        --row-hover:rgba(29,138,95,.05);
+    }
+    [data-theme="dark"] {
+        --bg-main:#0e1f18; --text-primary:#dcefe6; --text-secondary:#9fc0b1;
+        --border-fresh:#20402f; --card-white:#14291f; --card-tint:#11231a;
+        --row-bg:#182f24; --row-border:#244534;
+        --tile-bg:#1c3a2c; --tile-color:#4ade80;
+        --green-soft:#163328; --gold-light:#2e2510; --coral-soft:#2e1a16; --blue-soft:#152535;
+        --stone:#7fa895; --stone-light:#8fb8a8;
+        --shadow-xs:0 2px 8px rgba(0,0,0,.18); --shadow-sm:0 4px 14px rgba(0,0,0,.22);
+        --shadow-md:0 8px 24px rgba(0,0,0,.28); --shadow-lg:0 14px 40px rgba(0,0,0,.32);
+        --grid-line:rgba(45,85,65,.22); --blob-opacity:.10;
+        --dropdown-bg:#1a3329; --dropdown-link-hover:#163328; --dropdown-link-hover-text:#4ade80;
+        --pd-sep:#20402f; --chart-grid:#1e3a2e; --chart-tick:#5a7a6d;
+        --greeting-overlay:rgba(255,255,255,.06); --search-bg:#1a3329;
+        --green-on-soft:#4ade80; --gold-text:#e0b45c; --green-accent:#4ade80;
+        --toast-bg:#21493a; --btn-dark:#17754f; --btn-dark-hover:#12603f;
+        --row-hover:rgba(74,217,160,.05);
+    }
+
+    html { height:100%; }
+    body {
+        font-family:'Inter', system-ui, -apple-system, sans-serif;
+        background:var(--bg-main); line-height:1.5; color:var(--text-primary);
+        overflow-x:hidden; transition:background .4s, color .4s;
+    }
+    :focus-visible { outline:2px solid var(--green-accent); outline-offset:2px; }
+    ::-webkit-scrollbar { width:9px; }
+    ::-webkit-scrollbar-thumb { background:var(--border-fresh); border-radius:10px; border:2px solid var(--bg-main); }
+    ::-webkit-scrollbar-thumb:hover { background:var(--green-accent); }
+
+    /* ===== BACKGROUND ===== */
+    .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .bg-layer::before {
+        content:''; position:absolute; inset:0;
+        background-image:linear-gradient(var(--grid-line) 1px, transparent 1px),
+                         linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size:44px 44px; transition:background-image .4s;
+    }
+    .bg-blob { position:absolute; border-radius:50%; filter:blur(90px); opacity:var(--blob-opacity); animation:drift 22s ease-in-out infinite alternate; transition:opacity .4s; }
+    .bg-blob--1 { width:420px; height:420px; top:-12%; right:-6%; background:radial-gradient(circle, rgba(40,168,122,.4), transparent 70%); }
+    .bg-blob--2 { width:340px; height:340px; bottom:-10%; left:8%; background:radial-gradient(circle, rgba(232,185,60,.25), transparent 70%); animation-duration:28s; animation-delay:-6s; }
+    @keyframes drift { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(25px,-30px) scale(1.04)} 100%{transform:translate(-15px,15px) scale(.97)} }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+        width:var(--sidebar-w); height:100vh;
+        background:linear-gradient(178deg,#0a382a 0%,#0e4a37 55%,#0c4332 100%);
+        color:var(--sidebar-text); display:flex; flex-direction:column;
+        position:fixed; top:0; left:0;
+        overflow-y:auto; overflow-x:hidden;
+        border-right:1px solid rgba(255,255,255,.05);
+        box-shadow:5px 0 26px rgba(8,40,30,.22);
+        z-index:1000; transition:width .35s cubic-bezier(.4,0,.2,1);
+        scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.12) transparent;
+    }
+    .sidebar::-webkit-scrollbar { width:3px; }
+    .sidebar::-webkit-scrollbar-track { background:transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:10px; }
+
+    .sidebar-logo {
+        display:flex; align-items:center; justify-content:flex-start; gap:0;
+        border-bottom:1px solid rgba(255,255,255,.06);
+        padding:.4rem .15rem; transition:all .35s ease;
+        overflow:hidden; min-height:88px; flex-shrink:0; position:relative;
+    }
+    .logo-image { width:76px; height:76px; object-fit:contain; flex-shrink:0; margin:0; }
+    .logo-full { display:flex; flex-direction:column; align-items:flex-start; flex:1; min-width:0; margin-left:-8px; transition:opacity .2s ease; }
+    .logo-full h2 { font-size:1.3rem; font-weight:800; letter-spacing:-.5px; margin:0; white-space:nowrap; color:#fff; line-height:1.15; }
+    .logo-full h2 em { font-style:normal; color:var(--logo-accent); }
+    .logo-full p { font-size:.53rem; opacity:.55; margin:1px 0 0; white-space:nowrap; text-transform:uppercase; letter-spacing:1.4px; font-weight:600; color:#d6f0e4; }
+    .logo-mono { display:none; width:40px; min-width:40px; text-align:center; flex-shrink:0; align-items:center; justify-content:center; }
+    .logo-mono img { display:block; width:40px; height:40px; object-fit:contain; margin:0 auto; }
+    .logo-mono span { font-size:1.1rem; font-weight:900; letter-spacing:-.5px; color:#fff; }
+    .logo-mono span em { font-style:normal; color:var(--logo-accent); }
+
+    .toggle-btn {
+        background:var(--sidebar-icon-toggle); border:1px solid rgba(255,255,255,.06);
+        color:#d8efe5; font-size:.82rem; width:32px; height:32px;
+        border-radius:9px; cursor:pointer; transition:all .3s ease;
+        display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        position:absolute; top:50%; right:8px; transform:translateY(-65%);
+    }
+    .toggle-btn:hover { background:var(--sidebar-icon-toggle-hover); transform:translateY(-65%) rotate(90deg); }
+    .toggle-btn iconify-icon { font-size:15px; }
+
+    .hamburger-wrap { display:none; padding:.35rem 0 .15rem; justify-content:center; flex-shrink:0; }
+    .hamburger-btn {
+        background:var(--sidebar-icon-toggle); border:1px solid rgba(255,255,255,.06);
+        color:#d8efe5; font-size:.82rem; width:34px; height:34px;
+        border-radius:9px; cursor:pointer; transition:all .3s ease;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .hamburger-btn:hover { background:var(--sidebar-icon-toggle-hover); }
+    .hamburger-btn iconify-icon { font-size:15px; }
+
+    .sidebar.collapsed { width:var(--sidebar-collapsed-w); }
+    .sidebar.collapsed .sidebar-logo { justify-content:center; padding:.75rem .4rem; }
+    .sidebar.collapsed .logo-image { display:none; }
+    .sidebar.collapsed .logo-full { display:none; }
+    .sidebar.collapsed .logo-mono { display:flex; }
+    .sidebar.collapsed .toggle-btn { display:none; }
+    .sidebar.collapsed .hamburger-wrap { display:flex; }
+    .sidebar.collapsed .nav-link-custom { justify-content:center; padding:.55rem 0; margin:0 .4rem; width:calc(100% - .8rem); }
+    .sidebar.collapsed .nav-link-custom iconify-icon { font-size:1.05rem; }
+    .sidebar.collapsed .nav-text { display:none !important; }
+    .sidebar.collapsed .nav-section-label { height:0; padding:0; margin:0; opacity:0; overflow:hidden; }
+
+    .sidebar:not(.collapsed) .sidebar-logo { justify-content:center; }
+    .sidebar:not(.collapsed) .logo-image { display:block; }
+    .sidebar:not(.collapsed) .logo-full { display:flex; }
+    .sidebar:not(.collapsed) .logo-mono { display:none; }
+    .sidebar:not(.collapsed) .toggle-btn { display:flex; }
+    .sidebar:not(.collapsed) .hamburger-wrap { display:none; }
+    .sidebar:not(.collapsed) .nav-link-custom { justify-content:flex-start; padding:.5rem .85rem; margin:0 .5rem; width:calc(100% - 1rem); }
+    .sidebar:not(.collapsed) .nav-section-label { height:auto; padding:.9rem 1.15rem .3rem; opacity:1; }
+
+    .nav-section-label {
+        font-size:.56rem; text-transform:uppercase; letter-spacing:1.4px;
+        font-weight:700; color:var(--sidebar-section);
+        white-space:nowrap; transition:all .3s ease;
+    }
+    .sidebar-nav { flex:1; padding:.3rem 0 .4rem; min-height:0; }
+    .nav-item { position:relative; margin-bottom:3px; }
+    .nav-link-custom {
+        display:flex; align-items:center; gap:11px;
+        color:var(--sidebar-text); text-decoration:none;
+        border-radius:999px; transition:all .25s ease;
+        font-size:.82rem; font-weight:600; position:relative;
+        white-space:nowrap;
+    }
+    .nav-link-custom iconify-icon { width:20px; flex-shrink:0; font-size:1rem; transition:transform .25s, color .25s; }
+    .nav-link-custom:hover { background:var(--sidebar-hover-bg); color:var(--sidebar-text-hover); }
+    .nav-link-custom:hover iconify-icon { transform:scale(1.08); }
+    .nav-link-custom.active {
+        background:#ffffff; color:#0e4534; font-weight:700;
+        box-shadow:0 4px 14px rgba(0,0,0,.20); border-radius:999px;
+    }
+    .nav-link-custom.active iconify-icon { color:var(--green-accent); }
+    [data-theme="dark"] .nav-link-custom.active { color:var(--green-accent); }
+
+    /* ===== MAIN ===== */
+    .main-content {
+        margin-left:var(--sidebar-w);
+        padding:20px 28px 28px;
+        transition:margin-left .35s cubic-bezier(.4,0,.2,1);
+        min-height:100vh; min-width:0; max-width:100%;
+        position:relative; z-index:1;
+    }
+    .main-content.shifted { margin-left:var(--sidebar-collapsed-w); }
+
+    /* ===== TOP BAR ===== */
+    .top-bar {
+        background:transparent; border:none; box-shadow:none; backdrop-filter:none;
+        padding:.1rem .1rem; margin-bottom:1.1rem;
+        display:flex; justify-content:space-between; align-items:center; gap:12px;
+        position:relative; z-index:100;
+    }
+    .page-title {
+        font-size:1.18rem; font-weight:800; color:var(--text-primary);
+        letter-spacing:-.4px; margin:0; transition:color .4s ease;
+        display:flex; align-items:center; gap:10px;
+    }
+    .page-title iconify-icon {
+        width:36px; height:36px; border-radius:11px; flex-shrink:0;
+        background:var(--tile-bg); color:var(--tile-color);
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:.95rem;
+    }
+    .top-bar-right { display:flex; align-items:center; gap:8px; position:relative; z-index:200; }
+
+    .icon-btn {
+        width:38px; height:38px; border-radius:11px; border:none;
+        background:transparent; display:flex; align-items:center; justify-content:center;
+        color:var(--text-secondary); font-size:.95rem; cursor:pointer;
+        transition:all .3s ease; flex-shrink:0; position:relative;
+    }
+    .icon-btn iconify-icon { font-size:1rem; }
+    .icon-btn:hover { background:var(--card-white); color:var(--green-accent); box-shadow:var(--shadow-xs); }
+    .icon-btn.spinning iconify-icon { animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .theme-btn .icon-sun { display:none; }
+    .theme-btn .icon-moon { display:flex; }
+    [data-theme="dark"] .theme-btn .icon-sun { display:flex; }
+    [data-theme="dark"] .theme-btn .icon-moon { display:none; }
+
+    /* ===== USER PILL + DROPDOWN ===== */
+    .user-menu-wrap { position:relative; z-index:300; }
+    .user-pill {
+        display:flex; align-items:center; gap:9px;
+        background:var(--card-white); border:1px solid var(--border-fresh);
+        border-radius:999px; padding:4px 12px 4px 5px; cursor:pointer;
+        font:inherit; color:inherit; transition:all .25s;
+        box-shadow:var(--shadow-xs); flex-shrink:0;
+    }
+    .user-pill:hover { border-color:var(--green-accent); box-shadow:var(--shadow-sm); }
+    .user-menu-wrap.open .user-pill { border-color:var(--green-accent); box-shadow:0 0 0 3px rgba(29,138,95,.12); }
+    .up-avatar {
+        width:31px; height:31px; border-radius:50%; flex-shrink:0;
+        background:linear-gradient(135deg, var(--green-bright), var(--green-deep));
+        color:#fff; display:flex; align-items:center; justify-content:center;
+        font-size:.72rem; font-weight:700;
+    }
+    .up-avatar iconify-icon { font-size:18px; }
+    .up-info { display:flex; flex-direction:column; align-items:flex-start; line-height:1.25; }
+    .up-info strong { font-size:.75rem; font-weight:700; color:var(--text-primary); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:color .4s; }
+    .up-info small { font-size:.62rem; color:var(--text-secondary); font-weight:600; }
+    .user-pill .chev { font-size:14px; color:var(--stone-light); transition:transform .25s; }
+    .user-menu-wrap.open .user-pill .chev { transform:rotate(180deg); }
+
+    .user-dropdown {
+        position:absolute; top:calc(100% + 10px); right:0; width:240px;
+        background:var(--dropdown-bg); border:1px solid var(--border-fresh);
+        border-radius:var(--radius-md); box-shadow:0 20px 50px rgba(9,42,32,.20);
+        overflow:hidden; opacity:0; transform:translateY(-8px) scale(.97);
+        transform-origin:top right; pointer-events:none;
+        transition:all .25s cubic-bezier(.4,0,.2,1); z-index:var(--dropdown-z-index);
+    }
+    .user-menu-wrap.open .user-dropdown { opacity:1; transform:none; pointer-events:auto; }
+
+    .ud-head {
+        display:flex; align-items:center; gap:10px;
+        padding:.8rem .95rem; border-bottom:1px solid var(--pd-sep);
+    }
+    .ud-head .up-avatar { width:34px; height:34px; }
+    .ud-head strong { display:block; font-size:.78rem; font-weight:700; color:var(--text-primary); }
+    .ud-head small { font-size:.64rem; color:var(--stone-light); font-weight:600; }
+
+    .ud-body { padding:.25rem 0; }
+    .ud-item {
+        display:flex; align-items:center; gap:10px;
+        padding:.5rem .95rem; color:var(--text-secondary); text-decoration:none;
+        font-size:.75rem; font-weight:500; transition:all .2s;
+    }
+    .ud-item iconify-icon { font-size:.9rem; color:var(--stone); transition:color .2s; width:17px; text-align:center; }
+    .ud-item:hover { background:var(--dropdown-link-hover); color:var(--dropdown-link-hover-text); }
+    .ud-item:hover iconify-icon { color:var(--green-accent); }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+        display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+        gap:12px; margin-bottom:1.4rem;
+    }
+    .stat-card {
+        background:var(--card-white); border-radius:var(--radius-xl);
+        padding:1.05rem 1.2rem;
+        transition:all .35s cubic-bezier(.4,0,.2,1), background .4s ease, border-color .4s ease;
+        border:1px solid var(--border-fresh); box-shadow:var(--shadow-sm);
+        position:relative; overflow:hidden;
+    }
+    .stat-card::before {
+        content:''; position:absolute; top:0; left:0; right:0; height:2.5px;
+        border-radius:3px 3px 0 0; opacity:0; transition:opacity .3s;
+    }
+    .sc-neutral::before { background:linear-gradient(90deg, var(--stone), var(--stone-light)); }
+    .sc-gold::before    { background:linear-gradient(90deg, var(--gold-warm), #f0c060); }
+    .sc-blue::before    { background:linear-gradient(90deg, var(--blue), #6ba8e8); }
+    .sc-green::before   { background:linear-gradient(90deg, var(--green-bright), var(--green-main)); }
+    .stat-card:hover { transform:translateY(-2px); border-color:var(--green-accent); box-shadow:var(--shadow-md); }
+    .stat-card:hover::before { opacity:1; }
+    .stat-header {
+        display:flex; justify-content:space-between; align-items:center;
+        margin-bottom:.55rem;
+    }
+    .stat-header span {
+        font-size:.58rem; text-transform:uppercase; font-weight:700;
+        letter-spacing:1px; color:var(--stone); transition:color .4s ease;
+    }
+    .stat-icon {
+        width:40px; height:40px; border-radius:12px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.95rem; transition:transform .35s;
+    }
+    .stat-icon iconify-icon { font-size:.95rem; }
+    .sc-neutral .stat-icon { background:var(--card-tint); color:var(--stone); border:1px solid var(--border-fresh); }
+    .sc-gold .stat-icon  { background:var(--gold-light); color:var(--gold-text); }
+    .sc-blue .stat-icon  { background:var(--blue-soft); color:var(--blue); }
+    .sc-green .stat-icon { background:var(--tile-bg); color:var(--tile-color); }
+    .stat-card:hover .stat-icon { transform:scale(1.08) rotate(-3deg); }
+    .stat-value {
+        font-size:1.8rem; font-weight:900; color:var(--text-primary);
+        margin-bottom:2px; letter-spacing:-1px; line-height:1.1;
+        transition:color .4s ease; font-variant-numeric:tabular-nums;
+    }
+    .stat-label { color:var(--stone-light); font-size:.66rem; font-weight:500; transition:color .4s ease; }
+
+    /* ===== DASH CARD ===== */
+    .dash-card {
+        background:var(--card-white);
+        border:1px solid var(--border-fresh); border-radius:var(--radius-xl);
+        box-shadow:var(--shadow-sm); padding:1.1rem 1.2rem;
+        width:100%; transition:background .4s ease, border-color .4s ease;
+    }
+    .dash-card-head {
+        display:flex; align-items:center; justify-content:space-between;
+        gap:1rem; margin-bottom:.9rem; flex-wrap:wrap;
+    }
+    .dash-card-head h3 {
+        color:var(--text-primary); font-size:.92rem; font-weight:800; margin:0;
+        display:flex; align-items:center; gap:11px;
+    }
+    .dash-card-head h3 iconify-icon {
+        width:34px; height:34px; border-radius:10px; flex-shrink:0;
+        background:var(--tile-bg); color:var(--tile-color);
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:.85rem;
+    }
+    .dash-card-head h3 iconify-icon.gold { background:var(--gold-light); color:var(--gold-text); }
+    .dash-card-head h3 iconify-icon.blue { background:var(--blue-soft); color:var(--blue); }
+    .dash-card-head h3 iconify-icon.coral { background:var(--coral-soft); color:var(--coral); }
+    .dash-card-head .sub { font-size:.66rem; color:var(--stone-light); margin-top:2px; }
+
+    /* ===== REPORT CARDS ===== */
+    .report-grid { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; margin-top:.4rem; }
+    .report-card {
+        display:flex; align-items:center; gap:.75rem;
+        background:var(--card-tint); border:1px solid var(--border-fresh);
+        border-radius:12px; padding:.7rem .85rem; cursor:pointer;
+        text-align:left; font:inherit; color:inherit; width:100%;
+        transition:all .25s;
+    }
+    .report-card:hover { border-color:var(--green-accent); background:var(--card-white); transform:translateX(3px); }
+    .report-card:active { transform:translateX(2px) scale(.99); }
+    .rc-icon {
+        width:36px; height:36px; border-radius:10px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        transition:transform .35s;
+    }
+    .rc-icon iconify-icon { font-size:1rem; }
+    .rc-green .rc-icon { background:var(--tile-bg); color:var(--tile-color); }
+    .rc-blue  .rc-icon { background:var(--blue-soft); color:var(--blue); }
+    .rc-coral .rc-icon { background:var(--coral-soft); color:var(--coral); }
+    .report-card:hover .rc-icon { transform:scale(1.08) rotate(-4deg); }
+    .rc-info { flex:1; min-width:0; }
+    .rc-info p { font-size:.78rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:7px; margin:0; }
+    .rc-info span { font-size:.64rem; color:var(--stone-light); display:block; margin-top:1px; }
+    .rc-badge {
+        font-size:.52rem; font-weight:800; letter-spacing:.5px;
+        padding:2px 7px; border-radius:6px; flex-shrink:0;
+        background:var(--card-tint); color:var(--stone); border:1px solid var(--border-fresh);
+    }
+    .rc-arrow {
+        color:var(--green-accent); font-size:.75rem; flex-shrink:0;
+        opacity:.5; transition:opacity .2s, transform .2s;
+    }
+    .report-card:hover .rc-arrow { opacity:1; transform:translateX(2px); }
+
+    .panel-note {
+        display:flex; align-items:flex-start; gap:8px;
+        font-size:.66rem; color:var(--stone-light);
+        background:var(--card-tint); border:1px solid var(--border-fresh);
+        border-radius:12px; padding:.6rem .8rem; margin-top:1rem;
+    }
+    .panel-note iconify-icon { font-size:13px; color:var(--gold-warm); flex-shrink:0; margin-top:2px; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+        display:none; position:fixed; inset:0; z-index:5000;
+        background:rgba(10,26,20,.6); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
+        align-items:center; justify-content:center; padding:20px;
+    }
+    .modal-overlay.active { display:flex; animation:fadeIn .25s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .modal-content {
+        background:var(--card-white); border:1px solid var(--border-fresh);
+        border-radius:var(--radius-xl); max-width:860px; width:100%;
+        max-height:calc(100vh - 40px); display:flex; flex-direction:column;
+        box-shadow:0 24px 64px rgba(0,0,0,.4);
+        animation:dlgIn .3s cubic-bezier(.4,0,.2,1);
+        transition:background .4s, border-color .4s;
+    }
+    @keyframes dlgIn { from { opacity:0; transform:translateY(16px) scale(.97); } to { opacity:1; transform:none; } }
+    .modal-head {
+        display:flex; justify-content:space-between; align-items:center; gap:14px;
+        padding:1rem 1.3rem; border-bottom:1px solid var(--border-fresh);
+        flex-shrink:0;
+    }
+    .modal-head .mh-left { display:flex; flex-direction:column; min-width:0; }
+    .modal-head .mh-kicker {
+        font-size:.56rem; text-transform:uppercase; letter-spacing:1.2px; font-weight:700;
+        color:var(--gold-warm); display:flex; align-items:center; gap:6px;
+    }
+    .modal-head .mh-kicker iconify-icon { font-size:12px; }
+    .modal-head h3 { font-size:1rem; font-weight:800; letter-spacing:-.3px; margin-top:.1rem; color:var(--text-primary); }
+    .dlg-close {
+        width:34px; height:34px; border-radius:11px;
+        border:1px solid var(--border-fresh);
+        background:var(--card-white); color:var(--stone); cursor:pointer; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center; transition:all .2s;
+    }
+    .dlg-close:hover { border-color:var(--coral); color:var(--coral); }
+    .dlg-close iconify-icon { font-size:16px; }
+
+    .modal-scroll { overflow-y:auto; padding:1.2rem; flex:1; }
+    .modal-scroll::-webkit-scrollbar { width:6px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:var(--border-fresh); border-radius:10px; }
+
+    /* "Paper" — always light for exact PDF output */
+    .paper {
+        background:#fff; border-radius:14px; padding:26px 28px;
+        box-shadow:0 4px 20px rgba(0,0,0,.12);
+        max-width:760px; margin:0 auto;
+    }
+
+    .modal-foot {
+        display:flex; justify-content:flex-end; gap:9px; flex-shrink:0;
+        padding:.9rem 1.3rem; border-top:1px solid var(--border-fresh);
+    }
+    .btn-ghost, .btn-pdf {
+        border-radius:40px; padding:.55rem 1.1rem; font:inherit;
+        font-size:.74rem; font-weight:700; cursor:pointer;
+        display:inline-flex; align-items:center; gap:8px; transition:all .25s;
+    }
+    .btn-ghost { border:1px solid var(--border-fresh); background:var(--card-white); color:var(--stone); }
+    .btn-ghost:hover { border-color:var(--green-accent); color:var(--green-accent); }
+    .btn-pdf {
+        border:0; background:var(--btn-dark); color:#fff;
+        box-shadow:0 6px 20px rgba(13,69,52,.22);
+    }
+    .btn-pdf:hover { background:var(--btn-dark-hover); transform:translateY(-1px); }
+    .btn-pdf:active { transform:translateY(0) scale(.97); }
+    .btn-pdf:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .btn-pdf .spinner {
+        display:none; width:14px; height:14px; border:2px solid rgba(255,255,255,.35);
+        border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite;
+    }
+    .btn-pdf.loading .spinner { display:block; }
+    .btn-pdf.loading .btn-icon, .btn-pdf.loading .btn-label { display:none; }
+
+    /* Modal loading / error states */
+    .modal-state { padding:3rem 1rem; text-align:center; }
+    .modal-state .big-spinner {
+        width:34px; height:34px; margin:0 auto 1rem;
+        border:3px solid var(--border-fresh); border-top-color:var(--green-accent);
+        border-radius:50%; animation:spin .7s linear infinite;
+    }
+    .modal-state iconify-icon { font-size:2.2rem; color:var(--border-fresh); margin-bottom:.6rem; display:block; }
+    .modal-state p { font-size:.8rem; color:var(--stone-light); }
+    .retry-btn {
+        margin-top:1rem; border:1px solid var(--border-fresh); background:var(--card-white);
+        color:var(--green-accent); border-radius:40px; padding:.5rem 1rem;
+        font:inherit; font-size:.74rem; font-weight:700; cursor:pointer;
+        display:inline-flex; align-items:center; gap:7px; transition:all .2s;
+    }
+    .retry-btn:hover { border-color:var(--green-accent); background:var(--green-soft); color:var(--green-on-soft); }
+
+    /* ===== PDF CONTENT — hard-coded light colors for html2canvas ===== */
+    .pdf-content { font-family:'Inter', Arial, sans-serif; color:#10382c; background:#fff; }
+    .pdf-content .pdf-header {
+        display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+        border-bottom:3px solid #12604a; padding-bottom:14px; margin-bottom:18px;
+    }
+    .pdf-content .pdf-header h2 { font-size:21px; font-weight:800; color:#12604a; letter-spacing:-.5px; }
+    .pdf-content .pdf-header .sub { color:#6d8a7c; font-size:12px; margin-top:2px; }
+    .pdf-content .pdf-brand {
+        display:flex; align-items:center; gap:8px; flex-shrink:0;
+        background:#e3f4ec; border-radius:10px; padding:8px 12px;
+    }
+    .pdf-content .pdf-brand span { font-size:11px; font-weight:800; color:#12604a; letter-spacing:.5px; }
+    .pdf-content .stats-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:20px; }
+    .pdf-content .stat-box {
+        background:#f7fbf9; border-radius:10px; padding:12px 10px;
+        text-align:center; border:1px solid #e0ebe4;
+    }
+    .pdf-content .stat-box .number { font-size:24px; font-weight:800; color:#12604a; font-variant-numeric:tabular-nums; }
+    .pdf-content .stat-box .label {
+        font-size:10px; color:#6d8a7c; font-weight:700;
+        text-transform:uppercase; letter-spacing:.5px; margin-top:2px;
+    }
+    .pdf-content .table-title {
+        font-weight:800; font-size:13px; margin-bottom:8px; color:#12604a;
+        display:flex; align-items:center; gap:7px;
+    }
+    .pdf-content table { width:100%; border-collapse:collapse; font-size:11.5px; }
+    .pdf-content table th {
+        background:#12604a; color:#fff; padding:9px 12px; text-align:left; font-weight:600;
+    }
+    .pdf-content table th:first-child { border-radius:8px 0 0 0; }
+    .pdf-content table th:last-child { border-radius:0 8px 0 0; }
+    .pdf-content table td { padding:8px 12px; border-bottom:1px solid #e0ebe4; color:#3f5f52; }
+    .pdf-content table tr:nth-child(even) td { background:#f7fbf9; }
+    .pdf-content .no-data { text-align:center; padding:24px; color:#a8bfb4; font-size:12px; }
+    .pdf-content .pdf-footer {
+        margin-top:22px; padding-top:14px; border-top:1px solid #e0ebe4;
+        font-size:10.5px; color:#a8bfb4; text-align:center; line-height:1.6;
+    }
+
+    /* ===== Toast ===== */
+    .toast-box { position:fixed; bottom:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; }
+    .toast-msg {
+        background:var(--toast-bg); color:#fff; padding:9px 15px; border-radius:11px;
+        font-size:.75rem; font-weight:500; box-shadow:0 8px 28px rgba(0,0,0,.2);
+        display:flex; align-items:center; gap:8px; position:relative; overflow:hidden;
+        animation:tIn .4s cubic-bezier(.4,0,.2,1); transition:all .3s; max-width:360px;
+    }
+    .toast-msg iconify-icon { font-size:15px; color:var(--gold-warm); flex-shrink:0; }
+    .toast-msg.error iconify-icon { color:var(--coral); }
+    .toast-msg.out { opacity:0; transform:translateX(40px); }
+    @keyframes tIn { from { opacity:0; transform:translateX(40px) scale(.95); } to { opacity:1; transform:none; } }
+
+    footer {
+        margin-top:2rem; text-align:center; font-size:.66rem;
+        color:var(--stone-light); border-top:1px solid var(--border-fresh); padding-top:1.4rem;
+    }
+
+    .nav-tip {
+        position:fixed; z-index:99999; pointer-events:none;
+        background:var(--toast-bg); color:#eafff5; padding:5px 12px; border-radius:9px;
+        font-size:.68rem; font-weight:600; white-space:nowrap;
+        transform:translateY(-50%) translateX(-6px); opacity:0; transition:all .18s;
+        box-shadow:0 8px 24px rgba(0,0,0,.3);
+    }
+    .nav-tip.show { opacity:1; transform:translateY(-50%) translateX(0); }
+
+    .fu { opacity:0; transform:translateY(12px); animation:fuA .45s cubic-bezier(.4,0,.2,1) forwards; }
+    @keyframes fuA { to { opacity:1; transform:translateY(0); } }
+    .e1{animation-delay:.04s} .e2{animation-delay:.08s} .e3{animation-delay:.12s}
+
+    @media (max-width:860px) { .report-grid { grid-template-columns:1fr; } }
+    @media (max-width:768px) {
+        .sidebar { width:var(--sidebar-collapsed-w); }
+        .sidebar .logo-full, .sidebar .toggle-btn { display:none !important; }
+        .sidebar .hamburger-wrap { display:flex !important; }
+        .sidebar .sidebar-logo { justify-content:center; padding:.75rem .4rem; }
+        .sidebar .nav-link-custom { justify-content:center; padding:.55rem 0; margin:0 .3rem; width:calc(100% - .6rem); }
+        .sidebar .nav-link-custom iconify-icon { font-size:1.05rem; }
+        .sidebar .nav-text { display:none !important; }
+        .sidebar .nav-section-label { height:0; padding:0; margin:0; opacity:0; overflow:hidden; }
+        .main-content, .main-content.shifted { margin-left:var(--sidebar-collapsed-w); padding:14px; }
+        .page-title { font-size:1.02rem; }
+        .page-title iconify-icon { width:32px; height:32px; }
+        .pdf-content .stats-grid { grid-template-columns:repeat(2, 1fr); }
+        .paper { padding:18px 16px; }
+        .toast-box { left:12px; right:12px; bottom:12px; }
+    }
+    @media (max-width:520px) {
+        .up-info { display:none; }
+        .user-pill { padding:4px 9px 4px 4px; }
+        .user-pill .chev { display:none; }
+        .stats-grid { grid-template-columns:1fr 1fr; gap:8px; }
+        .stat-card { padding:.85rem .95rem; }
+        .stat-value { font-size:1.4rem; }
+        .stat-icon { width:34px; height:34px; font-size:.85rem; }
+        .top-bar { flex-wrap:wrap; gap:8px; }
+        .top-bar-right { margin-left:auto; flex-wrap:wrap; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+        *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    }
+</style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true">
+    <div class="bg-blob bg-blob--1"></div>
+    <div class="bg-blob bg-blob--2"></div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="logo-image">
+        <div class="logo-full">
+            <h2>Block<em>Learn</em></h2>
+            <p>PNHS · ICT Studio</p>
+        </div>
+        <div class="logo-mono"><img src="/static/BL-LOGO.png" alt="BlockLearn Logo"></div>
+        <button class="toggle-btn" id="toggleSidebar" title="Collapse sidebar" aria-label="Collapse sidebar">
+            <iconify-icon icon="lucide:panel-left-close"></iconify-icon>
+        </button>
+    </div>
+    <div class="hamburger-wrap">
+        <button class="hamburger-btn" id="hamburgerBtn" title="Expand sidebar" aria-label="Expand sidebar">
+            <iconify-icon icon="lucide:panel-left-open"></iconify-icon>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <p class="nav-section-label">Main</p>
+        <div class="nav-item"><a href="/ict_support_dashboard" class="nav-link-custom" data-tip="Dashboard">
+            <iconify-icon icon="lucide:layout-dashboard"></iconify-icon><span class="nav-text">Dashboard</span>
+        </a></div>
+
+        <p class="nav-section-label">Operations</p>
+        <div class="nav-item"><a href="/ict_support_tickets" class="nav-link-custom" data-tip="Tickets">
+            <iconify-icon icon="lucide:ticket"></iconify-icon><span class="nav-text">Tickets</span>
+        </a></div>
+        <div class="nav-item"><a href="/ict_support_students" class="nav-link-custom" data-tip="Users">
+            <iconify-icon icon="lucide:users"></iconify-icon><span class="nav-text">Users</span>
+        </a></div>
+
+        <p class="nav-section-label">Insights</p>
+        <div class="nav-item"><a href="/ict_support_reports" class="nav-link-custom active" data-tip="Reports">
+            <iconify-icon icon="lucide:file-text"></iconify-icon><span class="nav-text">Reports</span>
+        </a></div>
+        <div class="nav-item"><a href="/ict_feedback_analytics" class="nav-link-custom" data-tip="Feedback Analytics">
+            <iconify-icon icon="lucide:message-square-more"></iconify-icon><span class="nav-text">Feedback Analytics</span>
+        </a></div>
+
+        <p class="nav-section-label">System</p>
+        <div class="nav-item"><a href="/ict_support_audit_logs" class="nav-link-custom" data-tip="Audit Logs">
+            <iconify-icon icon="lucide:scroll-text"></iconify-icon><span class="nav-text">Audit Logs</span>
+        </a></div>
+        <div class="nav-item"><a href="/ict_support_settings" class="nav-link-custom" data-tip="Settings">
+            <iconify-icon icon="lucide:settings"></iconify-icon><span class="nav-text">Settings</span>
+        </a></div>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main-content" id="mainContent">
+
+    <div class="top-bar fu e1">
+        <h2 class="page-title"><iconify-icon icon="lucide:file-text"></iconify-icon>Reports &amp; Analytics</h2>
+        <div class="top-bar-right">
+            <button class="icon-btn" id="statsRefreshBtn" onclick="loadQuickStats()" title="Refresh stats" aria-label="Refresh stats">
+                <iconify-icon icon="lucide:rotate-cw"></iconify-icon>
+            </button>
+            <button class="icon-btn theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+                <iconify-icon icon="lucide:moon" class="icon-moon"></iconify-icon>
+                <iconify-icon icon="lucide:sun" class="icon-sun"></iconify-icon>
+            </button>
+
+            <div class="user-menu-wrap" id="userMenuWrap">
+                <button class="user-pill" id="userPill" aria-haspopup="true" aria-expanded="false">
+                    <span class="up-avatar">{{ (full_name or username or 'T')[:1]|upper }}</span>
+                    <span class="up-info">
+                        <strong>{{ full_name or username or 'ICT-Tech' }}</strong>
+                        <small>Tech Support</small>
+                    </span>
+                    <iconify-icon icon="lucide:chevron-down" class="chev"></iconify-icon>
+                </button>
+
+                <div class="user-dropdown" role="menu">
+                    <div class="ud-head">
+                        <span class="up-avatar">{{ (full_name or username or 'T')[:1]|upper }}</span>
+                        <div>
+                            <strong>{{ full_name or username or 'ICT-Tech' }}</strong>
+                            <small>Tech Support</small>
+                        </div>
+                    </div>
+                    <div class="ud-body">
+                        <a href="#" class="ud-item" role="menuitem">
+                            <iconify-icon icon="lucide:user-round"></iconify-icon>My Profile
+                        </a>
+                        <a href="/ict_support_settings" class="ud-item" role="menuitem">
+                            <iconify-icon icon="lucide:sliders-horizontal"></iconify-icon>Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="stats-grid fu e2">
+        <div class="stat-card sc-neutral">
+            <div class="stat-header">
+                <span>Total Tickets</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:ticket"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="statTotal">—</p>
+            <p class="stat-label">All time</p>
+        </div>
+        <div class="stat-card sc-gold">
+            <div class="stat-header">
+                <span>Open Tickets</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:hourglass"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="statOpen">—</p>
+            <p class="stat-label">Awaiting response</p>
+        </div>
+        <div class="stat-card sc-blue">
+            <div class="stat-header">
+                <span>In Progress</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:loader"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="statProgress">—</p>
+            <p class="stat-label">Being worked on</p>
+        </div>
+        <div class="stat-card sc-green">
+            <div class="stat-header">
+                <span>Resolved</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:circle-check"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="statResolved">—</p>
+            <p class="stat-label" id="statsSub">Loading stats…</p>
+        </div>
+    </div>
+
+    <!-- Reports -->
+    <section class="dash-card fu e3">
+        <div class="dash-card-head">
+            <div>
+                <h3><iconify-icon icon="lucide:file-bar-chart"></iconify-icon>Available Reports</h3>
+                <p class="sub">Generate a report, preview it, then export as PDF</p>
+            </div>
+        </div>
+
+        <div class="report-grid">
+            <button class="report-card rc-green" onclick="generateReport('ticket')">
+                <div class="rc-icon"><iconify-icon icon="lucide:file-bar-chart"></iconify-icon></div>
+                <div class="rc-info">
+                    <p>Ticket Report <span class="rc-badge">PDF</span></p>
+                    <span>All tickets with status, priority &amp; dates</span>
+                </div>
+                <iconify-icon icon="lucide:arrow-right" class="rc-arrow"></iconify-icon>
+            </button>
+
+            <button class="report-card rc-blue" onclick="generateReport('user')">
+                <div class="rc-icon"><iconify-icon icon="lucide:users"></iconify-icon></div>
+                <div class="rc-info">
+                    <p>User Report <span class="rc-badge">PDF</span></p>
+                    <span>Student accounts, activity &amp; ticket counts</span>
+                </div>
+                <iconify-icon icon="lucide:arrow-right" class="rc-arrow"></iconify-icon>
+            </button>
+
+            <button class="report-card rc-coral" onclick="generateReport('performance')">
+                <div class="rc-icon"><iconify-icon icon="lucide:activity"></iconify-icon></div>
+                <div class="rc-info">
+                    <p>Performance Report <span class="rc-badge">PDF</span></p>
+                    <span>Response times, resolution rate &amp; trends</span>
+                </div>
+                <iconify-icon icon="lucide:arrow-right" class="rc-arrow"></iconify-icon>
+            </button>
+        </div>
+
+        <p class="panel-note">
+            <iconify-icon icon="lucide:info"></iconify-icon>
+            <span>Reports are generated in real time from the database. For internal use only.</span>
+        </p>
+    </section>
+
+    <footer>PNHS-Main · ICT Tech Support Portal v2.0</footer>
+</div>
+
+<!-- PDF PREVIEW MODAL -->
+<div class="modal-overlay" id="pdfModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+        <div class="modal-head">
+            <div class="mh-left">
+                <span class="mh-kicker"><iconify-icon icon="lucide:file-text"></iconify-icon>PDF PREVIEW</span>
+                <h3 id="modalTitle">Report</h3>
+            </div>
+            <button class="dlg-close" onclick="closeModal()" aria-label="Close preview">
+                <iconify-icon icon="lucide:x"></iconify-icon>
+            </button>
+        </div>
+
+        <div class="modal-scroll" id="pdfScroll">
+            <div id="pdfContent"><!-- Report preview rendered here --></div>
+        </div>
+
+        <div class="modal-foot">
+            <button class="btn-ghost" onclick="closeModal()">
+                <iconify-icon icon="lucide:x"></iconify-icon>Close
+            </button>
+            <button class="btn-pdf" id="downloadBtn" onclick="downloadPDF()">
+                <span class="spinner"></span>
+                <iconify-icon icon="lucide:download" class="btn-icon"></iconify-icon>
+                <span class="btn-label">Download PDF</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-box" id="toastBox"></div>
+
+<script>
+let currentReportData = null;
+let currentReportType = '';
+const $ = id => document.getElementById(id);
+
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+const parseDate = s => { if (!s) return null; const d = new Date(String(s).replace(' ', 'T')); return isNaN(d) ? null : d; };
+const fmtDate = s => { const d = parseDate(s); return d ? d.toLocaleDateString() : (s || '—'); };
+const pretty = s => String(s || 'pending').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+/* Theme */
+const applyTheme = t => { document.documentElement.dataset.theme = t; localStorage.setItem('bl-theme', t); };
+applyTheme(localStorage.getItem('bl-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+$('themeBtn').addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+/* Sidebar collapse */
+const applySidebar = collapsed => {
+    $('sidebar').classList.toggle('collapsed', collapsed);
+    $('mainContent').classList.toggle('shifted', collapsed);
+    localStorage.setItem('bl-ict-sidebar', collapsed ? '1' : '0');
+};
+applySidebar(localStorage.getItem('bl-ict-sidebar') === '1');
+$('toggleSidebar').addEventListener('click', () => applySidebar(true));
+$('hamburgerBtn').addEventListener('click', () => applySidebar(false));
+
+/* User dropdown */
+const userMenuWrap = $('userMenuWrap');
+const userPill = $('userPill');
+const closeUserMenu = () => {
+    userMenuWrap.classList.remove('open');
+    userPill.setAttribute('aria-expanded', 'false');
+};
+userPill.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = userMenuWrap.classList.toggle('open');
+    userPill.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', e => { if (!userMenuWrap.contains(e.target)) closeUserMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUserMenu(); });
+
+/* Collapsed tooltips */
+const tip = document.createElement('div');
+tip.className = 'nav-tip';
+document.body.appendChild(tip);
+document.addEventListener('mouseover', e => {
+    const link = e.target.closest('.sidebar.collapsed .nav-link-custom[data-tip]');
+    if (!link) { tip.classList.remove('show'); return; }
+    const r = link.getBoundingClientRect();
+    tip.textContent = link.dataset.tip;
+    tip.style.top = (r.top + r.height / 2) + 'px';
+    tip.style.left = (r.right + 12) + 'px';
+    tip.classList.add('show');
+});
+document.addEventListener('mouseout', e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest('.nav-link-custom[data-tip]')) tip.classList.remove('show');
+});
+
+/* Toast */
+function toast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = 'toast-msg' + (type === 'error' ? ' error' : '');
+    el.innerHTML = `<iconify-icon icon="${type === 'error' ? 'lucide:circle-alert' : 'lucide:circle-check'}"></iconify-icon><span>${escapeHtml(msg)}</span>`;
+    $('toastBox').appendChild(el);
+    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, 3200);
+}
+
+function countUp(el, target) {
+    target = Number(target) || 0;
+    let t0 = null;
+    const step = now => {
+        if (!t0) t0 = now;
+        const p = Math.min((now - t0) / 900, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+/* ═══ 1. QUICK STATS ═══ */
+async function loadQuickStats() {
+    const btn = $('statsRefreshBtn');
+    btn.classList.add('spinning');
+    try {
+        const res = await fetch('/get_tickets', { headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        if (data.success) {
+            const tickets = data.tickets || [];
+            countUp($('statTotal'), tickets.length);
+            countUp($('statOpen'), tickets.filter(t => t.status === 'pending').length);
+            countUp($('statProgress'), tickets.filter(t => t.status === 'in_progress').length);
+            countUp($('statResolved'), tickets.filter(t => ['resolved', 'closed'].includes(t.status)).length);
+            $('statsSub').textContent = 'Synced ' + new Date().toLocaleTimeString();
+        } else {
+            throw 0;
+        }
+    } catch (e) {
+        ['statTotal', 'statOpen', 'statProgress', 'statResolved'].forEach(id => $(id).textContent = '—');
+        $('statsSub').textContent = 'Stats unavailable';
+        console.error('Error loading stats:', e);
+    } finally {
+        btn.classList.remove('spinning');
+    }
+}
+
+/* ═══ 2. GENERATE REPORT ═══ */
+async function generateReport(type) {
+    const modal = $('pdfModal');
+    const content = $('pdfContent');
+
+    currentReportType = type;
+    currentReportData = null;
+    $('modalTitle').textContent = ({
+        ticket: 'Ticket Report',
+        user: 'User Report',
+        performance: 'Performance Report'
+    })[type] || 'Report';
+    $('downloadBtn').disabled = true;
+
+    content.innerHTML = `
+        <div class="modal-state">
+            <div class="big-spinner"></div>
+            <p>Generating report…</p>
+        </div>
+    `;
+    modal.classList.add('active');
+
+    try {
+        let data;
+        if (type === 'ticket') {
+            const res = await fetch('/get_tickets', { headers: { 'Accept': 'application/json' } });
+            const ticketData = await res.json();
+            if (!ticketData.success) throw new Error(ticketData.message || 'Failed to load ticket data');
+            const tickets = ticketData.tickets || [];
+            data = {
+                success: true,
+                total: tickets.length,
+                open: tickets.filter(t => t.status === 'pending').length,
+                in_progress: tickets.filter(t => t.status === 'in_progress').length,
+                resolved: tickets.filter(t => ['resolved', 'closed'].includes(t.status)).length,
+                tickets
+            };
+        } else {
+            const res = await fetch(`/generate_report?type=${encodeURIComponent(type)}`, { headers: { 'Accept': 'application/json' } });
+            data = await res.json();
+        }
+
+        if (!data.success) {
+            content.innerHTML = `
+                <div class="modal-state">
+                    <iconify-icon icon="lucide:triangle-alert"></iconify-icon>
+                    <p>${escapeHtml(data.message || 'Failed to generate report.')}</p>
+                    <button class="retry-btn" onclick="generateReport('${type}')"><iconify-icon icon="lucide:rotate-cw"></iconify-icon>Try Again</button>
+                </div>
+            `;
+            return;
+        }
+
+        currentReportData = data;
+        renderReportPreview(data, type);
+    } catch (e) {
+        console.error('Report generation error:', e);
+        content.innerHTML = `
+            <div class="modal-state">
+                <iconify-icon icon="lucide:wifi"></iconify-icon>
+                <p>Error loading report data. Check your connection.</p>
+                <button class="retry-btn" onclick="generateReport('${type}')"><iconify-icon icon="lucide:rotate-cw"></iconify-icon>Try Again</button>
+            </div>
+        `;
+    }
+}
+
+/* ═══ 3. RENDER REPORT PREVIEW ═══ */
+function renderReportPreview(data, type) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    let title = 'Report';
+    let stats = '';
+    let thead = '';
+    let tableRows = '';
+
+    switch (type) {
+        case 'ticket':
+            title = 'Ticket Report';
+            stats = statBoxes([
+                [data.total || 0, 'Total Tickets', '#12604a'],
+                [data.open || 0, 'Open', '#e8b93c'],
+                [data.in_progress || 0, 'In Progress', '#4a90d9'],
+                [data.resolved || 0, 'Resolved', '#1d8a5f']
+            ]);
+            thead = '<th>Ticket</th><th>Subject</th><th>Status</th><th>Priority</th><th>Date</th>';
+            if (data.tickets?.length) {
+                tableRows = data.tickets.map(t => `
+                    <tr>
+                        <td>#${escapeHtml(String(t.ticket_number ?? t.id ?? ''))}</td>
+                        <td>${escapeHtml(t.subject || 'No subject')}</td>
+                        <td>${escapeHtml(pretty(t.status))}</td>
+                        <td>${escapeHtml(pretty(t.priority))}</td>
+                        <td>${escapeHtml(fmtDate(t.created_at))}</td>
+                    </tr>`).join('');
+            }
+            break;
+
+        case 'user':
+            title = 'User Report';
+            stats = statBoxes([
+                [data.total_users || 0, 'Total Users', '#12604a'],
+                [data.active_users || 0, 'Active', '#1d8a5f'],
+                [data.inactive_users || 0, 'Inactive', '#e8b93c'],
+                [data.total_tickets || 0, 'Total Tickets', '#4a90d9']
+            ]);
+            thead = '<th>Name</th><th>LRN</th><th>Grade</th><th>Tickets</th><th>Last Active</th>';
+            if (data.users?.length) {
+                tableRows = data.users.map(u => `
+                    <tr>
+                        <td>${escapeHtml(u.name || u.full_name || 'N/A')}</td>
+                        <td>${escapeHtml(u.lrn || '—')}</td>
+                        <td>${escapeHtml(u.grade_level || '—')}</td>
+                        <td>${escapeHtml(String(u.ticket_count ?? 0))}</td>
+                        <td>${escapeHtml(u.last_active ? fmtDate(u.last_active) : 'N/A')}</td>
+                    </tr>`).join('');
+            }
+            break;
+
+        case 'performance':
+            title = 'Performance Report';
+            stats = statBoxes([
+                [`${data.avg_resolution_time || 0}min`, 'Avg Resolution', '#12604a'],
+                [`${data.resolution_rate || 0}%`, 'Resolution Rate', '#1d8a5f'],
+                [data.total_tickets || 0, 'Total Tickets', '#4a90d9'],
+                [data.avg_rating || 0, 'Avg Rating', '#e8b93c']
+            ]);
+            thead = '<th>Date</th><th>Created</th><th>Resolved</th><th>Resolution</th>';
+            if (data.performance_data?.length) {
+                tableRows = data.performance_data.map(p => `
+                    <tr>
+                        <td>${escapeHtml(p.date || '')}</td>
+                        <td>${escapeHtml(String(p.tickets_created ?? 0))}</td>
+                        <td>${escapeHtml(String(p.tickets_resolved ?? 0))}</td>
+                        <td>${escapeHtml(String(p.avg_resolution_time ?? 0))}min</td>
+                    </tr>`).join('');
+            }
+            break;
+    }
+
+    $('modalTitle').textContent = title;
+    $('pdfContent').innerHTML = `
+        <div class="pdf-content" id="pdfContentInner">
+            <div class="pdf-header">
+                <div>
+                    <h2>${title}</h2>
+                    <p class="sub">PNHS-Main · ICT Tech Support Portal</p>
+                    <p class="sub" style="color:#a8bfb4">Generated on ${dateStr} at ${timeStr}</p>
+                </div>
+                <div class="pdf-brand">
+                    <iconify-icon icon="lucide:monitor-cog" width="18" height="18" style="color:#12604a"></iconify-icon>
+                    <span>PNHS-ICT</span>
+                </div>
+            </div>
+
+            ${stats}
+
+            ${tableRows ? `
+                <p class="table-title">Detailed Data</p>
+                <table>
+                    <thead><tr>${thead}</tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            ` : `
+                <div class="no-data">No detailed data available for this report.</div>
+            `}
+
+            <div class="pdf-footer">
+                <p>PNHS-Main · ICT Tech Support · This report is for internal use only</p>
+                <p>Report generated on ${dateStr} at ${timeStr}</p>
+            </div>
+        </div>
+    `;
+
+    $('downloadBtn').disabled = false;
+    $('pdfScroll').scrollTop = 0;
+}
+
+function statBoxes(items) {
+    return `<div class="stats-grid">${items.map(([num, label, color]) =>
+        `<div class="stat-box"><div class="number" style="color:${color}">${escapeHtml(String(num))}</div><div class="label">${escapeHtml(label)}</div></div>`
+    ).join('')}</div>`;
+}
+
+/* ═══ 4. DOWNLOAD PDF ═══ */
+function downloadPDF() {
+    const element = document.getElementById('pdfContentInner');
+    if (!element) { toast('No report data to download.', 'error'); return; }
+
+    const btn = $('downloadBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `${currentReportType}_report_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save()
+        .then(() => toast(`PDF downloaded — ${currentReportType}_report`))
+        .catch(() => toast('Failed to generate PDF. Please try again.', 'error'))
+        .finally(() => {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+        });
+}
+
+/* ═══ 5. MODAL ═══ */
+function closeModal() { $('pdfModal').classList.remove('active'); }
+
+$('pdfModal').addEventListener('click', e => {
+    if (e.target === $('pdfModal')) closeModal();
+});
+
+document.addEventListener('DOMContentLoaded', loadQuickStats);
+</script>
+</body>
+</html>

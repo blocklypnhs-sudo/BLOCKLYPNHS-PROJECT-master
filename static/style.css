@@ -1,0 +1,222 @@
+/* Custom styles for Blockly Learning Platform */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.btn-primary:hover {
+    background-color: #5a6fd8;
+    border-color: #5a6fd8;
+}
+
+.progress-bar {
+    background-color: #667eea;
+}
+
+.badge-primary {
+    background-color: #667eea;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.lesson-card {
+    cursor: pointer;
+}
+
+.lesson-card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Blockly customizations */
+#blocklyDiv {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Loading spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Table improvements */
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Modal improvements */
+.modal-xl {
+    max-width: 95%;
+}
+
+/* Alert styles */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Lesson Interface Styles */
+.lesson-sidebar {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.lesson-sidebar h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.lesson-sidebar ul li {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.lesson-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.lesson-content h4 {
+    color: #343a40;
+    margin-bottom: 15px;
+}
+
+.lesson-content h5 {
+    color: #495057;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.lesson-content code {
+    background-color: #f8f9fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.lesson-content .bg-light {
+    background-color: #f8f9fa !important;
+    border-left: 4px solid #007bff;
+}
+
+/* Progress indicators */
+.objective-completed {
+    color: #28a745;
+}
+
+.objective-pending {
+    color: #6c757d;
+}
+
+/* Blockly Editor Enhancements */
+#blocklyDiv {
+    border: none;
+    background-color: #f8f9fa;
+}
+
+.blocklyToolboxDiv {
+    background-color: #ffffff;
+    border-right: 1px solid #dee2e6;
+}
+
+.blocklyFlyoutBackground {
+    fill: #ffffff;
+}
+
+.blocklyMainBackground {
+    fill: #f8f9fa;
+}
+
+/* Code output styling */
+#codeOutput pre {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#codePreview {
+    max-height: 200px;
+}
+
+/* Modal fullscreen adjustments */
+.modal-fullscreen .modal-dialog {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    max-width: none;
+}
+
+.modal-fullscreen .modal-content {
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+}
+
+/* Blockly block customizations */
+.blocklyBlockBackground {
+    fill: #ffffff;
+    stroke: #ddd;
+}
+
+.blocklyBlockBackground:hover {
+    fill: #f0f8ff;
+}
+
+/* Success indicators */
+.activity-saved {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Loading states for Blockly */
+.blockly-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: #f8f9fa;
+}

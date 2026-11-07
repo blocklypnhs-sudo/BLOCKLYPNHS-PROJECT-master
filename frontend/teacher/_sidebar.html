@@ -1,0 +1,33 @@
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-logo">
+        <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="logo-image">
+        <div class="logo-full">
+            <h2>Block<em>Learn</em></h2>
+            <p>PNHS &middot; ICT Studio</p>
+        </div>
+        <div class="logo-mono"><img src="/static/BL-LOGO.png" alt="BlockLearn Logo"></div>
+        <button class="toggle-btn" type="button" aria-label="Collapse sidebar" onclick="portalSetSidebarCollapsed(true)">
+            <iconify-icon icon="lucide:panel-left-close"></iconify-icon>
+        </button>
+    </div>
+    <div class="hamburger-wrap">
+        <button class="hamburger-btn" type="button" aria-label="Expand sidebar" onclick="portalSetSidebarCollapsed(false)">
+            <iconify-icon icon="lucide:menu"></iconify-icon>
+        </button>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <div class="nav-item"><a href="/teacher_dashboard" class="nav-link-custom{% if request.path == '/teacher_dashboard' %} active{% endif %}"{% if request.path == '/teacher_dashboard' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:layout-dashboard"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
+        <div class="nav-item"><a href="/teacher_leaderboard" class="nav-link-custom{% if request.path == '/teacher_leaderboard' %} active{% endif %}"{% if request.path == '/teacher_leaderboard' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:trophy"></iconify-icon><span class="nav-text">Leaderboard</span></a></div>
+        <div class="nav-item"><a href="/teacher_students" class="nav-link-custom{% if request.path == '/teacher_students' %} active{% endif %}"{% if request.path == '/teacher_students' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:users"></iconify-icon><span class="nav-text">Students</span></a></div>
+        <div class="nav-item"><a href="/teacher_score_results" class="nav-link-custom{% if request.path == '/teacher_score_results' or request.path == '/teacher/score_history' %} active{% endif %}"{% if request.path == '/teacher_score_results' or request.path == '/teacher/score_history' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Student Scores</span><span class="nav-badge hidden" id="pendingBadge" title="Pending reviews"></span></a></div>
+        <div class="nav-item"><a href="/assessments_result" class="nav-link-custom{% if request.path == '/assessments_result' %} active{% endif %}"{% if request.path == '/assessments_result' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:file-check"></iconify-icon><span class="nav-text">Assessment Results</span></a></div>
+        <div class="nav-section-label">Insights</div>
+        <div class="nav-item"><a href="/teacher_reports_analytics" class="nav-link-custom{% if request.path == '/teacher_reports_analytics' %} active{% endif %}"{% if request.path == '/teacher_reports_analytics' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon><span class="nav-text">Reports &amp; Analytics</span></a></div>
+        <div class="nav-item"><a href="/teacher_feedback_analytics" class="nav-link-custom{% if request.path == '/teacher_feedback_analytics' %} active{% endif %}"{% if request.path == '/teacher_feedback_analytics' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:message-square-text"></iconify-icon><span class="nav-text">Feedback Analytics</span></a></div>
+        <div class="nav-section-label">Account</div>
+        <div class="nav-item"><a href="/notifications" class="nav-link-custom{% if request.path == '/notifications' %} active{% endif %}"{% if request.path == '/notifications' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:bell"></iconify-icon><span class="nav-text">Notifications</span></a></div>
+        <div class="nav-item"><a href="/teacher_profile" class="nav-link-custom{% if request.path == '/teacher_profile' %} active{% endif %}"{% if request.path == '/teacher_profile' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:circle-user-round"></iconify-icon><span class="nav-text">Profile</span></a></div>
+        <div class="nav-item"><a href="/teacher_settings" class="nav-link-custom{% if request.path == '/teacher_settings' %} active{% endif %}"{% if request.path == '/teacher_settings' %} aria-current="page"{% endif %}><iconify-icon icon="lucide:sliders-horizontal"></iconify-icon><span class="nav-text">Settings</span></a></div>
+    </nav>
+</aside>

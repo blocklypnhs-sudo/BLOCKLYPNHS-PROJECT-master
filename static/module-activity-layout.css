@@ -1,0 +1,168 @@
+.container-custom {
+  max-width: 1440px;
+  padding: 10px 16px 24px;
+}
+
+.top-bar {
+  background: linear-gradient(180deg, rgba(223, 236, 230, 0.96), rgba(217, 230, 224, 0.96));
+  border: 1px solid rgba(116, 146, 131, 0.18);
+  border-radius: 22px;
+  padding: 0.4rem 1rem;
+  margin-bottom: 0.55rem;
+  box-shadow: 0 2px 10px rgba(20, 90, 66, 0.06);
+}
+
+.stepper {
+  gap: 3px;
+  margin-bottom: 0.55rem;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(116, 146, 131, 0.18);
+  border-radius: 20px;
+}
+
+.step-chip {
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 0.64rem;
+}
+
+.step-chip.active {
+  background: rgba(255, 139, 52, 0.12);
+  border-color: rgba(255, 139, 52, 0.7);
+}
+
+.step-chip.done {
+  background: rgba(29, 128, 89, 0.08);
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.02rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.page-title i {
+  font-size: 0.85rem;
+}
+
+.btn-back {
+  background: #f3d8d6;
+  color: #ca4653;
+  border: 1px solid rgba(202, 70, 83, 0.08);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.step-chip .num {
+  width: 16px;
+  height: 16px;
+}
+
+.section {
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 0.55rem;
+}
+
+.section h2 {
+  margin-bottom: 0.15rem;
+  font-size: 1.02rem;
+}
+
+.section .subtitle {
+  margin-bottom: 0.55rem;
+}
+
+.module-hero {
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.65rem;
+}
+
+.module-hero h1 {
+  font-size: 1.2rem;
+}
+
+.module-hero .overview {
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.module-meta {
+  gap: 8px 12px;
+}
+
+.obj-list {
+  gap: 4px;
+}
+
+.obj-list li {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.callout {
+  margin: 6px 0;
+  padding: 7px 10px;
+  line-height: 1.45;
+}
+
+.callout ol {
+  margin: 4px 0 0 18px !important;
+  line-height: 1.45 !important;
+}
+
+.workspace-panel {
+  margin: 7px 0;
+}
+
+.expected-strip {
+  gap: 8px;
+  padding: 5px 10px;
+}
+
+.workspace-toolbar {
+  gap: 6px;
+  padding: 5px 9px;
+}
+
+.workspace-toolbar .actions button {
+  padding: 4px 10px;
+}
+
+#blocklyDiv,
+#blocklyDiv2,
+#blocklyDiv3 {
+  height: clamp(220px, calc(100vh - 400px), 340px);
+}
+
+.output-panel {
+  padding: 6px 10px;
+}
+
+.btn-row {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+}
+
+@media (max-width: 768px) {
+  .container-custom {
+    padding: 8px 10px 20px;
+  }
+
+  .section {
+    padding: 0.8rem;
+  }
+
+  #blocklyDiv,
+  #blocklyDiv2,
+  #blocklyDiv3 {
+    height: clamp(200px, 38vh, 260px);
+  }
+}

@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PHP Module 2 · Conditionals · BlockLearn</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/8.0.4/blockly.min.js"></script>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --php-deep:#4d5b96;--php-main:#777bb4;--php-light:#eef0fa;--php-soft:#e8eaf6;
+    --gold-warm:#e8a838;--gold-light:#fce9c5;--coral:#e06050;--coral-soft:#fce8e5;
+    --blue:#4a90d9;--blue-soft:#e4eefb;--stone:#7f9e92;--stone-light:#a8bfb4;
+    --green-deep:#145a42;--green-main:#145a42;--green-soft:#e2f3ed;
+    --border-fresh:#dde9e3;--card-white:#fff;--bg-main:#f0f6f3;
+    --text-primary:#1a463a;--text-secondary:#4a6b5e;
+    --shadow-sm:0 4px 16px rgba(20,90,66,.06);--shadow-md:0 8px 28px rgba(20,90,66,.08);
+    --shadow-lg:0 16px 48px rgba(20,90,66,.12);
+    --radius-sm:10px;--radius-md:16px;--radius-lg:20px;--radius-xl:28px;
+    --glass-bg:rgba(255,255,255,.75);--glass-border:rgba(255,255,255,.6);
+    --card-glass:rgba(255,255,255,.85);
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg-main);color:var(--text-primary);min-height:100vh}
+  .container-custom{max-width:1200px;margin:0 auto;padding:20px 24px 60px}
+
+  .top-bar{background:var(--glass-bg);backdrop-filter:blur(20px);border-radius:var(--radius-xl);
+    padding:.5rem 1.5rem;margin-bottom:1.2rem;display:flex;justify-content:space-between;
+    align-items:center;border:1px solid var(--glass-border);box-shadow:var(--shadow-sm)}
+  .page-title{font-size:1rem;font-weight:800;color:var(--text-primary);margin:0}
+  .page-title i{color:var(--php-main);margin-right:8px}
+  .btn-back{background:var(--coral-soft);color:var(--coral);border:none;padding:6px 16px;
+    border-radius:40px;font-weight:600;font-size:12px;cursor:pointer;transition:.3s;font-family:inherit}
+  .btn-back:hover{background:var(--coral);color:#fff}
+
+  .stepper{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:1.2rem;background:var(--card-glass);
+    backdrop-filter:blur(12px);border-radius:var(--radius-lg);padding:10px 14px;
+    border:1px solid var(--glass-border);box-shadow:var(--shadow-sm);overflow-x:auto}
+  .step-chip{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:600;
+    color:var(--stone);padding:5px 10px;border-radius:40px;transition:.25s;cursor:pointer;
+    white-space:nowrap;border:1.5px solid transparent;background:none;font-family:inherit}
+  .step-chip .num{width:18px;height:18px;border-radius:50%;background:var(--border-fresh);
+    color:var(--stone);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700}
+  .step-chip.active{background:var(--php-soft);color:var(--php-deep);border-color:var(--php-main)}
+  .step-chip.active .num{background:var(--php-main);color:#fff}
+  .step-chip.done{color:var(--green-main)}
+  .step-chip.done .num{background:var(--green-main);color:#fff}
+  .step-chip.locked{opacity:.5;cursor:not-allowed}
+
+  .section{background:var(--card-glass);backdrop-filter:blur(12px);border-radius:var(--radius-lg);
+    border:1px solid var(--glass-border);box-shadow:var(--shadow-sm);padding:1.6rem 1.8rem;
+    margin-bottom:1.2rem;display:none}
+  .section.active{display:block;animation:fadeUp .4s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .section h2{font-size:1.15rem;font-weight:800;color:var(--text-primary);margin-bottom:.3rem;
+    display:flex;align-items:center;gap:10px}
+  .section h2 i{color:var(--php-main)}
+  .section .subtitle{font-size:.8rem;color:var(--stone-light);margin-bottom:1.2rem}
+
+  .module-hero{background:linear-gradient(135deg,#eef0fa 0%,#d8dcf0 60%,#fce9c5 100%);
+    border-radius:var(--radius-lg);padding:1.6rem 1.8rem;border:1px solid var(--glass-border);
+    box-shadow:var(--shadow-sm);margin-bottom:1.2rem}
+  .module-hero h1{font-size:1.5rem;font-weight:900;color:#2c3a6c;margin-bottom:.2rem}
+  .module-hero .lang-pill{display:inline-flex;align-items:center;gap:6px;background:#1a463a;
+    color:#ffd43b;font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:40px;margin-bottom:.6rem}
+  .module-hero .overview{font-size:.85rem;color:#3a4a6c;line-height:1.6;margin-bottom:.9rem}
+  .module-meta{display:flex;gap:16px;flex-wrap:wrap}
+  .module-meta span{font-size:.75rem;color:#2c3a6c;font-weight:600;display:flex;align-items:center;gap:5px}
+
+  .obj-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .obj-list li{display:flex;gap:10px;font-size:.85rem;color:var(--text-secondary);line-height:1.5;
+    background:var(--bg-main);padding:10px 14px;border-radius:var(--radius-sm);border-left:3px solid var(--php-main)}
+  .obj-list li i{color:var(--php-main);margin-top:2px;flex-shrink:0}
+  /* keep text and inline <code> flowing as one sentence */
+  .obj-list li{display:block;position:relative;padding-left:38px}
+  .obj-list li i{position:absolute;left:13px;top:13px;margin-top:0}
+
+  .callout{padding:12px 16px;border-radius:var(--radius-sm);font-size:.82rem;line-height:1.6;
+    margin:12px 0;display:flex;gap:10px;align-items:flex-start}
+  .callout.info{background:var(--blue-soft);color:#1e3a6e;border-left:3px solid var(--blue)}
+  .callout.tip{background:var(--green-soft);color:var(--green-deep);border-left:3px solid var(--green-main)}
+  .callout.warn{background:var(--gold-light);color:#7a5b00;border-left:3px solid var(--gold-warm)}
+  .callout i{margin-top:2px;flex-shrink:0}
+
+  pre.code{background:#1a2d27;color:#bbf0e0;padding:14px 16px;border-radius:var(--radius-sm);
+    font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:.78rem;line-height:1.6;
+    overflow-x:auto;margin:10px 0;position:relative}
+  pre.code .filename{position:absolute;top:0;right:0;background:#0f1f19;color:#8fb8a8;
+    font-size:.6rem;padding:3px 10px;border-bottom-left-radius:8px;font-weight:600;letter-spacing:.5px}
+  pre.code .kw{color:#ff9d5c}pre.code .str{color:#f7df1e}
+  pre.code .num{color:#4ade80}pre.code .cmt{color:#7fa898;font-style:italic}
+  pre.code .fn{color:#b48cff}pre.code .var{color:#6ab8e8}
+
+  .output-box{background:#0f1f19;color:#4ade80;padding:12px 16px;border-radius:var(--radius-sm);
+    font-family:'SF Mono',Consolas,monospace;font-size:.78rem;line-height:1.6;
+    margin:10px 0;border-left:3px solid var(--green-main)}
+  .output-box .label{color:#8fb8a8;font-size:.6rem;text-transform:uppercase;letter-spacing:.6px;
+    font-weight:700;display:block;margin-bottom:4px}
+
+  .btn-nav{background:var(--php-main);color:#fff;border:none;padding:9px 22px;
+    border-radius:40px;font-weight:700;font-size:.8rem;cursor:pointer;transition:.3s;
+    font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  .btn-nav:hover{background:var(--php-deep);transform:translateY(-1px)}
+  .btn-nav.secondary{background:var(--bg-main);color:var(--text-secondary)}
+  .btn-nav.secondary:hover{background:var(--border-fresh);color:var(--text-primary)}
+  .btn-nav:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.4rem;
+    padding-top:1rem;border-top:1px solid var(--border-fresh);gap:10px;flex-wrap:wrap}
+
+  .workspace-panel{background:var(--card-glass);border-radius:var(--radius-lg);
+    border:1px solid var(--glass-border);overflow:hidden;margin:12px 0}
+  .workspace-toolbar{padding:8px 14px;border-bottom:1px solid var(--border-fresh);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg-main)}
+  .workspace-toolbar .lang-badge{background:var(--php-light);padding:3px 12px;border-radius:40px;
+    font-size:.65rem;font-weight:700;color:var(--php-deep)}
+  .workspace-toolbar .actions{display:flex;gap:5px;flex-wrap:wrap}
+  .workspace-toolbar .actions button{padding:5px 14px;border-radius:40px;border:none;
+    font-weight:600;font-size:.7rem;cursor:pointer;transition:.3s;font-family:inherit}
+  .btn-run{background:var(--php-main);color:#fff}.btn-run:hover{background:var(--php-deep)}
+  .btn-clear{background:var(--coral-soft);color:var(--coral)}.btn-clear:hover{background:var(--coral);color:#fff}
+  .btn-hint{background:var(--gold-light);color:#7a5b00}.btn-hint:hover{background:var(--gold-warm);color:#fff}
+  .btn-submit{background:var(--gold-warm);color:#1a4235}.btn-submit:hover{background:#d49a2a}
+
+  #blocklyDiv,#blocklyDiv2,#blocklyDiv3{height:340px;width:100%;background:#fefefb}
+  .output-panel{padding:10px 16px;border-top:1px solid var(--border-fresh);background:#1a2d27}
+  .output-panel .label{font-size:.6rem;text-transform:uppercase;font-weight:700;letter-spacing:.6px;
+    color:#8fb8a8;margin-bottom:3px;display:block}
+  .output-panel .output-text{font-family:'SF Mono',Consolas,monospace;font-size:.78rem;
+    color:#bbf0e0;min-height:20px;line-height:1.5;word-break:break-all;white-space:pre-wrap}
+  .output-panel .output-text.success{color:#4ade80}
+  .output-panel .output-text.error{color:#f87171}
+  .expected-strip{padding:8px 16px;background:#1a2d27;border-bottom:1px solid var(--border-fresh);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .expected-strip .label{font-size:.6rem;text-transform:uppercase;font-weight:700;letter-spacing:.6px;color:#8fb8a8}
+  .expected-strip .value{font-family:'SF Mono',Consolas,monospace;font-size:.8rem;color:#fbbf24;font-weight:600;white-space:pre-wrap}
+
+  .quiz-q{background:var(--bg-main);border-radius:var(--radius-md);padding:1.1rem 1.3rem;margin-bottom:12px;
+    border:1px solid var(--border-fresh)}
+  .quiz-q .q-text{font-size:.88rem;font-weight:600;color:var(--text-primary);margin-bottom:10px;line-height:1.5;white-space:pre-line}
+  .quiz-opts{display:flex;flex-direction:column;gap:6px}
+  .quiz-opt{padding:9px 14px;border-radius:var(--radius-sm);background:#fff;border:1.5px solid var(--border-fresh);
+    font-size:.82rem;cursor:pointer;transition:.2s;text-align:left;font-family:inherit;color:var(--text-secondary)}
+  .quiz-opt:hover{border-color:var(--php-main);background:var(--php-soft)}
+  .quiz-opt.correct{background:var(--green-soft);border-color:var(--green-main);color:var(--green-deep);font-weight:600}
+  .quiz-opt.incorrect{background:var(--coral-soft);border-color:var(--coral);color:var(--coral);font-weight:600}
+  .quiz-opt:disabled{cursor:default}
+  .quiz-feedback{font-size:.78rem;margin-top:8px;padding:8px 12px;border-radius:8px;display:none;line-height:1.5}
+  .quiz-feedback.show{display:block}
+  .quiz-feedback.ok{background:var(--green-soft);color:var(--green-deep)}
+  .quiz-feedback.no{background:var(--coral-soft);color:var(--coral)}
+
+  .result-card{border-radius:var(--radius-md);padding:1.4rem 1.6rem;text-align:center;margin:14px 0}
+  .result-card.pass{background:linear-gradient(135deg,#e2f3ed,#d1ead9);border:2px solid var(--green-main)}
+  .result-card.fail{background:linear-gradient(135deg,#fce8e5,#fbd6d1);border:2px solid var(--coral)}
+  .result-card .score{font-size:2.4rem;font-weight:900;line-height:1}
+  .result-card.pass .score{color:var(--green-deep)}
+  .result-card.fail .score{color:var(--coral)}
+  .result-card .verdict{font-size:1rem;font-weight:800;margin-top:4px}
+  .result-card .detail{font-size:.8rem;color:var(--text-secondary);margin-top:8px;line-height:1.6}
+
+  .completion-card{background:linear-gradient(135deg,#eef0fa,#fce9c5);border-radius:var(--radius-lg);
+    padding:1.8rem;text-align:center;border:2px solid var(--php-main)}
+  .completion-card .trophy{font-size:3rem;margin-bottom:8px}
+  .completion-card h3{font-size:1.3rem;font-weight:900;color:#2c3a6c;margin-bottom:6px}
+  .completion-card .stat{font-size:.82rem;color:#2c3a6c;margin:4px 0}
+  .completion-card .stat strong{color:#1a463a}
+
+  #toastBox{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px}
+  .toast-msg{padding:10px 16px;border-radius:12px;font-size:.78rem;font-weight:500;
+    box-shadow:0 8px 32px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px;
+    animation:tIn .4s cubic-bezier(.4,0,.2,1);transition:.3s;color:#fff}
+  .toast-msg.success{background:#1a463a}.toast-msg.error{background:#dc2626}
+  @keyframes tIn{from{opacity:0;transform:translateX(40px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+  @media(max-width:768px){
+    .container-custom{padding:12px 10px 40px}
+    .section{padding:1.1rem 1.2rem}
+    #blocklyDiv,#blocklyDiv2,#blocklyDiv3{height:260px}
+    .step-chip{font-size:.62rem;padding:4px 8px}
+  }
+</style>
+</head>
+<body data-module-language="php" data-lesson-number="2" data-student-id="{{ session.get('user_id', '') }}"
+      data-module-completed="{{ 'true' if module_completed|default(false) else 'false' }}"
+      data-completion-score="{{ module_completion_score|default('', true) }}"
+      data-completion-date="{{ module_completion_date|default('', true) }}">
+<div class="container-custom">
+
+  <div class="top-bar">
+    <div><p class="page-title"><i class="fab fa-php"></i> PHP · Module 2</p></div>
+    <button class="btn-back" onclick="window.location.href='/module_assessments'">
+      <i class="fas fa-times me-1"></i> Close
+    </button>
+  </div>
+
+  <div class="stepper" id="stepper"></div>
+
+  <!-- ========== 0. INTRO ========== -->
+  <section class="section active" data-step="0">
+    <div class="module-hero">
+      <span class="lang-pill"><i class="fab fa-php"></i> PHP</span>
+      <h1>PHP Conditionals</h1>
+      <p class="overview">
+        Learn how to make your PHP scripts <em>decide</em>. Use <code>if</code>, <code>else</code>,
+        and comparison operators to control what happens based on different values.
+      </p>
+      <div class="module-meta">
+        <span><i class="fas fa-clock"></i> 30 mins</span>
+        <span><i class="fas fa-signal"></i> Beginner+</span>
+        <span><i class="fas fa-star"></i> 10 points</span>
+        <span><i class="fas fa-code"></i> if / elseif / else</span>
+      </div>
+    </div>
+
+    <h2><i class="fas fa-bullseye"></i> Learning Objectives</h2>
+    <p class="subtitle">By the end of this module, you will be able to:</p>
+    <ul class="obj-list">
+      <li><i class="fas fa-check-circle"></i> Use comparison operators (<code>&gt;</code>, <code>&lt;</code>, <code>==</code>, <code>!=</code>).</li>
+      <li><i class="fas fa-check-circle"></i> Write a basic <code>if</code> statement in PHP.</li>
+      <li><i class="fas fa-check-circle"></i> Add an <code>else</code> branch for the alternative case.</li>
+      <li><i class="fas fa-check-circle"></i> Use <code>elseif</code> for multiple conditions.</li>
+      <li><i class="fas fa-check-circle"></i> Combine conditions with <code>AND</code> (<code>&amp;&amp;</code>) and <code>OR</code> (<code>||</code>).</li>
+      <li><i class="fas fa-check-circle"></i> Predict output based on variable values.</li>
+    </ul>
+
+    <h2 style="margin-top:1.4rem"><i class="fas fa-clipboard-check"></i> Prerequisites</h2>
+    <div class="callout info">
+      <i class="fas fa-info-circle"></i>
+      <div><strong>Prerequisite:</strong> PHP Module 1 (Introduction to PHP). You must already know how to create a variable, use <code>echo</code>, and do math operations.</div>
+    </div>
+
+    <div class="btn-row">
+      <span></span>
+      <button class="btn-nav" onclick="goStep(1)">Start Lesson <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 1. LESSON ========== -->
+  <section class="section" data-step="1">
+    <h2><i class="fas fa-book-open"></i> Lesson Content</h2>
+    <p class="subtitle">Read carefully — the quiz and final assessment test exactly these concepts.</p>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1rem 0 .4rem">1. What are Conditionals?</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      A <strong>conditional</strong> lets your program choose between different paths. Instead of running every line,
+      PHP checks a <strong>condition</strong> first — if it's <code>true</code>, it runs one block; otherwise, it runs another.
+    </p>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">2. Comparison Operators</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      These operators compare two values and return either <code>true</code> or <code>false</code>:
+    </p>
+    <ul style="font-size:.85rem;color:var(--text-secondary);line-height:1.8;padding-left:1.4rem">
+      <li><code>&gt;</code> — greater than</li>
+      <li><code>&lt;</code> — less than</li>
+      <li><code>&gt;=</code> — greater than or equal</li>
+      <li><code>&lt;=</code> — less than or equal</li>
+      <li><code>==</code> — equal to (value only)</li>
+      <li><code>!=</code> — not equal</li>
+    </ul>
+    <pre class="code"><span class="filename">index.php</span><span class="fn">var_dump</span>(<span class="num">25</span> &gt; <span class="num">18</span>);   <span class="cmt">// true</span>
+<span class="fn">var_dump</span>(<span class="num">10</span> == <span class="num">20</span>);  <span class="cmt">// false</span></pre>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">3. The if Statement</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      An <code>if</code> statement runs a block of code <em>only if</em> a condition is true.
+    </p>
+    <pre class="code"><span class="filename">index.php</span><span class="var">$score</span> = <span class="num">85</span>;
+<span class="kw">if</span> (<span class="var">$score</span> &gt;= <span class="num">75</span>) {
+    <span class="fn">echo</span> <span class="str">"You passed!"</span>;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>You passed!</div>
+
+    <div class="callout tip">
+      <i class="fas fa-lightbulb"></i>
+      <div><strong>Syntax rules:</strong> Condition goes inside parentheses <code>( )</code>. Code block goes inside braces <code>{ }</code>. No semicolon after the closing <code>}</code>.</div>
+    </div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">4. Adding else</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      Use <code>else</code> to run a different block when the condition is false.
+    </p>
+    <pre class="code"><span class="filename">index.php</span><span class="var">$score</span> = <span class="num">60</span>;
+<span class="kw">if</span> (<span class="var">$score</span> &gt;= <span class="num">75</span>) {
+    <span class="fn">echo</span> <span class="str">"Passed"</span>;
+} <span class="kw">else</span> {
+    <span class="fn">echo</span> <span class="str">"Failed"</span>;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>Failed</div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1.2rem 0 .4rem">5. Multiple Conditions with elseif</h3>
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      Use <code>elseif</code> to test more conditions before falling back to <code>else</code>.
+    </p>
+    <pre class="code"><span class="filename">index.php</span><span class="var">$score</span> = <span class="num">85</span>;
+<span class="kw">if</span> (<span class="var">$score</span> &gt;= <span class="num">90</span>) {
+    <span class="fn">echo</span> <span class="str">"Excellent"</span>;
+} <span class="kw">elseif</span> (<span class="var">$score</span> &gt;= <span class="num">75</span>) {
+    <span class="fn">echo</span> <span class="str">"Passed"</span>;
+} <span class="kw">else</span> {
+    <span class="fn">echo</span> <span class="str">"Failed"</span>;
+}</pre>
+    <div class="output-box"><span class="label">Output</span>Passed</div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(0)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav secondary" type="button" data-mark-lesson-complete data-next-step="2"><i class="fas fa-check"></i> Mark Lesson Complete</button>
+      <button class="btn-nav" onclick="goStep(2)">Worked Example <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 2. WORKED EXAMPLE ========== -->
+  <section class="section" data-step="2">
+    <h2><i class="fas fa-laptop-code"></i> Worked Example</h2>
+    <p class="subtitle">Trace the condition step by step to understand the output.</p>
+
+    <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7">
+      <strong>Task:</strong> Check if a grade is passing (75 or higher) and print the result.
+    </p>
+
+    <pre class="code"><span class="filename">index.php</span><span class="var">$grade</span> = <span class="num">82</span>;
+
+<span class="kw">if</span> (<span class="var">$grade</span> &gt;= <span class="num">75</span>) {
+    <span class="fn">echo</span> <span class="str">"Grade: Passed"</span>;
+} <span class="kw">else</span> {
+    <span class="fn">echo</span> <span class="str">"Grade: Failed"</span>;
+}</pre>
+    <div class="output-box"><span class="label">Expected Output</span>Grade: Passed</div>
+
+    <h3 style="font-size:.95rem;font-weight:700;margin:1rem 0 .4rem">Step-by-step trace</h3>
+    <ol style="font-size:.85rem;color:var(--text-secondary);line-height:1.8;padding-left:1.4rem">
+      <li>We set <code>$grade = 82</code>.</li>
+      <li><code>$grade &gt;= 75</code> is <code>true</code> (82 is ≥ 75).</li>
+      <li>The <code>then</code> block runs → prints "Grade: Passed".</li>
+      <li>The <code>else</code> block is skipped.</li>
+    </ol>
+
+    <div class="callout tip">
+      <i class="fas fa-puzzle-piece"></i>
+      <div><strong>Matching Blockly blocks:</strong> <code>$grade = 82</code> → <code>if $grade >= 75</code> → <code>echo "Grade: Passed"</code> | else → <code>echo "Grade: Failed"</code></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" onclick="goStep(3)">Guided Practice <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 3. GUIDED PRACTICE ========== -->
+  <section class="section" data-step="3">
+    <h2><i class="fas fa-hands-helping"></i> Guided Practice</h2>
+    <p class="subtitle">Build the solution yourself using the Blockly workspace. Follow the instructions one step at a time.</p>
+
+    <div class="callout info">
+      <i class="fas fa-list-ol"></i>
+      <div>
+        <strong>Instructions:</strong>
+        <ol style="margin:6px 0 0 18px;line-height:1.7">
+          <li>From the <strong>LOGIC</strong> category, drag an <code>if</code> block.</li>
+          <li>Attach a <code>&gt;</code> compare block into the if condition slot. Left: <code>25</code>, Right: <code>18</code>.</li>
+          <li>Inside the <code>then</code> slot, add <code>echo "25 is greater than 18"</code>.</li>
+          <li>Click <strong>Run</strong>, check the output, then click <strong>Submit</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="workspace-toolbar">
+        <span class="lang-badge"><i class="fab fa-php me-1"></i> PHP</span>
+        <div class="actions">
+          <button class="btn-hint" onclick="showHint()"><i class="fas fa-lightbulb me-1"></i> Hint</button>
+          <button class="btn-clear" onclick="clearWorkspace('guided')"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+          <button class="btn-run" onclick="runPhpCode('guided')"><i class="fas fa-play me-1"></i> Run</button>
+          <button class="btn-submit" onclick="submitGuided()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+      </div>
+      <div id="blocklyDiv"></div>
+      <div class="output-panel">
+        <span class="label"><i class="fas fa-terminal me-1"></i> Your Output</span>
+        <div class="output-text" id="guidedOutput">Run your code to see output</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" onclick="goStep(4)">Independent Practice <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 4. INDEPENDENT PRACTICE ========== -->
+  <section class="section" data-step="4">
+    <h2><i class="fas fa-user-graduate"></i> Independent Practice</h2>
+    <p class="subtitle">Solve the task on your own using the instructions below.</p>
+
+    <div class="callout warn">
+      <i class="fas fa-tasks"></i>
+      <div>
+        <strong>Task:</strong> Store a number in <code>$num</code>. If it's ≥ 0, print "Positive". Otherwise, print "Negative".
+        For this task, use <code>$num = 7</code>.
+      </div>
+    </div>
+    <div class="callout info">
+      <i class="fas fa-list-ol"></i>
+      <div><strong>Instructions:</strong>
+        <ol style="margin:6px 0 0 18px;line-height:1.7">
+          <li>Create <code>$num</code> and set it to <code>7</code>.</li>
+          <li>Add an <code>if/else</code> block that checks whether <code>$num &gt;= 0</code>.</li>
+          <li>Print <code>Positive</code> in the true branch and <code>Negative</code> in the else branch.</li>
+          <li>Run and check the output is <code>Positive</code>, then click <strong>Submit</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="workspace-toolbar">
+        <span class="lang-badge"><i class="fab fa-php me-1"></i> PHP</span>
+        <div class="actions">
+          <button class="btn-hint" onclick="showHint()"><i class="fas fa-lightbulb me-1"></i> Hint</button>
+          <button class="btn-clear" onclick="clearWorkspace('independent')"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+          <button class="btn-run" onclick="runPhpCode('independent')"><i class="fas fa-play me-1"></i> Run</button>
+          <button class="btn-submit" onclick="submitIndependent()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+      </div>
+      <div id="blocklyDiv2"></div>
+      <div class="output-panel">
+        <span class="label"><i class="fas fa-terminal me-1"></i> Your Output</span>
+        <div class="output-text" id="independentOutput">Run your code to see output</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" onclick="goStep(5)">Knowledge Check <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 5. QUIZ ========== -->
+  <section class="section" data-step="5">
+    <h2><i class="fas fa-question-circle"></i> Knowledge Check</h2>
+    <p class="subtitle">Answer all 10 questions. Earn at least 7 points to move to the assessment.</p>
+    <div id="quizContainer"></div>
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(4)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" id="quizNextBtn" onclick="finishQuiz()" disabled>Final Assessment <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 6. ASSESSMENT ========== -->
+  <section class="section" data-step="6">
+    <h2><i class="fas fa-clipboard-check"></i> Final Assessment</h2>
+    <p class="subtitle">This is the graded task for Module 2. Score ≥ 75 to pass.</p>
+
+    <div class="callout warn">
+      <i class="fas fa-bullseye"></i>
+      <div>
+        <strong>Assessment Task:</strong> Store a grade in <code>$grade</code>. Print "Excellent" if grade ≥ 90,
+        "Passed" if grade ≥ 75, otherwise "Failed". Use <code>$grade = 88</code>.
+      </div>
+    </div>
+    <div class="callout info">
+      <i class="fas fa-list-ol"></i>
+      <div><strong>Instructions:</strong>
+        <ol style="margin:6px 0 0 18px;line-height:1.7">
+          <li>Create <code>$grade</code> and set it to <code>88</code>.</li>
+          <li>Use an if/elseif/else chain: grade ≥ <code>90</code> prints <code>Excellent</code>; otherwise grade ≥ <code>75</code> prints <code>Passed</code>; else print <code>Failed</code>.</li>
+          <li>Run and confirm the output is <code>Passed</code>, then click <strong>Submit</strong>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="workspace-toolbar">
+        <span class="lang-badge"><i class="fab fa-php me-1"></i> PHP · 25 pts</span>
+        <div class="actions">
+          <button class="btn-clear" onclick="clearWorkspace('assessment')"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+          <button class="btn-run" onclick="runPhpCode('assessment')"><i class="fas fa-play me-1"></i> Run</button>
+          <button class="btn-submit" onclick="submitAssessment()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+        </div>
+      </div>
+      <div id="blocklyDiv3"></div>
+      <div class="output-panel">
+        <span class="label"><i class="fas fa-terminal me-1"></i> Your Output</span>
+        <div class="output-text" id="assessmentOutput">Run your code to see output</div>
+      </div>
+    </div>
+
+    <div id="assessmentResult"></div>
+
+    <div class="btn-row">
+      <button class="btn-nav secondary" onclick="goStep(5)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-nav" id="completionBtn" onclick="goStep(7)" disabled>View Completion <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <!-- ========== 7. COMPLETION ========== -->
+  <section class="section" data-step="7">
+    <h2><i class="fas fa-flag-checkered"></i> Module Completion</h2>
+    <div id="completionContent"></div>
+  </section>
+
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+/* ============================================================
+   MODULE DATA
+   ============================================================ */
+const MODULE = {
+  id: 'php-02-conditionals',
+  number: 2,
+  language: 'php',
+  title: 'PHP Conditionals',
+  steps: ['Intro','Lesson','Example','Guided','Independent','Quiz','Assessment','Complete'],
+  quiz: [
+    {
+      q: 'Which operator checks if two values are equal in PHP?',
+      options: ['=', '==', '!=', '=>'],
+      correct: 1,
+      explain: 'Use == to check equality. A single = is for assignment.'
+    },
+    {
+      q: 'What does this code print?\nif (10 > 5) { echo "A"; } else { echo "B"; }',
+      options: ['A', 'B', 'AB', 'Nothing'],
+      correct: 0,
+      explain: '10 > 5 is true, so the then-block runs and prints A.'
+    },
+    {
+      q: 'When do you use elseif?',
+      options: [
+        'To test more conditions before falling back to else',
+        'To loop through an array',
+        'To declare a variable',
+        'To print text'
+      ],
+      correct: 0,
+      explain: 'elseif lets you chain additional conditions before falling back to else.'
+    }
+  ],
+  assessment: {
+    points: 25,
+    expectedOutput: 'Passed',
+    taskDescription: 'Store a grade in $grade. Print "Excellent" if grade >= 90, "Passed" if grade >= 75, otherwise "Failed". Use $grade = 88.'
+  }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let currentStep = 0;
+let quizAnswers = [];
+let guidedWorkspace, independentWorkspace, assessmentWorkspace;
+let lastGeneratedCode = {};
+let assessmentResultData = null;
+const PROGRESS_KEY = 'blocklearn_assessment_' + MODULE.id + '_' + document.body.dataset.studentId;
+const SERVER_MODULE_COMPLETED = document.body.dataset.moduleCompleted === 'true';
+const SERVER_COMPLETION_SCORE = document.body.dataset.completionScore === ''
+  ? null
+  : Number(document.body.dataset.completionScore);
+const SERVER_COMPLETION_DATE = document.body.dataset.completionDate || null;
+
+function saveProgress() {
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify({ currentStep, quizAnswers, assessmentResultData })); } catch (e) {}
+}
+function loadProgress() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null');
+    if (saved && typeof saved === 'object') {
+      currentStep = Math.max(0, Math.min(Number(saved.currentStep) || 0, MODULE.steps.length - 1));
+      quizAnswers = Array.isArray(saved.quizAnswers) ? saved.quizAnswers : [];
+      assessmentResultData = saved.assessmentResultData || null;
+    }
+  } catch (e) {}
+  if (SERVER_MODULE_COMPLETED) {
+    if (!assessmentResultData || !assessmentResultData.passed) {
+      assessmentResultData = { passed: true, score: SERVER_COMPLETION_SCORE };
+    }
+    currentStep = MODULE.steps.length - 1;
+  }
+}
+
+/* ============================================================
+   STEPPER
+   ============================================================ */
+function renderStepper() {
+  const el = document.getElementById('stepper');
+  el.innerHTML = MODULE.steps.map((label, i) => {
+    let cls = 'step-chip';
+    if (i === currentStep) cls += ' active';
+    else if (i < currentStep) cls += ' done';
+    else if (i > currentStep) cls += ' locked';
+    const num = i < currentStep ? '<i class="fas fa-check" style="font-size:.55rem"></i>' : (i + 1);
+    return `<button class="${cls}" ${i > currentStep ? 'disabled' : ''} onclick="goStep(${i}, true)"><span class="num">${num}</span>${label}</button>`;
+  }).join('');
+}
+
+function goStep(n, fromStepper) {
+  if (n < 0 || n >= MODULE.steps.length) return;
+  if (fromStepper && n > currentStep) {
+    showToast('Complete the current section first.', 'error');
+    return;
+  }
+  if (!fromStepper && n > currentStep + 1) return;
+  if (n === 6 && quizAnswers.filter(a => a !== undefined).length < MODULE.quiz.length) {
+    showToast('Please answer all quiz questions first.', 'error');
+    return;
+  }
+  if (n === 7 && !isModulePassed(assessmentResultData)) {
+    showToast(assessmentResultData ? 'Score below the pass mark. Retry the assessment to continue.' : 'Submit the assessment first.', 'error');
+    return;
+  }
+  currentStep = n;
+  saveProgress();
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.querySelector(`.section[data-step="${n}"]`);
+  if (target) target.classList.add('active');
+  renderStepper();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (n === 3 && !guidedWorkspace) initGuided();
+  if (n === 4 && !independentWorkspace) initIndependent();
+  if (n === 6 && !assessmentWorkspace) initAssessment();
+  if (n === 7) renderCompletion();
+}
+
+/* ============================================================
+   BLOCKLY — PHP blocks (with if/elseif)
+   ============================================================ */
+function registerPhpBlocks() {
+  if (!Blockly.Blocks['php_echo']) {
+    Blockly.Blocks['php_echo'] = { init: function() {
+      this.appendValueInput('TEXT').setCheck(['String','Number']).appendField('echo');
+      this.setInputsInline(true);
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#777bb4');
+    }};
+  }
+  if (!Blockly.Blocks['php_variable']) {
+    Blockly.Blocks['php_variable'] = { init: function() {
+      this.appendDummyInput().appendField('$').appendField(new Blockly.FieldTextInput('myVar'),'NAME').appendField('=');
+      this.appendValueInput('VALUE');
+      this.setInputsInline(true);
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['php_variable_get']) {
+    Blockly.Blocks['php_variable_get'] = { init: function() {
+      this.appendDummyInput().appendField('$').appendField(new Blockly.FieldTextInput('myVar'),'NAME');
+      this.setOutput(true, ['String','Number','Boolean']); this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['php_text']) {
+    Blockly.Blocks['php_text'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldTextInput(''),'TEXT');
+      this.setOutput(true,'String'); this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['php_number']) {
+    Blockly.Blocks['php_number'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldNumber(0,-Infinity,Infinity,1),'NUM');
+      this.setOutput(true,'Number'); this.setColour('#10b981');
+    }};
+  }
+  if (!Blockly.Blocks['php_boolean']) {
+    Blockly.Blocks['php_boolean'] = { init: function() {
+      this.appendDummyInput().appendField(new Blockly.FieldDropdown([['true','TRUE'],['false','FALSE']]),'BOOL');
+      this.setOutput(true,'Boolean'); this.setColour('#8b5cf6');
+    }};
+  }
+  if (!Blockly.Blocks['php_compare']) {
+    Blockly.Blocks['php_compare'] = { init: function() {
+      this.appendValueInput('A');
+      this.appendDummyInput().appendField(new Blockly.FieldDropdown([['=','EQ'],['≠','NEQ'],['>','GT'],['<','LT'],['≥','GTE'],['≤','LTE']]),'OP');
+      this.appendValueInput('B');
+      this.setInputsInline(true); this.setOutput(true,'Boolean'); this.setColour('#f0b84d');
+    }};
+  }
+  if (!Blockly.Blocks['php_if']) {
+    Blockly.Blocks['php_if'] = { init: function() {
+      this.appendValueInput('IF0').setCheck('Boolean').appendField('if');
+      this.appendStatementInput('DO0').appendField('then');
+      this.appendStatementInput('ELSE').appendField('else');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#f0b84d');
+    }};
+  }
+  if (!Blockly.Blocks['php_if_elseif']) {
+    Blockly.Blocks['php_if_elseif'] = { init: function() {
+      this.appendValueInput('IF0').setCheck('Boolean').appendField('if');
+      this.appendStatementInput('DO0').appendField('then');
+      this.appendValueInput('IF1').setCheck('Boolean').appendField('elseif');
+      this.appendStatementInput('DO1').appendField('then');
+      this.appendStatementInput('ELSE').appendField('else');
+      this.setPreviousStatement(true, null); this.setNextStatement(true, null);
+      this.setColour('#f0b84d');
+    }};
+  }
+}
+
+function phpToolbox() {
+  return `
+    <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display:none">
+      <category name="BASIC" colour="#777bb4">
+        <block type="php_echo"></block>
+        <block type="php_text"></block>
+      </category>
+      <category name="VARIABLES" colour="#8b5cf6">
+        <block type="php_variable"></block>
+        <block type="php_variable_get"></block>
+        <block type="php_number"></block>
+        <block type="php_boolean"></block>
+      </category>
+      <category name="LOGIC" colour="#f0b84d">
+        <block type="php_if"></block>
+        <block type="php_if_elseif"></block>
+        <block type="php_compare"></block>
+      </category>
+    </xml>`;
+}
+
+function registerPhpGenerators() {
+  if (!Blockly.JavaScript) return;
+  const J = Blockly.JavaScript;
+  J['php_echo'] = function(b){
+    var t = J.valueToCode(b,'TEXT',J.ORDER_ATOMIC) || '""';
+    return 'echo ' + t + ';\n';
+  };
+  J['php_variable'] = function(b){
+    var n = b.getFieldValue('NAME');
+    var v = J.valueToCode(b,'VALUE',J.ORDER_ATOMIC) || '""';
+    return '$' + n + ' = ' + v + ';\n';
+  };
+  J['php_variable_get'] = function(b){ return ['$' + b.getFieldValue('NAME'), J.ORDER_ATOMIC]; };
+  J['php_text'] = function(b){ return ['"' + (b.getFieldValue('TEXT')||'') + '"', J.ORDER_ATOMIC]; };
+  J['php_number'] = function(b){ return [b.getFieldValue('NUM'), J.ORDER_ATOMIC]; };
+  J['php_boolean'] = function(b){ return [b.getFieldValue('BOOL') === 'TRUE' ? 'true' : 'false', J.ORDER_ATOMIC]; };
+  J['php_compare'] = function(b){
+    var a = J.valueToCode(b,'A',J.ORDER_ATOMIC) || '0';
+    var c = J.valueToCode(b,'B',J.ORDER_ATOMIC) || '0';
+    var op = b.getFieldValue('OP');
+    var s = op === 'EQ' ? '==' : op === 'NEQ' ? '!=' : op === 'GT' ? '>' : op === 'LT' ? '<' : op === 'GTE' ? '>=' : '<=';
+    return ['(' + a + ' ' + s + ' ' + c + ')', J.ORDER_ATOMIC];
+  };
+  J['php_if'] = function(b){
+    var cond = J.valueToCode(b,'IF0',J.ORDER_ATOMIC) || 'false';
+    var doC = J.statementToCode(b,'DO0') || '';
+    var elC = J.statementToCode(b,'ELSE') || '';
+    var code = 'if (' + cond + ') {\n' + doC + '}';
+    if(elC) code += ' else {\n' + elC + '}';
+    return code + '\n';
+  };
+  J['php_if_elseif'] = function(b){
+    var c0 = J.valueToCode(b,'IF0',J.ORDER_ATOMIC) || 'false';
+    var d0 = J.statementToCode(b,'DO0') || '';
+    var c1 = J.valueToCode(b,'IF1',J.ORDER_ATOMIC) || 'false';
+    var d1 = J.statementToCode(b,'DO1') || '';
+    var el = J.statementToCode(b,'ELSE') || '';
+    var code = 'if (' + c0 + ') {\n' + d0 + '} elseif (' + c1 + ') {\n' + d1 + '}';
+    if(el) code += ' else {\n' + el + '}';
+    return code + '\n';
+  };
+}
+
+function injectWorkspace(divId) {
+  registerPhpBlocks();
+  registerPhpGenerators();
+  const ws = Blockly.inject(divId, {
+    toolbox: phpToolbox(),
+    trashcan: true,
+    zoom: { controls: true, wheel: true, startScale: 0.9 },
+    renderer: 'zelos'
+  });
+  Blockly.svgResize(ws);
+  window.addEventListener('resize', () => Blockly.svgResize(ws));
+  return ws;
+}
+
+function initGuided() { guidedWorkspace = injectWorkspace('blocklyDiv'); }
+function initIndependent() { independentWorkspace = injectWorkspace('blocklyDiv2'); }
+function initAssessment() { assessmentWorkspace = injectWorkspace('blocklyDiv3'); }
+
+/* ============================================================
+   PHP → JS PREVIEW
+   ============================================================ */
+function phpPreviewCode(phpCode) {
+  return phpCode
+    .replace(/\becho\s+([^;]+);/g, 'console.log($1);')
+    .replace(/\belseif\s*\(/g, 'else if (')
+    .replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=/g, 'let $1 =')
+    .replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, '$1');
+}
+
+function runPhpCode(which) {
+  const wsMap = { guided: guidedWorkspace, independent: independentWorkspace, assessment: assessmentWorkspace };
+  const outMap = { guided: 'guidedOutput', independent: 'independentOutput', assessment: 'assessmentOutput' };
+  const ws = wsMap[which];
+  const out = document.getElementById(outMap[which]);
+  if (!ws) return;
+
+  try {
+    let code = Blockly.JavaScript.workspaceToCode(ws);
+    if (!code || !code.trim()) {
+      out.textContent = 'No code to run. Build your solution first!';
+      out.className = 'output-text error';
+      return;
+    }
+    lastGeneratedCode[which] = code;
+    const js = phpPreviewCode(code);
+    let printed = [];
+    const orig = console.log;
+    console.log = (...args) => printed.push(args.join(' '));
+    try { Function(js)(); } finally { console.log = orig; }
+    if (printed.length) {
+      out.textContent = printed.join('\n');
+      out.className = 'output-text success';
+    } else {
+      out.textContent = 'Code ran successfully but printed nothing.';
+      out.className = 'output-text';
+    }
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+    out.className = 'output-text error';
+  }
+}
+
+function clearWorkspace(which) {
+  if (!confirm('Clear all blocks from workspace?')) return;
+  const wsMap = { guided: guidedWorkspace, independent: independentWorkspace, assessment: assessmentWorkspace };
+  const outMap = { guided: 'guidedOutput', independent: 'independentOutput', assessment: 'assessmentOutput' };
+  const ws = wsMap[which];
+  if (ws) ws.clear();
+  const out = document.getElementById(outMap[which]);
+  if (out) { out.textContent = 'Workspace cleared'; out.className = 'output-text'; }
+}
+
+function showHint() {
+  showToast('Hint: Use the if block, attach a compare block with >=, and put echo inside the then slot.', 'success');
+}
+
+function submitGuided() {
+  submitPracticeOutput('guidedOutput', 'Guided Practice');
+}
+
+function submitPracticeOutput(outputId, practiceName) {
+  const output = document.getElementById(outputId);
+  const panel = output && output.closest('.workspace-panel');
+  const expectedElement = panel && panel.querySelector('.expected-strip .value');
+  const normalize = value => value.replace(/\r\n/g, '\n').split('\n').map(line => line.trim()).join('\n').trim();
+  if (!output || !expectedElement || !output.textContent.trim() ||
+      output.textContent.trim() === 'Run your code to see output') {
+    showToast('Run your code first, then submit your output.', 'error');
+    return;
+  }
+  if (normalize(output.textContent) === normalize(expectedElement.textContent)) {
+    showToast(`✓ ${practiceName} complete! Your output is correct.`, 'success');
+  } else {
+    showToast('Not quite. Compare your output with the expected output and try again.', 'error');
+  }
+}
+
+function submitIndependent() {
+  const out = document.getElementById('independentOutput').textContent.trim();
+  if (out === 'Positive') {
+    showToast('✓ Correct! You can proceed to the quiz.', 'success');
+  } else {
+    showToast('Not quite. Expected exactly: Positive', 'error');
+  }
+}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+function renderQuiz() {
+  const c = document.getElementById('quizContainer');
+  c.innerHTML = MODULE.quiz.map((q, i) => `
+    <div class="quiz-q">
+      <div class="q-text">${i + 1}. ${q.q}</div>
+      <div class="quiz-opts">
+        ${q.options.map((opt, j) =>
+          `<button class="quiz-opt" onclick="answerQuiz(${i}, ${j})">${opt}</button>`
+        ).join('')}
+      </div>
+      <div class="quiz-feedback" id="fb-${i}"></div>
+    </div>
+  `).join('');
+}
+
+function answerQuiz(qIdx, optIdx) {
+  const q = MODULE.quiz[qIdx];
+  const btns = document.querySelectorAll(`.quiz-q:nth-child(${qIdx + 1}) .quiz-opt`);
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById(`fb-${qIdx}`);
+  if (optIdx === q.correct) {
+    btns[optIdx].classList.add('correct');
+    fb.className = 'quiz-feedback show ok';
+    fb.innerHTML = `<i class="fas fa-check-circle"></i> ${q.explain}`;
+    quizAnswers[qIdx] = true;
+  } else {
+    btns[optIdx].classList.add('incorrect');
+    btns[q.correct].classList.add('correct');
+    fb.className = 'quiz-feedback show no';
+    fb.innerHTML = `<i class="fas fa-times-circle"></i> ${q.explain}`;
+    quizAnswers[qIdx] = false;
+  }
+  saveProgress();
+  if (quizAnswers.filter(a => a !== undefined).length === MODULE.quiz.length) {
+    document.getElementById('quizNextBtn').disabled = false;
+  }
+}
+
+function finishQuiz() {
+  const correct = quizAnswers.filter(Boolean).length;
+  if (correct < 7) {
+    showToast(`You got ${correct}/10. Review the lesson and retry the quiz.`, 'error');
+    quizAnswers = [];
+    renderQuiz();
+    document.getElementById('quizNextBtn').disabled = true;
+    return;
+  }
+  showToast(`Quiz passed: ${correct}/10. Proceed to the assessment.`, 'success');
+  goStep(6);
+}
+
+/* ============================================================
+   ASSESSMENT SUBMISSION
+   ============================================================ */
+/* Retry rules: pass mark comes from the server (default 75). Below it, the student must retry. */
+function retryMessage(r) {
+  const mark = Math.ceil((r.passMark || 75) / 10);
+  if (r.modulePassed) return `This attempt scored below ${mark}/10, but your earlier pass (best: ${Math.round((r.bestScore || 0) / 10)}/10) is kept. You can retry to improve.`;
+  return `You need at least ${mark}/10 to pass. Review the lesson, fix your blocks and retry. You can't finish this module until you pass.`;
+}
+function isModulePassed(r) { return !!(r && (r.modulePassed || r.passed)); }
+
+async function submitAssessment() {
+  const out = document.getElementById('assessmentOutput').textContent.trim();
+  const expected = MODULE.assessment.expectedOutput;
+  if (!out || out === 'Run your code to see output') {
+    showToast('Run your code first so your output can be scored.', 'error');
+    return;
+  }
+  const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(assessmentWorkspace));
+  const generated = lastGeneratedCode.assessment || '';
+
+  try {
+    const res = await fetch('/submit_module_assessment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: MODULE.language,
+        module_id: MODULE.id,
+        code_blocks: codeBlocks,
+        generated_code: generated,
+        output: out
+      })
+    });
+    const data = await res.json();
+    if (!data.success) { showToast(data.message || 'Failed to save assessment.', 'error'); return; }
+    if (Array.isArray(data.new_badges) && data.new_badges.length) {
+      try { sessionStorage.setItem('new_badges', JSON.stringify(data.new_badges)); } catch (e) {}
+    }
+    const score = data.score;
+    const points = data.points == null ? Math.round(score / 10) : data.points;
+    const passed = data.passed;
+    const modulePassed = data.module_passed !== undefined ? !!data.module_passed : !!passed;
+    assessmentResultData = { score, points, passed, out, expected, modulePassed, bestScore: data.best_score, attempts: data.attempts, passMark: data.pass_mark || 75 };
+    saveProgress();
+    renderAssessmentResult();
+    document.getElementById('completionBtn').disabled = !modulePassed;
+    try { localStorage.setItem('progress_updated', Date.now().toString()); } catch(e) {}
+    showToast(passed ? `Score: ${points}/10 · PASSED` : `Score: ${points}/10 · Below the pass mark (8/10). Please retry.`, passed ? 'success' : 'error');
+  } catch (e) {
+    showToast('Could not save your assessment. Check your connection and try again.', 'error');
+  }
+}
+
+function renderAssessmentResult() {
+  const el = document.getElementById('assessmentResult');
+  const r = assessmentResultData;
+  if (!r) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="result-card ${r.passed ? 'pass' : 'fail'}">
+      <div class="score">${r.points == null ? Math.round(r.score / 10) : r.points}<span style="font-size:1rem">/10</span></div>
+      <div class="verdict">${r.passed ? '✓ PASSED' : '✗ BELOW PASS MARK — RETRY REQUIRED'}</div>
+      ${r.attempts ? `<div class="detail" style="margin-bottom:6px">Pass mark: ${Math.ceil((r.passMark || 75) / 10)}/10 · Attempt ${r.attempts}${r.bestScore != null ? ` · Best score: ${Math.round(r.bestScore / 10)}/10` : ''}</div>` : ''}
+      <div class="detail">
+        Your output: <code style="white-space:pre">${r.out || '(empty)'}</code><br>
+        Expected: <code style="white-space:pre">${r.expected}</code><br>
+        ${r.passed
+          ? 'Great work! You can view your completion summary.'
+          : retryMessage(r)}
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-nav secondary" onclick="goStep(1)"><i class="fas fa-book-open"></i> Review Lesson</button>
+        <button class="btn-nav${r.passed ? ' secondary' : ''}" onclick="retryAssessment()"><i class="fas fa-redo"></i> Retry Assessment</button>
+      </div>
+    </div>`;
+}
+
+function retryAssessment() {
+  document.getElementById('assessmentOutput').textContent = 'Run your code to see output';
+  document.getElementById('assessmentResult').innerHTML = '';
+  document.getElementById('completionBtn').disabled = true;
+  assessmentResultData = null;
+  saveProgress();
+  showToast('Fix your blocks, run the code again, then submit.', 'success');
+}
+
+/* ============================================================
+   COMPLETION
+   ============================================================ */
+function renderCompletion() {
+  const r = assessmentResultData;
+  if (!r) return;
+  const el = document.getElementById('completionContent');
+  const dateStr = SERVER_COMPLETION_DATE ||
+    (SERVER_MODULE_COMPLETED ? 'Completed' : new Date().toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' }));
+  const scoreText = r.score == null ? 'Completed' : `${r.points == null ? Math.round(r.score / 10) : r.points}/10 (${r.passed ? 'Passed' : 'Failed'})`;
+  el.innerHTML = `
+    <div class="completion-card">
+      <div class="trophy">${r.passed ? '🏆' : '📘'}</div>
+      <h3>${r.passed ? 'Module 2 Complete!' : 'Module 2 — Needs Retry'}</h3>
+      <div class="stat">Module: <strong>${MODULE.title}</strong></div>
+      <div class="stat">Final Score: <strong>${scoreText}</strong></div>
+      <div class="stat">Completion Date: <strong>${dateStr}</strong></div>
+      <div class="stat">Language: <strong>PHP</strong></div>
+      <div style="margin-top:18px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-nav secondary" onclick="window.location.href='/student_progress'">
+          <i class="fas fa-chart-line"></i> View Progress
+        </button>
+        ${r.passed
+          ? `<button class="btn-nav" onclick="window.location.href='/student_activities_php'">
+               Open PHP Activities <i class="fas fa-arrow-right"></i>
+             </button>`
+          : `<button class="btn-nav" onclick="goStep(6)"><i class="fas fa-redo"></i> Retry Assessment</button>`}
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg, type) {
+  const box = document.getElementById('toastBox');
+  const t = document.createElement('div');
+  t.className = 'toast-msg ' + (type || 'success');
+  t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${msg}`;
+  box.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(40px)';
+    setTimeout(() => t.remove(), 300);
+  }, 3200);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  loadProgress();
+  renderStepper();
+  renderQuiz();
+  if (assessmentResultData) {
+    renderAssessmentResult();
+    document.getElementById('completionBtn').disabled = !isModulePassed(assessmentResultData);
+  }
+  goStep(currentStep);
+});
+</script>
+<script src="{{ url_for('static', filename='js/lesson_completion.js') }}"></script>
+<script src="{{ url_for('static', filename='js/module_quiz_randomizer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/module_score_display.js') }}"></script>
+</body>
+</html>

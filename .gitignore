@@ -1,0 +1,36 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+Block-Based-Learning-Platform/
+BlocklyPNHS-Project/
+
+# Database backups
+*.sql
+backup_*.sql
+
+# Environment variables
+.env
+/instance/flask_secret_key
+
+__pycache__/
+*.pyc
+*.bundle

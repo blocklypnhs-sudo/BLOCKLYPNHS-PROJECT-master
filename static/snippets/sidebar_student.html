@@ -1,0 +1,31 @@
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Restore Button - GREEN -->
+<button class="sidebar-restore-btn" id="sidebarRestoreBtn" onclick="toggleSidebar()" title="Show Sidebar">
+    <i class="fas fa-chevron-right"></i>
+</button>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px;">
+        <img src="/static/pnhs-logo.png" alt="PNHS Logo" class="pnhs-logo-main" style="height: 50px; background: white; padding: 6px; border-radius: 8px; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar" style="padding: 4px 8px; font-size: 14px;">
+                <iconify-icon icon="lucide:menu"></iconify-icon>
+            </button>
+            <div>
+                <h2 style="margin: 0;">Block<span>Learn</span></h2>
+                <p style="margin: 2px 0 0 0; font-size: 12px;">PNHS · ICT Studio</p>
+            </div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-item"><a href="/student_dashboard" class="nav-link-custom active"><iconify-icon icon="lucide:house"></iconify-icon> Dashboard</a></div>
+        <div class="nav-item"><a href="/student_activities" class="nav-link-custom"><iconify-icon icon="lucide:puzzle"></iconify-icon> Activities</a></div>
+        <div class="nav-item"><a href="/student_progress" class="nav-link-custom"><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon> Progress</a></div>
+        <div class="nav-item"><a href="/student_profile" class="nav-link-custom"><iconify-icon icon="lucide:circle-user-round"></iconify-icon> Profile</a></div>
+        <div class="nav-item"><a href="/student_settings" class="nav-link-custom"><iconify-icon icon="lucide:sliders-horizontal"></iconify-icon> Settings</a></div>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+    </div>
+</aside>

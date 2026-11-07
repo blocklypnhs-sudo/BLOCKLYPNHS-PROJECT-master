@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlockLearn · Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#2e6f40',
+              'green-dark': '#1f4f2e',
+              'green-light': '#3d8c52',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::selection { background-color: #2e6f40; color: #ffffff; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    body {
+      background-image: url('/static/pnhs_main_bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #f7faf8;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(1px);
+      z-index: 0;
+    }
+    nav, main {
+      position: relative;
+      z-index: 1;
+    }
+    .login-card {
+      width: 100%;
+      min-height: 400px;
+      padding: 16px 12px 12px;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .login-logo-wrap {
+      width: 96px;
+      height: 68px;
+      margin: -8px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-logo {
+      width: 136px;
+      height: 136px;
+      object-fit: contain;
+      transform: translateY(-12px);
+    }
+    .login-card .login-title { margin-top: -14px !important; }
+    .login-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+    }
+    .form-input {
+      transition: all 0.2s ease;
+      background: #f8faf9;
+      border: 2px solid #e8edeb;
+    }
+    .form-input:focus {
+      background: #ffffff;
+      border-color: #2e6f40;
+      box-shadow: 0 0 0 4px rgba(46, 111, 64, 0.08);
+    }
+    .form-input:hover {
+      border-color: #bccfc4;
+    }
+    .role-tab {
+      transition: all 0.2s ease;
+      border: 2px solid #e8edeb;
+      background: #f8faf9;
+      padding: 8px 0;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 11px;
+    }
+    .role-tab:hover {
+      border-color: #bccfc4;
+      background: #f0f4f2;
+      transform: translateY(-1px);
+    }
+    .peer:checked + .role-tab,
+    .role-tab.active {
+      border-color: #2e6f40;
+      background: #eaf5ef;
+      color: #1f4f2e;
+      box-shadow: 0 4px 12px rgba(46, 111, 64, 0.12);
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #2e6f40 0%, #1f4f2e 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -8px rgba(46, 111, 64, 0.4);
+    }
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+    .toast-success {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+    }
+    .toast-error {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+    .toast-warning {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+    }
+    .custom-checkbox {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #d1d9d4;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .custom-checkbox:checked {
+      background: #2e6f40;
+      border-color: #2e6f40;
+    }
+    .custom-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .custom-checkbox:hover {
+      border-color: #2e6f40;
+    }
+    .link-hover {
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .link-hover::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #2e6f40;
+      transition: width 0.3s ease;
+    }
+    .link-hover:hover::after {
+      width: 100%;
+    }
+    .nav-link {
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #2e6f40;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .brand-title {
+      color: #145a42;
+    }
+    .brand-title .brand-learn {
+      color: #c5e34a;
+    }
+    /* Compact spacing */
+    .compact-space > * + * {
+      margin-top: 0.75rem;
+    }
+    @media (max-height: 620px) {
+      .login-card { min-height: 0; }
+    }
+
+    /* === Staff Account dropdown === */
+    .staff-menu-wrap {
+      position: relative;
+    }
+    .staff-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #525252;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px 4px;
+      transition: all 0.2s ease;
+    }
+    .staff-trigger:hover { color: #2e6f40; }
+    .staff-trigger .caret {
+      font-size: 14px;
+      transition: transform 0.25s ease;
+    }
+    .staff-menu-wrap.open .staff-trigger { color: #2e6f40; }
+    .staff-menu-wrap.open .staff-trigger .caret { transform: rotate(180deg); }
+    .staff-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 180px;
+      background: #ffffff;
+      border: 1px solid #e8edeb;
+      border-radius: 14px;
+      box-shadow: 0 18px 40px -12px rgba(0,0,0,0.18);
+      padding: 6px;
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+      transform-origin: top right;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+    }
+    .staff-menu-wrap.open .staff-dropdown {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+    .staff-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #404040;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .staff-item:hover {
+      background: #eaf5ef;
+      color: #1f4f2e;
+    }
+    .staff-item iconify-icon {
+      font-size: 16px;
+      color: #6b7280;
+      transition: color 0.15s ease;
+    }
+    .staff-item:hover iconify-icon { color: #2e6f40; }
+    .staff-item.active {
+      background: #eaf5ef;
+      color: #1f4f2e;
+      font-weight: 600;
+    }
+    .staff-item.active iconify-icon { color: #2e6f40; }
+
+    .role-hint {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #2e6f40;
+      background: #eaf5ef;
+      border-radius: 20px;
+      padding: 2px 8px;
+      display: inline-block;
+    }
+  </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+</head>
+<body class="font-sans bg-white text-neutral-900 min-h-screen overflow-x-hidden flex flex-col">
+
+  <!-- Navigation Bar - Compact -->
+  <nav class="fixed top-0 left-0 right-0 h-20 bg-white/95 backdrop-blur-md z-50 border-b border-neutral-200/50 shadow-sm">
+    <div class="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-1 group">
+        <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="h-12 w-auto transition-transform duration-300 group-hover:scale-105">
+        <span class="-ml-4 text-2xl font-extrabold tracking-tight brand-title">Block<span class="brand-learn">Learn</span></span>
+      </a>
+      <div class="flex items-center gap-8">
+
+        <!-- ═══ STAFF ACCOUNT DROPDOWN ═══ -->
+        <div class="staff-menu-wrap" id="staffMenuWrap">
+          <button type="button" class="staff-trigger" id="staffTrigger" aria-haspopup="true" aria-expanded="false">
+            Staff Account
+            <iconify-icon icon="lucide:chevron-down" class="caret"></iconify-icon>
+          </button>
+          <div class="staff-dropdown" id="staffDropdown" role="menu">
+            <button type="button" class="staff-item" data-role="teacher" role="menuitem">
+              <iconify-icon icon="lucide:graduation-cap"></iconify-icon>
+              <span>Teacher</span>
+            </button>
+            <button type="button" class="staff-item" data-role="ict_support" role="menuitem">
+              <iconify-icon icon="lucide:wrench"></iconify-icon>
+              <span>ICT Support</span>
+            </button>
+          </div>
+        </div>
+
+        <a href="/about" class="text-sm font-medium text-neutral-600 hover:text-[#2e6f40] transition-all duration-200 nav-link">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center pt-20 pb-8">
+    <div class="w-full max-w-[320px] px-1">
+      <div class="login-card rounded-2xl">
+
+        <!-- Card Header - Compact -->
+        <div class="text-center mb-1">
+          <div class="flex justify-center mt-0 mb-0">
+            <div class="login-logo-wrap">
+              <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="login-logo">
+            </div>
+          </div>
+          <h2 class="login-title text-[1.45rem] font-bold tracking-tight text-neutral-900">Login</h2>
+          <p class="text-xs text-neutral-500 mt-1 font-light">
+            <span id="loginSubtitle">Sign in to continue to BlockLearn</span>
+          </p>
+          <div class="mt-2">
+            <span class="role-hint" id="roleHint">Student</span>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-2" autocomplete="off" onsubmit="return handleLogin(event)">
+
+          <!-- Hidden role (default: student) -->
+          <input type="hidden" name="loginRole" id="loginRole" value="student">
+
+          <!-- Dynamic field -->
+          <div>
+            <label id="identifierLabel" for="loginIdentifier" class="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-0">LRN (Learner Reference Number)</label>
+            <input type="text" id="loginIdentifier" autocomplete="off" placeholder="e.g. 123456789012" required
+              class="form-input w-full px-3 py-1.5 text-sm rounded-lg focus:outline-none placeholder:text-neutral-400">
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="loginPassword" class="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-0">Password</label>
+            <div class="relative">
+              <input type="password" id="loginPassword" autocomplete="new-password" placeholder="Enter your password" required
+                class="form-input w-full pr-10 px-3 py-1.5 text-sm rounded-lg focus:outline-none placeholder:text-neutral-400">
+              <button type="button" onclick="togglePw('loginPassword','loginEye')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-all duration-200 hover:scale-110">
+                <iconify-icon id="loginEye" icon="lucide:eye" width="18" height="18"></iconify-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Staff-only validation code -->
+          <div id="staffCodeGroup" class="hidden">
+            <label id="staffCodeLabel" for="staffValidationCode" class="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-0">Staff Validation Code</label>
+            <input type="password" id="staffValidationCode" autocomplete="off" placeholder="Enter validation code"
+              class="form-input w-full px-3 py-1.5 text-sm rounded-lg focus:outline-none placeholder:text-neutral-400">
+          </div>
+
+          <!-- Forgot password -->
+          <div class="flex items-center justify-end">
+            <label class="flex items-center gap-1.5 cursor-pointer group mr-auto">
+              <input type="checkbox" id="rememberAccount" class="custom-checkbox">
+              <span class="text-[11px] text-neutral-600 group-hover:text-neutral-800 transition-colors">Remember account</span>
+            </label>
+            <a href="/forgot-password" class="text-[11px] font-medium text-[#2e6f40] hover:text-[#1f4f2e] transition-all duration-200 link-hover">Forgot password?</a>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" id="loginBtn"
+            class="btn-submit w-full py-1.5 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 shadow-md shadow-[#2e6f40]/20">
+            <span id="loginBtnText">Sign In</span>
+            <iconify-icon id="loginSpinner" icon="lucide:loader-2" width="18" height="18" class="hidden animate-spin"></iconify-icon>
+          </button>
+
+          <!-- Register link -->
+          <p class="text-center text-[11px] text-neutral-500 -mt-1 mb-1">
+            Don't have an account?
+            <a href="/registeracc" class="font-semibold text-[#2e6f40] hover:text-[#1f4f2e] transition-all duration-200 link-hover">Create Account</a>
+          </p>
+
+          <!-- School Branding -->
+          <div class="text-center pt-1 border-t border-neutral-200/50">
+            <p class="text-[9px] font-medium text-neutral-500">PNHS-Main · Senior High School</p>
+          </div>
+
+        </form>
+
+        <!-- Toast -->
+        <div id="toast" class="hidden mt-3 p-2.5 rounded-lg text-xs font-medium text-center transition-all duration-300"></div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Toggle password visibility
+    function togglePw(inputId, iconId) {
+      const pw = document.getElementById(inputId);
+      const ic = document.getElementById(iconId);
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        ic.setAttribute('icon', 'lucide:eye-off');
+      } else {
+        pw.type = 'password';
+        ic.setAttribute('icon', 'lucide:eye');
+      }
+    }
+
+    /* ── Role config ── */
+    const ROLE_CONFIG = {
+      student: {
+        hint: 'Student',
+        subtitle: 'Sign in to continue to BlockLearn',
+        labelText: 'LRN (Learner Reference Number)',
+        placeholder: 'e.g. 123456789012',
+        showStaffCode: false,
+        staffCodeLabel: ''
+      },
+      teacher: {
+        hint: 'Teacher',
+        subtitle: 'Sign in with your teacher account',
+        labelText: 'Username',
+        placeholder: 'Enter your username',
+        showStaffCode: true,
+        staffCodeLabel: 'Teacher Validation Code'
+      },
+      ict_support: {
+        hint: 'ICT Support',
+        subtitle: 'Sign in with your ICT Support account',
+        labelText: 'ICT - Admin',
+        placeholder: 'Enter your ICT - Support username',
+        showStaffCode: true,
+        staffCodeLabel: 'ICT Support Validation Code'
+      }
+    };
+
+    function applyRole(role) {
+      const cfg = ROLE_CONFIG[role];
+      if (!cfg) return;
+
+      document.getElementById('loginRole').value = role;
+      document.getElementById('roleHint').textContent = cfg.hint;
+      document.getElementById('loginSubtitle').textContent = cfg.subtitle;
+      document.getElementById('identifierLabel').textContent = cfg.labelText;
+
+      const input = document.getElementById('loginIdentifier');
+      input.placeholder = cfg.placeholder;
+      input.value = '';
+
+      const staffCodeGroup = document.getElementById('staffCodeGroup');
+      const staffCodeLabel = document.getElementById('staffCodeLabel');
+      const staffCodeInput = document.getElementById('staffValidationCode');
+
+      if (cfg.showStaffCode) {
+        staffCodeLabel.textContent = cfg.staffCodeLabel;
+        staffCodeGroup.classList.remove('hidden');
+        staffCodeInput.required = true;
+      } else {
+        staffCodeGroup.classList.add('hidden');
+        staffCodeInput.required = false;
+      }
+      staffCodeInput.value = '';
+
+      document.querySelectorAll('.staff-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.role === role);
+      });
+
+      loadRememberedAccount(role);
+    }
+
+    /* ── Staff dropdown behavior ── */
+    const staffMenuWrap = document.getElementById('staffMenuWrap');
+    const staffTrigger  = document.getElementById('staffTrigger');
+    const staffDropdown = document.getElementById('staffDropdown');
+
+    function openStaffMenu() {
+      staffMenuWrap.classList.add('open');
+      staffTrigger.setAttribute('aria-expanded', 'true');
+    }
+    function closeStaffMenu() {
+      staffMenuWrap.classList.remove('open');
+      staffTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    staffTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      staffMenuWrap.classList.contains('open') ? closeStaffMenu() : openStaffMenu();
+    });
+
+    staffDropdown.querySelectorAll('.staff-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const role = btn.dataset.role;
+        applyRole(role);
+        closeStaffMenu();
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!staffMenuWrap.contains(e.target)) closeStaffMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeStaffMenu();
+    });
+
+    /* ── Remembered account per role ── */
+    function rememberKey(role) {
+      return `blocklearn_account_${role}`;
+    }
+    function loadRememberedAccount(role) {
+      const saved = localStorage.getItem(rememberKey(role));
+      const input = document.getElementById('loginIdentifier');
+      const remember = document.getElementById('rememberAccount');
+      input.value = saved || '';
+      remember.checked = Boolean(saved);
+    }
+
+    /* ── Toast helper ── */
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'mt-3 p-2.5 rounded-lg text-xs font-medium text-center transition-all duration-300';
+      if (type === 'success') {
+        t.classList.add('toast-success');
+      } else if (type === 'error') {
+        t.classList.add('toast-error');
+      } else {
+        t.classList.add('toast-warning');
+      }
+      t.classList.remove('hidden');
+
+      clearTimeout(window.toastTimeout);
+      window.toastTimeout = setTimeout(() => {
+        t.classList.add('hidden');
+      }, 5000);
+    }
+
+    /* ── Login handler ── */
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const txt = document.getElementById('loginBtnText');
+      const spin = document.getElementById('loginSpinner');
+      const role = document.getElementById('loginRole').value;
+      const identifier = document.getElementById('loginIdentifier').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const validationCode = document.getElementById('staffValidationCode').value;
+      const rememberAccount = document.getElementById('rememberAccount').checked;
+
+      if (!identifier || !password || (role !== 'student' && !validationCode)) {
+        showToast('Please fill in all fields.', 'error');
+        return false;
+      }
+
+      let endpoint = '/login';
+      let payload = { role, password };
+      if (role === 'student') {
+        payload.lrn = identifier;
+      } else if (role === 'teacher') {
+        payload.username = identifier;
+        payload.validation_code = validationCode;
+      } else if (role === 'ict_support') {
+        payload.employee_id = identifier;
+        payload.validation_code = validationCode;
+      }
+
+      btn.disabled = true;
+      btn.classList.add('opacity-80');
+      txt.textContent = 'Signing in...';
+      spin.classList.remove('hidden');
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          if (rememberAccount) {
+            localStorage.setItem(rememberKey(role), identifier);
+          } else {
+            localStorage.removeItem(rememberKey(role));
+          }
+          const roleNames = {
+            student: 'Student',
+            teacher: 'Teacher',
+            ict_support: 'ICT Tech Support'
+          };
+          showToast(`Welcome back! Signed in as ${roleNames[role]}.`, 'success');
+          setTimeout(() => {
+            const redirects = {
+              student: '/student_dashboard',
+              teacher: '/teacher_dashboard',
+              ict_support: '/ict_support_dashboard'
+            };
+            window.location.href = result.redirect || redirects[role];
+          }, 800);
+        } else {
+          showToast(result.message || 'Invalid login credentials.', 'error');
+        }
+      } catch (error) {
+        showToast('Unable to sign in. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-80');
+        txt.textContent = 'Sign In';
+        spin.classList.add('hidden');
+      }
+      return false;
+    }
+
+    /* ── Init: default role = Student ── */
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('toast').classList.add('hidden');
+      applyRole('student');
+    });
+  </script>
+
+</body>
+</html>

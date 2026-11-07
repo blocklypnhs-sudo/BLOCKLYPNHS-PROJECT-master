@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PHP Playground · BlockLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/8.0.4/blockly.min.js"></script>
+    <script src="/static/js/score_breakdown.js"></script>
+    <script src="/static/js/learning_timer.js"></script>
+    <script src="/static/js/activity_session.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f6f3; min-height: 100vh; }
+
+        :root {
+            --php-deep: #4d5b96;
+            --php-main: #777bb4;
+            --php-light: #eef0fa;
+            --php-soft: #e8eaf6;
+            --green-deep: #145a42;
+            --green-main: #145a42;
+            --green-light: #28a87a;
+            --green-soft: #e2f3ed;
+            --gold-warm: #e8a838;
+            --gold-light: #fce9c5;
+            --coral: #e06050;
+            --coral-soft: #fce8e5;
+            --blue: #4a90d9;
+            --blue-soft: #e4eefb;
+            --stone: #7f9e92;
+            --stone-light: #a8bfb4;
+            --border-fresh: #dde9e3;
+            --card-white: #ffffff;
+            --bg-main: #f0f6f3;
+            --text-primary: #1a463a;
+            --text-secondary: #4a6b5e;
+            --shadow-sm: 0 4px 16px rgba(20, 90, 66, 0.06);
+            --shadow-md: 0 8px 28px rgba(20, 90, 66, 0.08);
+            --shadow-lg: 0 16px 48px rgba(20, 90, 66, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --card-glass: rgba(255, 255, 255, 0.85);
+        }
+
+        .container-custom {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 0.4rem 1.5rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+        }
+        .page-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin: 0;
+        }
+        .page-title i {
+            color: var(--php-main);
+            margin-right: 8px;
+        }
+        .playground-close {
+            background: var(--coral-soft);
+            color: var(--coral);
+            border: none;
+            padding: 4px 14px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .playground-close:hover {
+            background: var(--coral);
+            color: white;
+        }
+
+        /* ===== ACTIVITY SELECTOR ===== */
+        .activity-selector {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        .activity-selector .title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--stone);
+            margin-bottom: 8px;
+        }
+        .activity-selector .title i {
+            color: var(--php-main);
+            margin-right: 4px;
+        }
+        .activity-btns {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .activity-btn {
+            padding: 5px 14px;
+            border-radius: 40px;
+            border: 1.5px solid var(--border-fresh);
+            background: white;
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+        }
+        .activity-btn:hover {
+            border-color: var(--php-main);
+            color: var(--php-main);
+        }
+        .activity-btn.active {
+            background: var(--php-main);
+            border-color: var(--php-main);
+            color: white;
+        }
+        .activity-btn.activity-locked,
+        .activity-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            filter: grayscale(0.35);
+        }
+        .activity-lock-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #a33a2e;
+        }
+        .activity-btn .difficulty-tag {
+            font-size: 9px;
+            padding: 1px 7px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .difficulty-easy { background: #d1fae5; color: #065f46; }
+        .difficulty-medium { background: #fef3c7; color: #b45309; }
+        .difficulty-hard { background: #fee2e2; color: #991b1b; }
+        .activity-btn.active .difficulty-tag {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        /* ===== ACTIVITY BANNER (INSTRUCTIONS / GUIDE) ===== */
+        .activity-banner {
+            background: linear-gradient(125deg, var(--php-deep), var(--php-main));
+            border-radius: var(--radius-lg);
+            padding: 14px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: 0 8px 18px rgba(77, 91, 150, 0.2);
+        }
+        .activity-banner-info {
+            flex: 1;
+            min-width: 280px;
+        }
+        .activity-banner-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: white;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .activity-banner-info h4 .difficulty-tag {
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .activity-banner-info .instructions {
+            font-size: 12px;
+            opacity: 0.95;
+            margin: 0 0 8px 0;
+            color: #f5f5ff;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .activity-banner-info .instructions code {
+            background: rgba(255,255,255,0.15);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 11px;
+        }
+        .activity-banner-info .expected-output-box {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 6px 14px;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .activity-banner-info .expected-output-box .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.75;
+            display: block;
+            margin-bottom: 2px;
+            color: #f5f5ff;
+        }
+        .activity-banner-info .expected-output-box .value {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            color: #4ade80;
+            font-weight: 700;
+            white-space: pre-wrap;
+        }
+        .btn-clear-activity {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .btn-clear-activity:hover { background: rgba(255,255,255,0.35); }
+
+        /* ===== WORKSPACE PANEL ===== */
+        .workspace-panel {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== WORKSPACE TOOLBAR ===== */
+        .workspace-toolbar {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-fresh);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: var(--bg-main);
+        }
+        .workspace-toolbar .lang-badge {
+            background: var(--php-light);
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--php-deep);
+        }
+        .workspace-toolbar .actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .workspace-toolbar .actions button {
+            padding: 3px 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .btn-run { background: var(--php-main); color: white; }
+        .btn-run:hover { background: var(--php-deep); }
+        .btn-clear { background: var(--coral-soft); color: var(--coral); }
+        .btn-clear:hover { background: var(--coral); color: white; }
+        .btn-submit { background: var(--gold-warm); color: #1a4235; }
+        .btn-submit:hover { background: #d49a2a; }
+
+        /* ===== WORKSPACE WRAPPER ===== */
+        .workspace-wrapper {
+            height: 400px;
+            min-height: 400px;
+            max-height: 540px;
+            overflow: hidden;
+            position: relative;
+        }
+        #blocklyDiv {
+            height: 100%;
+            width: 100%;
+            min-height: 400px;
+            max-height: 540px;
+            background: #fefefb;
+        }
+
+        /* ===== OUTPUT PANEL ===== */
+        .output-panel {
+            padding: 8px 16px 12px;
+            border-top: 1px solid var(--border-fresh);
+            background: #1a2d27;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .output-panel .output-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .output-panel .output-col {
+            flex: 1;
+            min-width: 120px;
+        }
+        .output-panel .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #8fb8a8;
+            margin-bottom: 1px;
+        }
+        .output-panel .output-text {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            color: #bbf0e0;
+            min-height: 20px;
+            line-height: 1.5;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+        .output-panel .output-text.success { color: #4ade80; }
+        .output-panel .output-text.error { color: #f87171; }
+
+        /* ===== TOAST ===== */
+        @keyframes tIn {
+            0% { opacity: 0; transform: translateX(40px) scale(0.95); }
+            100% { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        #toastBox {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast-msg {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: tIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+        }
+        .toast-msg.success { background: #1a463a; color: white; }
+        .toast-msg.error { background: #dc2626; color: white; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container-custom { padding: 12px 10px; }
+            .activity-header { padding: 10px 14px; }
+            .activity-header .left h3 { font-size: 13px; }
+            .workspace-wrapper { height: 260px; min-height: 260px; }
+            #blocklyDiv { min-height: 260px; max-height: 360px; }
+            .output-panel .output-row { flex-direction: column; gap: 6px; }
+            .activity-banner { padding: 12px 14px; }
+            .activity-banner-info h4 { font-size: 13px; }
+            .activity-banner-info .instructions { font-size: 11px; }
+        }
+        @media (max-width: 576px) {
+            .workspace-toolbar { flex-direction: column; align-items: stretch; }
+            .workspace-toolbar .actions { justify-content: center; }
+            .top-bar { padding: 0.3rem 1rem; }
+            .page-title { font-size: 0.85rem; }
+        }
+    </style>
+<script src="/static/js/blockly_code_preview.js"></script>
+</head>
+<body>
+
+    <div class="container-custom">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <p class="page-title"><i class="fab fa-php"></i>PHP Playground</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="playground-close" onclick="window.location.href='/student_activities_php'">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Activity Selector -->
+        <div class="activity-selector">
+            <div class="title"><i class="fas fa-graduation-cap"></i> PHP Activities</div>
+            <div class="activity-btns">
+                <button class="activity-btn active" data-activity="hello-php" onclick="loadActivity('hello-php')">
+                    <i class="fas fa-terminal"></i> Hello PHP
+                    <span class="difficulty-tag difficulty-easy">Easy</span>
+                </button>
+                <button class="activity-btn" data-activity="store-name" onclick="loadActivity('store-name')">
+                    <i class="fas fa-cube"></i> Store Name
+                    <span class="difficulty-tag difficulty-easy">Easy</span>
+                </button>
+                <button class="activity-btn" data-activity="subtract-numbers" onclick="loadActivity('subtract-numbers')">
+                    <i class="fas fa-calculator"></i> Subtract Numbers
+                    <span class="difficulty-tag difficulty-medium">Medium</span>
+                </button>
+                <button class="activity-btn" data-activity="greater-than-php" onclick="loadActivity('greater-than-php')">
+                    <i class="fas fa-code-branch"></i> Greater Than
+                    <span class="difficulty-tag difficulty-medium">Medium</span>
+                </button>
+                <button class="activity-btn" data-activity="repeat-php" onclick="loadActivity('repeat-php')">
+                    <i class="fas fa-list-ol"></i> Repeat Message
+                    <span class="difficulty-tag difficulty-hard">Hard</span>
+                </button>
+                <button class="activity-btn" data-activity="free-play" onclick="loadActivity('free-play')">
+                    <i class="fas fa-play"></i> Free Play
+                </button>
+            </div>
+        </div>
+
+        <!-- Activity Banner (INSTRUCTIONS / GUIDE) -->
+        <div class="activity-banner" id="activityBanner">
+            <div class="activity-banner-info">
+                <h4>
+                    <i class="fas fa-code"></i>
+                    <span id="bannerActivityName">Hello PHP</span>
+                    <span class="difficulty-tag difficulty-easy" id="bannerDifficulty">Easy</span>
+                </h4>
+                <p class="instructions" id="bannerInstructions">Build a PHP program that prints "Hello, PHP!"</p>
+                <div class="expected-output-box">
+                    <span class="label"><i class="fas fa-eye me-1"></i>Expected Output</span>
+                    <span class="value" id="bannerExpectedOutput">Hello, PHP!</span>
+                </div>
+            </div>
+            <button class="btn-clear-activity" onclick="clearWorkspace()">
+                <i class="fas fa-times me-1"></i> Clear
+            </button>
+        </div>
+
+        <!-- Workspace Panel -->
+        <div class="workspace-panel">
+            <div class="workspace-toolbar">
+                <span class="lang-badge"><i class="fab fa-php me-1"></i> PHP</span>
+                <div class="actions">
+                    <button class="btn-clear" onclick="clearWorkspace()"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+                    <button class="btn-run" onclick="runPhpCode()"><i class="fas fa-play me-1"></i> Run</button>
+                    <button class="btn-submit" onclick="savePhpPractice()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+                </div>
+            </div>
+            <div class="workspace-wrapper">
+                <div id="blocklyDiv"></div>
+            </div>
+            <!-- Output Panel -->
+            <div class="output-panel">
+                <div class="output-row">
+                    <div class="output-col">
+                        <div class="label"><i class="fas fa-terminal me-1"></i> Your Output</div>
+                        <div class="output-text" id="outputArea">Run your code to see output</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastBox"></div>
+
+    <script>
+        // ============================================================
+        // BLOCK REGISTRATION (SAME AS BEFORE)
+        // ============================================================
+        console.log('Blockly version:', Blockly.version || 'unknown');
+
+        Blockly.Blocks['php_echo'] = {
+            init: function() {
+                this.appendValueInput('TEXT').setCheck(['String', 'Number']).appendField('echo');
+                this.setInputsInline(true);
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#777bb4');
+                this.setTooltip('Print to output in PHP');
+            }
+        };
+
+        Blockly.Blocks['php_variable'] = {
+            init: function() {
+                this.appendDummyInput().appendField('$').appendField(new Blockly.FieldTextInput('myVar'), 'NAME').appendField('=');
+                this.appendValueInput('VALUE');
+                this.setInputsInline(true);
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#8b5cf6');
+                this.setTooltip('Create a PHP variable');
+            }
+        };
+
+        Blockly.Blocks['php_variable_get'] = {
+            init: function() {
+                this.appendDummyInput().appendField('$').appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
+                this.setOutput(true, ['String', 'Number']);
+                this.setColour('#8b5cf6');
+                this.setTooltip('Get variable value');
+            }
+        };
+
+        Blockly.Blocks['php_math_operation'] = {
+            init: function() {
+                this.appendValueInput('A').setCheck('Number').appendField('math');
+                this.appendDummyInput().appendField(new Blockly.FieldDropdown([
+                    ['+', 'ADD'], ['-', 'SUBTRACT'], ['×', 'MULTIPLY'], ['÷', 'DIVIDE']
+                ]), 'OP');
+                this.appendValueInput('B').setCheck('Number').appendField('');
+                this.setInputsInline(true);
+                this.setOutput(true, 'Number');
+                this.setColour('#10b981');
+                this.setTooltip('Perform math operation');
+            }
+        };
+
+        Blockly.Blocks['php_number'] = {
+            init: function() {
+                this.appendDummyInput().appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 1), 'NUM');
+                this.setOutput(true, 'Number');
+                this.setColour('#10b981');
+                this.setTooltip('A number');
+            }
+        };
+
+        Blockly.Blocks['php_text'] = {
+            init: function() {
+                this.appendDummyInput().appendField(new Blockly.FieldTextInput(''), 'TEXT');
+                this.setOutput(true, 'String');
+                this.setColour('#8b5cf6');
+                this.setTooltip('A text string');
+            }
+        };
+
+        Blockly.Blocks['php_if'] = {
+            init: function() {
+                this.appendValueInput('IF0').setCheck('Boolean').appendField('if');
+                this.appendStatementInput('DO0').appendField('then');
+                this.appendStatementInput('ELSE').appendField('else');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#f0b84d');
+                this.setTooltip('If-Else statement in PHP');
+            }
+        };
+
+        Blockly.Blocks['php_compare'] = {
+            init: function() {
+                this.appendValueInput('A').setCheck(['Number', 'String']);
+                this.appendDummyInput().appendField(new Blockly.FieldDropdown([
+                    ['=', 'EQ'], ['≠', 'NEQ'], ['>', 'GT'], ['<', 'LT'], ['≥', 'GTE'], ['≤', 'LTE']
+                ]), 'OP');
+                this.appendValueInput('B').setCheck(['Number', 'String']);
+                this.setInputsInline(true);
+                this.setOutput(true, 'Boolean');
+                this.setColour('#f0b84d');
+                this.setTooltip('Compare two values');
+            }
+        };
+
+        Blockly.Blocks['php_for'] = {
+            init: function() {
+                this.appendDummyInput().appendField('for ($').appendField(new Blockly.FieldTextInput('i'), 'VAR').appendField('=');
+                this.appendValueInput('FROM').setCheck('Number');
+                this.appendDummyInput().appendField('; $').appendField(new Blockly.FieldTextInput('i'), 'VAR2').appendField('<= ');
+                this.appendValueInput('TO').setCheck('Number');
+                this.appendDummyInput().appendField('; $').appendField(new Blockly.FieldTextInput('i'), 'VAR3').appendField('++) {');
+                this.appendStatementInput('DO').appendField('body');
+                this.appendDummyInput().appendField('}');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#d97706');
+                this.setTooltip('For loop in PHP');
+            }
+        };
+
+        // ============================================================
+        // JAVASCRIPT GENERATORS
+        // ============================================================
+        if (typeof Blockly.JavaScript === 'undefined') {
+            try {
+                var jsGenerator = Blockly.Generator.getGenerator('JavaScript');
+                if (jsGenerator) {
+                    for (var key in jsGenerator) {
+                        Blockly.JavaScript = Blockly.JavaScript || {};
+                        Blockly.JavaScript[key] = jsGenerator[key];
+                    }
+                }
+            } catch(e) { console.error('Failed to get JavaScript generator:', e); }
+        }
+
+        if (Blockly.JavaScript) {
+            Blockly.JavaScript['php_echo'] = function(block) {
+                var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+                return 'echo ' + text + ';\n';
+            };
+            Blockly.JavaScript['php_variable'] = function(block) {
+                var name = block.getFieldValue('NAME');
+                var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC) || '""';
+                return '$' + name + ' = ' + value + ';\n';
+            };
+            Blockly.JavaScript['php_variable_get'] = function(block) {
+                var name = block.getFieldValue('NAME');
+                return ['$' + name, Blockly.JavaScript.ORDER_ATOMIC];
+            };
+            Blockly.JavaScript['php_math_operation'] = function(block) {
+                var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+                var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+                var op = block.getFieldValue('OP');
+                var symbol = op === 'ADD' ? '+' : op === 'SUBTRACT' ? '-' : op === 'MULTIPLY' ? '*' : '/';
+                return ['(' + a + ' ' + symbol + ' ' + b + ')', Blockly.JavaScript.ORDER_ATOMIC];
+            };
+            Blockly.JavaScript['php_number'] = function(block) {
+                return [block.getFieldValue('NUM'), Blockly.JavaScript.ORDER_ATOMIC];
+            };
+            Blockly.JavaScript['php_text'] = function(block) {
+                var text = block.getFieldValue('TEXT') || '';
+                return ['"' + text + '"', Blockly.JavaScript.ORDER_ATOMIC];
+            };
+            Blockly.JavaScript['php_compare'] = function(block) {
+                var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+                var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+                var op = block.getFieldValue('OP');
+                var symbol = op === 'EQ' ? '==' : op === 'NEQ' ? '!=' : op === 'GT' ? '>' : op === 'LT' ? '<' : op === 'GTE' ? '>=' : '<=';
+                return ['(' + a + ' ' + symbol + ' ' + b + ')', Blockly.JavaScript.ORDER_ATOMIC];
+            };
+            Blockly.JavaScript['php_if'] = function(block) {
+                var condition = Blockly.JavaScript.valueToCode(block, 'IF0', Blockly.JavaScript.ORDER_ATOMIC) || 'false';
+                var doCode = Blockly.JavaScript.statementToCode(block, 'DO0') || '';
+                var elseCode = Blockly.JavaScript.statementToCode(block, 'ELSE') || '';
+                var code = 'if (' + condition + ') {\n' + doCode + '}';
+                if (elseCode) code += ' else {\n' + elseCode + '}';
+                return code + '\n';
+            };
+            Blockly.JavaScript['php_for'] = function(block) {
+                var varName = block.getFieldValue('VAR');
+                var from = Blockly.JavaScript.valueToCode(block, 'FROM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+                var to = Blockly.JavaScript.valueToCode(block, 'TO', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+                var doCode = Blockly.JavaScript.statementToCode(block, 'DO') || '';
+                return 'for ($' + varName + ' = ' + from + '; $' + varName + ' <= ' + to + '; $' + varName + '++) {\n' + doCode + '}\n';
+            };
+        }
+
+        // ===== BLOCKLY SETUP =====
+        let workspace;
+        let currentActivity = 'hello-php';
+
+        // ===== ACTIVITY CONFIGURATIONS (SAME INSTRUCTIONS AS BEFORE) =====
+        const phpActivities = {
+            'hello-php': {
+                name: 'Hello PHP',
+                difficulty: 'Easy',
+                step: 1,
+                toolboxCategories: ['PHP Basic'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
+                instructions: `TASK: Print "Hello, PHP!" to the output.\n\nBLOCKS NEEDED: echo, TEXT\n\nSTEPS:\n1. Drag echo from BASIC\n2. Drag TEXT from BASIC and attach INSIDE echo\n3. Type "Hello, PHP!" in TEXT\n4. Click RUN CODE`,
+                expected: 'Hello, PHP!'
+            },
+            'store-name': {
+                name: 'Store Name',
+                difficulty: 'Easy',
+                step: 2,
+                toolboxCategories: ['PHP Basic', 'PHP Variables'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
+                instructions: `TASK: Create a variable called "name" with value "Caryll" and print it.\n\nBLOCKS NEEDED: $variable, echo, TEXT, variable_get\n\nSTEPS:\n1. Drag "$myVar =" from VARIABLES\n2. Change "myVar" to "name"\n3. Attach a TEXT block with value "Caryll"\n4. Drag echo from BASIC\n5. Drag variable_get from VARIABLES and attach INSIDE echo\n6. Change variable_get to "name"\n7. Click RUN CODE`,
+                expected: 'Caryll'
+            },
+            'subtract-numbers': {
+                name: 'Subtract Numbers',
+                difficulty: 'Medium',
+                step: 3,
+                toolboxCategories: ['PHP Basic', 'PHP Math'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
+                instructions: `TASK: Subtract 50 from 80 and print the result.\n\nBLOCKS NEEDED: echo, math_operation, number\n\nSTEPS:\n1. Drag echo\n2. Inside echo, add math_operation (-)\n3. Add two number blocks: 80 and 50\n4. Click RUN CODE`,
+                expected: '30'
+            },
+            'greater-than-php': {
+                name: 'Greater Than',
+                difficulty: 'Medium',
+                step: 4,
+                toolboxCategories: ['PHP Basic', 'PHP Math', 'PHP Logic'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="php_if" x="40" y="40">
+                        <value name="IF0">
+                            <block type="php_compare">
+                                <field name="OP">GT</field>
+                                <value name="A"><block type="php_number"><field name="NUM">25</field></block></value>
+                                <value name="B"><block type="php_number"><field name="NUM">18</field></block></value>
+                            </block>
+                        </value>
+                        <statement name="DO0">
+                            <block type="php_echo">
+                                <value name="TEXT"><block type="php_text"><field name="TEXT">25 is greater than 18</field></block></value>
+                            </block>
+                        </statement>
+                    </block>
+                </xml>`,
+                instructions: `TASK: Check if 25 is greater than 18. If true, print "25 is greater than 18".\n\nBLOCKS NEEDED: if, compare, echo, number, text\n\nSTEPS:\n1. Drag if block\n2. Add compare (>) block as condition\n3. Set values: 25 and 18\n4. Inside if, add echo with text "25 is greater than 18"\n5. Click RUN CODE`,
+                expected: '25 is greater than 18'
+            },
+            'repeat-php': {
+                name: 'Repeat Message',
+                difficulty: 'Hard',
+                step: 5,
+                toolboxCategories: ['PHP Basic', 'PHP Math', 'PHP Loops'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
+                instructions: `TASK: Display "Learning PHP!" 3 times using a for loop.\n\nBLOCKS NEEDED: for loop, echo, number, text\n\nSTEPS:\n1. Drag for loop\n2. Set counter to "i"\n3. Set from: 0, to: 2 (or 1 to 3)\n4. Inside loop, add echo with text "Learning PHP!"\n5. Click RUN CODE`,
+                expected: 'Learning PHP!\nLearning PHP!\nLearning PHP!'
+            },
+            'free-play': {
+                name: 'Free Play',
+                difficulty: 'All Levels',
+                step: 0,
+                toolboxCategories: ['All'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
+                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: echo, TEXT\nMATH: math_operation, number\nVARIABLES: $variable, variable_get\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                expected: 'Your Code'
+            }
+        };
+
+        // ===== TOOLBOX GENERATOR =====
+        function getPhpToolbox(categories) {
+            const allCategories = {
+                'PHP Basic': `
+                    <category name="BASIC" colour="#777bb4">
+                        <block type="php_echo"></block>
+                        <block type="php_text"></block>
+                    </category>`,
+                'PHP Math': `
+                    <category name="MATH" colour="#10b981">
+                        <block type="php_math_operation"></block>
+                        <block type="php_number"></block>
+                    </category>`,
+                'PHP Variables': `
+                    <category name="VARIABLES" colour="#8b5cf6">
+                        <block type="php_variable"></block>
+                        <block type="php_variable_get"></block>
+                    </category>`,
+                'PHP Logic': `
+                    <category name="LOGIC" colour="#f0b84d">
+                        <block type="php_if"></block>
+                        <block type="php_compare"></block>
+                    </category>`,
+                'PHP Loops': `
+                    <category name="LOOPS" colour="#d97706">
+                        <block type="php_for"></block>
+                    </category>`
+            };
+
+            if (categories.includes('All')) {
+                return `
+                    <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none;">
+                        ${allCategories['PHP Basic']}
+                        ${allCategories['PHP Math']}
+                        ${allCategories['PHP Variables']}
+                        ${allCategories['PHP Logic']}
+                        ${allCategories['PHP Loops']}
+                    </xml>`;
+            }
+
+            let toolboxXml = '<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none;">';
+            categories.forEach(cat => {
+                if (allCategories[cat]) toolboxXml += allCategories[cat];
+            });
+            toolboxXml += '</xml>';
+            return toolboxXml;
+        }
+
+        // ===== BLOCKLY INITIALIZATION =====
+        function initBlockly(toolboxXml) {
+            if (workspace) { workspace.dispose(); workspace = null; }
+
+            workspace = Blockly.inject('blocklyDiv', {
+                toolbox: toolboxXml,
+                trashcan: true,
+                zoom: { controls: true, wheel: true, startScale: 0.9 },
+                renderer: 'zelos'
+            });
+            window.attachBlocklyCodePreview(
+                workspace,
+                'blocklyDiv',
+                () => Blockly.JavaScript.workspaceToCode(workspace),
+                'Generated JavaScript'
+            );
+
+            setTimeout(() => {
+                document.querySelectorAll('.blocklyTrash').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.transition = 'all 0.3s ease';
+                });
+            }, 200);
+
+            window.addEventListener('resize', () => {
+                if (workspace) Blockly.svgResize(workspace);
+            });
+        }
+
+        // ===== ACTIVITY LOADING =====
+        async function loadActivity(activityId, userInitiated = true) {
+            const activity = phpActivities[activityId];
+            if (!activity) return;
+            try {
+                await window.ActivitySession.start(activityId, userInitiated);
+            } catch (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            currentActivity = activityId;
+
+            document.querySelectorAll('.activity-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.activity === activityId);
+            });
+
+            // Update banner with activity name, difficulty, instructions, expected output
+            document.getElementById('bannerActivityName').textContent = activity.name;
+            
+            const diffTag = document.getElementById('bannerDifficulty');
+            diffTag.textContent = activity.difficulty;
+            diffTag.className = 'difficulty-tag';
+            if (activity.difficulty === 'Easy') diffTag.classList.add('difficulty-easy');
+            else if (activity.difficulty === 'Medium') diffTag.classList.add('difficulty-medium');
+            else if (activity.difficulty === 'Hard') diffTag.classList.add('difficulty-hard');
+            else diffTag.classList.add('difficulty-easy');
+            
+            document.getElementById('bannerInstructions').textContent = activity.instructions;
+            document.getElementById('bannerExpectedOutput').textContent = activity.expected || '—';
+
+            const toolboxXml = getPhpToolbox(activity.toolboxCategories);
+            initBlockly(toolboxXml);
+
+            setTimeout(() => {
+                try {
+                    if (workspace && activity.blocksXml) {
+                        const xmlDom = Blockly.Xml.textToDom(activity.blocksXml);
+                        Blockly.Xml.domToWorkspace(xmlDom, workspace);
+                        Blockly.svgResize(workspace);
+                    }
+                    document.getElementById('outputArea').textContent = 'Run your code to see output';
+                    document.getElementById('outputArea').className = 'output-text';
+                } catch(e) { console.error('Failed to load activity blocks:', e); }
+            }, 100);
+        }
+
+        // ===== WORKSPACE CONTROLS =====
+        function clearWorkspace() {
+            if (confirm('Clear all blocks from workspace?')) {
+                try {
+                    if (workspace) {
+                        workspace.clear();
+                        document.getElementById('outputArea').textContent = 'Workspace cleared';
+                        document.getElementById('outputArea').className = 'output-text';
+                    }
+                } catch(e) { console.error('Error clearing workspace:', e); }
+            }
+        }
+
+        // ===== RUN PHP CODE =====
+        function runPhpCode() {
+            const outputArea = document.getElementById('outputArea');
+            try {
+                if (!workspace) {
+                    outputArea.textContent = 'Workspace not initialized.';
+                    outputArea.className = 'output-text error';
+                    return;
+                }
+                if (typeof Blockly.JavaScript === 'undefined') {
+                    outputArea.textContent = 'PHP generator not available.';
+                    outputArea.className = 'output-text error';
+                    return;
+                }
+
+                let code = Blockly.JavaScript.workspaceToCode(workspace);
+
+                if (!code || code.trim() === '') {
+                    outputArea.textContent = 'No code to run. Build your solution first!';
+                    outputArea.className = 'output-text error';
+                    return;
+                }
+
+                const originalConsoleLog = console.log;
+                window.lastPhpOutput = '';
+
+                try {
+                    let consoleOutput = [];
+                    console.log = function(...args) { consoleOutput.push(args.join(' ')); };
+
+                    const executableCode = code
+                        .replace(/\becho\s+([^;]+);/g, 'console.log($1);')
+                        .replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=/g, 'let $1 =')
+                        .replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, '$1');
+
+                    eval(executableCode);
+
+                    if (consoleOutput.length > 0) {
+                        window.lastPhpOutput = consoleOutput.join('\n');
+                        outputArea.textContent = consoleOutput.join('\n');
+                        outputArea.className = 'output-text success';
+                    } else {
+                        outputArea.textContent = 'Code ran successfully but no output was printed.';
+                        outputArea.className = 'output-text';
+                    }
+                } catch(e) {
+                    outputArea.textContent = 'Execution error: ' + e.message;
+                    outputArea.className = 'output-text error';
+                } finally {
+                    console.log = originalConsoleLog;
+                }
+            } catch(e) {
+                outputArea.textContent = 'Error: ' + e.message;
+                outputArea.className = 'output-text error';
+            }
+        }
+
+        function savePhpPractice() {
+            if (!workspace) { alert('Workspace not ready.'); return; }
+            if (typeof Blockly.JavaScript === 'undefined') { alert('PHP generator not available.'); return; }
+
+            let code = Blockly.JavaScript.workspaceToCode(workspace).trim();
+            if (!code) { alert('Build your solution before submitting!'); return; }
+
+            const activityNumbers = {
+                'hello-php': 1,
+                'store-name': 2,
+                'subtract-numbers': 3,
+                'greater-than-php': 4,
+                'repeat-php': 5
+            };
+            const assessmentNumber = activityNumbers[currentActivity];
+            if (!assessmentNumber) {
+                alert('Free Play cannot be submitted as an assessment.');
+                return;
+            }
+
+            const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+            const output = window.lastPhpOutput || '';
+
+            const submitBtn = document.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting...';
+            submitBtn.disabled = true;
+
+            fetch('/submit_activity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    language: 'php',
+                    assessment_number: assessmentNumber,
+                    code_blocks: codeBlocks,
+                    generated_code: code,
+                    output: output,
+                    duration_seconds: window.getLearningDurationSeconds()
+                })
+            })
+            .then(response => {
+                if (!response.ok) return response.text().then(text => { throw new Error(text || `HTTP ${response.status}`); });
+                return response.json();
+            })
+            .then(async result => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                if (result.success) {
+                    const earnedPoints = result.points || 0;
+                    const maxPoints = result.max_points || 0;
+                    window.showScoreAttemptFeedback(result, result.activity_title || currentActivity);
+                    await window.ActivitySession.submitted(result);
+                    showToast(`Submitted ${earnedPoints}/${maxPoints}`, result.points === result.max_points ? 'success' : 'error');
+                    try { localStorage.setItem('student_dashboard_refresh', Date.now().toString()); } catch(e) {}
+                    try { localStorage.setItem('progress_updated', Date.now().toString()); } catch(e) {}
+                } else {
+                    showToast(result.message || 'Submission failed.', 'error');
+                }
+            })
+            .catch(error => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                console.error('Submit activity failed:', error);
+                showToast('Unable to submit. Please try again.', 'error');
+            });
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            const box = document.getElementById('toastBox');
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg ' + type;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            box.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(40px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Page loaded - initializing...');
+            const requestedActivity = new URLSearchParams(window.location.search).get('activity');
+            const activityId = Object.prototype.hasOwnProperty.call(phpActivities, requestedActivity)
+                ? requestedActivity
+                : 'hello-php';
+            await window.ActivitySession.initialize('php', phpActivities);
+            loadActivity(activityId, false);
+        });
+    </script>
+</body>
+</html>

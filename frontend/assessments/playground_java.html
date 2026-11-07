@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Java Playground · BlockLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/blockly/blockly.min.js">
+    </script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js">
+    </script>
+    <script src="/static/js/score_breakdown.js"></script>
+    <script src="/static/js/learning_timer.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f6f3;
+            min-height: 100vh;
+        }
+
+        :root {
+            --java-deep: #b85a00;
+            --java-main: #e76f00;
+            --java-light: #ffa54a;
+            --java-soft: #fde8d0;
+            --gold-warm: #e8a838;
+            --gold-light: #fce9c5;
+            --coral: #e06050;
+            --coral-soft: #fce8e5;
+            --blue: #4a90d9;
+            --blue-soft: #e4eefb;
+            --stone: #7f9e92;
+            --stone-light: #a8bfb4;
+            --border-fresh: #dde9e3;
+            --card-white: #ffffff;
+            --bg-main: #f0f6f3;
+            --text-primary: #1a463a;
+            --text-secondary: #4a6b5e;
+            --shadow-sm: 0 4px 16px rgba(20, 90, 66, 0.06);
+            --shadow-md: 0 8px 28px rgba(20, 90, 66, 0.08);
+            --shadow-lg: 0 16px 48px rgba(20, 90, 66, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --card-glass: rgba(255, 255, 255, 0.85);
+        }
+
+        .container-custom {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        .top-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 0.4rem 1.5rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+        }
+        .page-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin: 0;
+        }
+        .page-title i {
+            color: var(--java-main);
+            margin-right: 8px;
+        }
+        .playground-close {
+            background: var(--coral-soft);
+            color: var(--coral);
+            border: none;
+            padding: 4px 14px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .playground-close:hover {
+            background: var(--coral);
+            color: white;
+        }
+
+        .activity-header {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            padding: 12px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .activity-header .left h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .activity-header .left .sub {
+            font-size: 11px;
+            color: var(--stone-light);
+        }
+        .activity-header .meta {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .activity-header .meta span {
+            font-size: 11px;
+            color: var(--stone);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .activity-header .meta span i {
+            color: var(--java-main);
+        }
+
+        .workspace-panel {
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .expected-top {
+            padding: 8px 16px;
+            background: #1a2d27;
+            border-bottom: 1px solid var(--border-fresh);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .expected-top .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #8fb8a8;
+            margin-right: 4px;
+        }
+        .expected-top .value {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            color: #fbbf24;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .workspace-toolbar {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-fresh);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: var(--bg-main);
+        }
+        .workspace-toolbar .lang-badge {
+            background: var(--java-soft);
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--java-deep);
+        }
+        .workspace-toolbar .actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .workspace-toolbar .actions button {
+            padding: 3px 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .btn-run {
+            background: var(--java-main);
+            color: white;
+        }
+        .btn-run:hover {
+            background: var(--java-deep);
+        }
+        .btn-clear {
+            background: var(--coral-soft);
+            color: var(--coral);
+        }
+        .btn-clear:hover {
+            background: var(--coral);
+            color: white;
+        }
+        .btn-submit {
+            background: var(--gold-warm);
+            color: #1a4235;
+        }
+        .btn-submit:hover {
+            background: #d49a2a;
+        }
+
+        .workspace-wrapper {
+            height: 400px;
+            min-height: 400px;
+            max-height: 540px;
+            overflow: hidden;
+            position: relative;
+        }
+        #blocklyDiv {
+            height: 100%;
+            width: 100%;
+            min-height: 400px;
+            max-height: 540px;
+            background: #fefefb;
+        }
+
+        .output-panel {
+            padding: 8px 16px 12px;
+            border-top: 1px solid var(--border-fresh);
+            background: #1a2d27;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .output-panel .output-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .output-panel .output-col {
+            flex: 1;
+            min-width: 120px;
+        }
+        .output-panel .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: #8fb8a8;
+            margin-bottom: 1px;
+        }
+        .output-panel .output-text {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            color: #bbf0e0;
+            min-height: 20px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+        .output-panel .output-text.success {
+            color: #4ade80;
+        }
+        .output-panel .output-text.error {
+            color: #f87171;
+        }
+
+        @media (max-width: 768px) {
+            .container-custom {
+                padding: 12px 10px;
+            }
+            .activity-header {
+                padding: 10px 14px;
+            }
+            .activity-header .left h3 {
+                font-size: 13px;
+            }
+            .workspace-wrapper {
+                height: 260px;
+                min-height: 260px;
+            }
+            #blocklyDiv {
+                min-height: 260px;
+                max-height: 360px;
+            }
+            .output-panel .output-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .expected-top {
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .expected-top .value {
+                font-size: 12px;
+            }
+        }
+        @media (max-width: 576px) {
+            .workspace-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .workspace-toolbar .actions {
+                justify-content: center;
+            }
+            .top-bar {
+                padding: 0.3rem 1rem;
+            }
+            .page-title {
+                font-size: 0.85rem;
+            }
+        }
+
+        @keyframes tIn {
+            0% {
+                opacity: 0;
+                transform: translateX(40px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        #toastBox {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast-msg {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: tIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+        }
+        .toast-msg.success {
+            background: #1a463a;
+            color: white;
+        }
+        .toast-msg.error {
+            background: #dc2626;
+            color: white;
+        }
+    </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+<script src="/static/js/blockly_code_preview.js"></script>
+</head>
+<body>
+
+    <div class="container-custom">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <p class="page-title"><i class="fab fa-java"></i>Java Playground</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="playground-close" onclick="window.location.href='/assessments_java'"><i class="fas fa-times"></i> Close</button>
+            </div>
+        </div>
+
+        <!-- Activity Header -->
+        <div class="activity-header">
+            <div class="left">
+                <h3 id="activityTitle">Java Fundamentals</h3>
+                <div class="sub" id="activitySub">Java · Assessment #1</div>
+            </div>
+            <div class="meta">
+                <span><i class="fas fa-star"></i> <span id="activityPoints">10 points</span></span>
+                <span><i class="fas fa-signal"></i> <span id="activityDifficulty">Easy</span></span>
+            </div>
+        </div>
+
+        <!-- Workspace Panel -->
+        <div class="workspace-panel">
+            <!-- Expected output at the top -->
+            <div class="expected-top">
+                <span class="label"><i class="fas fa-bullseye me-1"></i> Expected Output</span>
+                <span class="value" id="expectedOutputText">Hello, World!</span>
+            </div>
+
+            <div class="workspace-toolbar">
+                <span class="lang-badge"><i class="fab fa-java me-1"></i> Java</span>
+                <div class="actions">
+                    <button class="btn-clear" onclick="clearWorkspace()"><i class="fas fa-trash-alt me-1"></i> Clear</button>
+                    <button class="btn-run" onclick="runJavaCode()"><i class="fas fa-play me-1"></i> Run</button>
+                    <button class="btn-submit" onclick="submitActivity()"><i class="fas fa-paper-plane me-1"></i> Submit</button>
+                </div>
+            </div>
+            <div class="workspace-wrapper">
+                <div id="blocklyDiv"></div>
+            </div>
+            <!-- Output Panel -->
+            <div class="output-panel">
+                <div class="output-row">
+                    <div class="output-col">
+                        <div class="label"><i class="fas fa-terminal me-1"></i> Your Output</div>
+                        <div class="output-text" id="outputText">Run your code to see output</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ACTIVITY DATA (Java version) =====
+        const activityData = {
+            1: {
+                title: 'Java Fundamentals',
+                sub: 'Java · Assessment #1',
+                points: '10 points',
+                difficulty: 'Easy',
+                output: 'Hello, World!',
+                blocks: ['System.out.println', 'TEXT'],
+                blocksXml: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+                expectedOutput: 'Hello, World!'
+            },
+            2: {
+                title: 'Variables & Data Types',
+                sub: 'Java · Assessment #2',
+                points: '10 points',
+                difficulty: 'Easy',
+                output: '16',
+                blocks: ['CREATE VARIABLE', 'System.out.println', 'GET VARIABLE', 'NUMBER'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="java_variable" x="20" y="20">
+                        <field name="TYPE">int</field><field name="NAME">age</field>
+                        <value name="VALUE"><block type="math_number"><field name="NUM">16</field></block></value>
+                    </block>
+                </xml>`,
+                expectedOutput: '16'
+            },
+            3: {
+                title: 'Conditional Statements',
+                sub: 'Java · Assessment #3',
+                points: '10 points',
+                difficulty: 'Medium',
+                output: 'Passed',
+                blocks: ['IF-ELSE', 'CREATE VARIABLE', 'System.out.println', 'COMPARE', 'NUMBER'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="java_variable" x="20" y="20">
+                        <field name="TYPE">int</field><field name="NAME">score</field>
+                        <value name="VALUE"><block type="math_number"><field name="NUM">80</field></block></value>
+                        <next><block type="java_if">
+                            <value name="IF0"><block type="logic_compare"><field name="OP">GTE</field>
+                                <value name="A"><block type="java_variable_get"><field name="NAME">score</field></block></value>
+                                <value name="B"><block type="math_number"><field name="NUM">75</field></block></value>
+                            </block></value>
+                        </block></next>
+                    </block>
+                </xml>`,
+                expectedOutput: 'Passed'
+            },
+            4: {
+                title: 'Loops & Repetition',
+                sub: 'Java · Assessment #4',
+                points: '10 points',
+                difficulty: 'Medium',
+                output: '1\n2\n3\n4\n5',
+                blocks: ['FOR LOOP', 'System.out.println', 'GET VARIABLE'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="java_for" x="20" y="20">
+                        <field name="VAR">i</field>
+                        <value name="FROM"><block type="math_number"><field name="NUM">1</field></block></value>
+                        <value name="TO"><block type="math_number"><field name="NUM">5</field></block></value>
+                    </block>
+                </xml>`,
+                expectedOutput: '1\n2\n3\n4\n5'
+            },
+            5: {
+                title: 'Methods & Problem Solving',
+                sub: 'Java · Assessment #5',
+                points: '10 points',
+                difficulty: 'Hard',
+                output: 'Welcome to Java!',
+                blocks: ['CREATE METHOD', 'System.out.println', 'CALL METHOD', 'TEXT'],
+                blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+                    <block type="java_method" x="20" y="20">
+                        <field name="NAME">welcome</field>
+                        <next><block type="java_method_call"><field name="NAME">welcome</field></block></next>
+                    </block>
+                </xml>`,
+                expectedOutput: 'Welcome to Java!'
+            }
+        };
+
+        // ===== GET ACTIVITY ID =====
+        function getActivityId() {
+            const params = new URLSearchParams(window.location.search);
+            return parseInt(params.get('id')) || 1;
+        }
+
+        // ===== RENDER HEADER & EXPECTED =====
+        function renderActivity(id) {
+            const data = activityData[id];
+            if (!data) return;
+            document.getElementById('activityTitle').textContent = data.title;
+            document.getElementById('activitySub').textContent = data.sub;
+            document.getElementById('activityPoints').textContent = data.points;
+            document.getElementById('activityDifficulty').textContent = data.difficulty;
+            document.getElementById('expectedOutputText').textContent = data.expectedOutput || data.output || '—';
+            window.currentActivityData = data;
+        }
+
+        // ===== BLOCKLY SETUP (Java blocks) =====
+        let workspace;
+        let saveBlocksTimer;
+        let javaGenerator;
+
+        function saveAssessmentBlocks() {
+            if (!workspace) return;
+            clearTimeout(saveBlocksTimer);
+            saveBlocksTimer = setTimeout(() => {
+                const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+                fetch('/save_assessment_blocks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        language: 'java',
+                        assessment_number: getActivityId(),
+                        code_blocks: codeBlocks
+                    })
+                }).catch(() => {});
+            }, 300);
+        }
+
+        function initBlockly(blocksXml) {
+            if (workspace) {
+                workspace.dispose();
+            }
+
+            registerJavaBlocks();
+
+            const toolbox = `
+                <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none;">
+                    <category name="BASIC" colour="#e76f00">
+                        <block type="java_print"></block>
+                        <block type="text"></block>
+                    </category>
+                    <category name="VARIABLES" colour="#8b5cf6">
+                        <block type="java_variable"></block>
+                        <block type="java_variable_get"></block>
+                    </category>
+                    <category name="MATH" colour="#10b981">
+                        <block type="math_number"></block>
+                        <block type="math_arithmetic"></block>
+                    </category>
+                    <category name="LOGIC" colour="#f0b84d">
+                        <block type="java_if"></block>
+                        <block type="logic_compare"></block>
+                        <block type="logic_boolean"></block>
+                    </category>
+                    <category name="LOOPS" colour="#d97706">
+                        <block type="java_for"></block>
+                        <block type="java_while"></block>
+                    </category>
+                    <category name="METHODS" colour="#7c3aed">
+                        <block type="java_method"></block>
+                        <block type="java_method_call"></block>
+                    </category>
+                </xml>
+            `;
+
+            workspace = Blockly.inject('blocklyDiv', {
+                toolbox: toolbox,
+                trashcan: true,
+                zoom: { controls: true, wheel: true, startScale: 0.9 },
+                renderer: 'zelos'
+            });
+            window.attachBlocklyCodePreview(
+                workspace,
+                'blocklyDiv',
+                () => javaGenerator.workspaceToCode(workspace),
+                'Java'
+            );
+
+            if (blocksXml) {
+                try {
+                    const xmlDom = Blockly.utils.xml.textToDom(blocksXml);
+                    Blockly.Xml.domToWorkspace(xmlDom, workspace);
+                } catch (e) {
+                    console.error('Error loading blocks:', e);
+                }
+            }
+
+            Blockly.svgResize(workspace);
+            workspace.addChangeListener(saveAssessmentBlocks);
+            window.addEventListener('resize', () => {
+                if (workspace) Blockly.svgResize(workspace);
+            });
+        }
+
+        // ===== JAVA BLOCK DEFINITIONS =====
+        function registerJavaBlocks() {
+            if (!Blockly.Blocks['java_print']) {
+                Blockly.Blocks['java_print'] = {
+                    init: function() {
+                        this.appendValueInput('TEXT').setCheck('String').appendField('System.out.println');
+                        this.setInputsInline(true);
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#e76f00');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_variable']) {
+                Blockly.Blocks['java_variable'] = {
+                    init: function() {
+                        this.appendDummyInput()
+                            .appendField(new Blockly.FieldDropdown([
+                                ['int', 'int'],
+                                ['double', 'double'],
+                                ['String', 'String'],
+                                ['boolean', 'boolean']
+                            ]), 'TYPE')
+                            .appendField(new Blockly.FieldTextInput('myVar'), 'NAME')
+                            .appendField('=');
+                        this.appendValueInput('VALUE');
+                        this.setInputsInline(true);
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#8b5cf6');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_variable_get']) {
+                Blockly.Blocks['java_variable_get'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
+                        this.setOutput(true, ['String', 'Number', 'Boolean']);
+                        this.setColour('#8b5cf6');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_if']) {
+                Blockly.Blocks['java_if'] = {
+                    init: function() {
+                        this.appendValueInput('IF0').setCheck('Boolean').appendField('if');
+                        this.appendStatementInput('DO0').appendField('then');
+                        this.appendStatementInput('ELSE').appendField('else');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#f0b84d');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_for']) {
+                Blockly.Blocks['java_for'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField('for (int')
+                            .appendField(new Blockly.FieldTextInput('i'), 'VAR')
+                            .appendField('=');
+                        this.appendValueInput('FROM').setCheck('Number');
+                        this.appendDummyInput().appendField(';')
+                            .appendField(new Blockly.FieldTextInput('i'), 'VAR2')
+                            .appendField('<= ');
+                        this.appendValueInput('TO').setCheck('Number');
+                        this.appendDummyInput().appendField(';')
+                            .appendField(new Blockly.FieldTextInput('i'), 'VAR3')
+                            .appendField('++) {');
+                        this.appendStatementInput('DO').appendField('body');
+                        this.appendDummyInput().appendField('}');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#d97706');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_while']) {
+                Blockly.Blocks['java_while'] = {
+                    init: function() {
+                        this.appendValueInput('CONDITION').setCheck('Boolean').appendField('while (');
+                        this.appendDummyInput().appendField(') {');
+                        this.appendStatementInput('DO').appendField('body');
+                        this.appendDummyInput().appendField('}');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#d97706');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_method']) {
+                Blockly.Blocks['java_method'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField('void')
+                            .appendField(new Blockly.FieldTextInput('myMethod'), 'NAME')
+                            .appendField('() {');
+                        this.appendStatementInput('STACK').appendField('body');
+                        this.appendDummyInput().appendField('}');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#7c3aed');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['java_method_call']) {
+                Blockly.Blocks['java_method_call'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField(new Blockly.FieldTextInput('myMethod'), 'NAME').appendField('();');
+                        this.setPreviousStatement(true, null);
+                        this.setNextStatement(true, null);
+                        this.setColour('#7c3aed');
+                    }
+                };
+            }
+
+            // Standard blocks (text, math, logic) are already defined by Blockly,
+            // but we need to ensure they exist. If not, define them.
+            if (!Blockly.Blocks['text']) {
+                Blockly.Blocks['text'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField(new Blockly.FieldTextInput(''), 'TEXT');
+                        this.setOutput(true, 'String');
+                        this.setColour('#8b5cf6');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['math_number']) {
+                Blockly.Blocks['math_number'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField(new Blockly.FieldNumber(0, -Infinity, Infinity, 1), 'NUM');
+                        this.setOutput(true, 'Number');
+                        this.setColour('#10b981');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['math_arithmetic']) {
+                Blockly.Blocks['math_arithmetic'] = {
+                    init: function() {
+                        this.appendValueInput('A').setCheck('Number');
+                        this.appendDummyInput().appendField(new Blockly.FieldDropdown([
+                            ['+', 'ADD'],
+                            ['-', 'SUBTRACT'],
+                            ['×', 'MULTIPLY'],
+                            ['÷', 'DIVIDE']
+                        ]), 'OP');
+                        this.appendValueInput('B').setCheck('Number');
+                        this.setInputsInline(true);
+                        this.setOutput(true, 'Number');
+                        this.setColour('#10b981');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['logic_compare']) {
+                Blockly.Blocks['logic_compare'] = {
+                    init: function() {
+                        this.appendValueInput('A').setCheck(['Number', 'String']);
+                        this.appendDummyInput().appendField(new Blockly.FieldDropdown([
+                            ['=', 'EQ'],
+                            ['≠', 'NEQ'],
+                            ['>', 'GT'],
+                            ['<', 'LT'],
+                            ['≥', 'GTE'],
+                            ['≤', 'LTE']
+                        ]), 'OP');
+                        this.appendValueInput('B').setCheck(['Number', 'String']);
+                        this.setInputsInline(true);
+                        this.setOutput(true, 'Boolean');
+                        this.setColour('#f0b84d');
+                    }
+                };
+            }
+
+            if (!Blockly.Blocks['logic_boolean']) {
+                Blockly.Blocks['logic_boolean'] = {
+                    init: function() {
+                        this.appendDummyInput().appendField(new Blockly.FieldDropdown([
+                            ['true', 'TRUE'],
+                            ['false', 'FALSE']
+                        ]), 'BOOL');
+                        this.setOutput(true, 'Boolean');
+                        this.setColour('#f0b84d');
+                    }
+                };
+            }
+
+            // GENERATORS (JavaScript translation for Java)
+            javaGenerator = typeof javascriptGenerator !== 'undefined'
+                ? javascriptGenerator
+                : Blockly.JavaScript;
+            if (!javaGenerator) throw new Error('Blockly JavaScript generator is unavailable.');
+
+            const gen = javaGenerator.forBlock || javaGenerator;
+
+            gen['java_print'] = function(block) {
+                const text = javaGenerator.valueToCode(block, 'TEXT', 0) || '""';
+                return 'console.log(' + text + ');\n';
+            };
+
+            gen['java_variable'] = function(block) {
+                const type = block.getFieldValue('TYPE');
+                const name = block.getFieldValue('NAME');
+                const value = javaGenerator.valueToCode(block, 'VALUE', 0) || (type === 'String' ? '""' : type === 'boolean' ? 'false' : '0');
+                return 'let ' + name + ' = ' + value + ';\n';
+            };
+
+            gen['java_variable_get'] = function(block) {
+                return [block.getFieldValue('NAME'), 0];
+            };
+
+            gen['text'] = function(block) {
+                const text = block.getFieldValue('TEXT') || '';
+                return [JSON.stringify(text), 0];
+            };
+
+            gen['math_number'] = function(block) {
+                return [block.getFieldValue('NUM'), 0];
+            };
+
+            gen['math_arithmetic'] = function(block) {
+                const a = javaGenerator.valueToCode(block, 'A', 0) || '0';
+                const b = javaGenerator.valueToCode(block, 'B', 0) || '0';
+                const op = block.getFieldValue('OP');
+                const symbol = { ADD: '+', SUBTRACT: '-', MULTIPLY: '*', DIVIDE: '/' } [op] || '+';
+                return ['(' + a + ' ' + symbol + ' ' + b + ')', 0];
+            };
+
+            gen['logic_compare'] = function(block) {
+                const a = javaGenerator.valueToCode(block, 'A', 0) || '0';
+                const b = javaGenerator.valueToCode(block, 'B', 0) || '0';
+                const op = block.getFieldValue('OP');
+                const symbol = { EQ: '==', NEQ: '!=', GT: '>', LT: '<', GTE: '>=', LTE: '<=' } [op] || '==';
+                return ['(' + a + ' ' + symbol + ' ' + b + ')', 0];
+            };
+
+            gen['logic_boolean'] = function(block) {
+                return [block.getFieldValue('BOOL') === 'TRUE' ? 'true' : 'false', 0];
+            };
+
+            gen['java_if'] = function(block) {
+                const cond = javaGenerator.valueToCode(block, 'IF0', 0) || 'false';
+                const doBlock = javaGenerator.statementToCode(block, 'DO0') || '';
+                const elseBlock = javaGenerator.statementToCode(block, 'ELSE') || '';
+                return 'if (' + cond + ') {\n' + doBlock + '}' + (elseBlock ? ' else {\n' + elseBlock + '}' : '') + '\n';
+            };
+
+            gen['java_for'] = function(block) {
+                const varName = block.getFieldValue('VAR');
+                const from = javaGenerator.valueToCode(block, 'FROM', 0) || '0';
+                const to = javaGenerator.valueToCode(block, 'TO', 0) || '0';
+                const body = javaGenerator.statementToCode(block, 'DO') || '';
+                return 'for (let ' + varName + ' = ' + from + '; ' + varName + ' <= ' + to + '; ' + varName + '++) {\n' + body + '}\n';
+            };
+
+            gen['java_while'] = function(block) {
+                const cond = javaGenerator.valueToCode(block, 'CONDITION', 0) || 'false';
+                const body = javaGenerator.statementToCode(block, 'DO') || '';
+                return 'while (' + cond + ') {\n' + body + '}\n';
+            };
+
+            gen['java_method'] = function(block) {
+                const name = block.getFieldValue('NAME');
+                const body = javaGenerator.statementToCode(block, 'STACK') || '';
+                return 'function ' + name + '() {\n' + body + '}\n';
+            };
+
+            gen['java_method_call'] = function(block) {
+                const name = block.getFieldValue('NAME');
+                return name + '();\n';
+            };
+        }
+
+        // ===== WORKSPACE FUNCTIONS =====
+        function clearWorkspace() {
+            if (confirm('Clear all blocks from workspace?')) {
+                if (workspace) {
+                    workspace.clear();
+                    document.getElementById('outputText').textContent = 'Run your code to see output';
+                    document.getElementById('outputText').className = 'output-text';
+                }
+            }
+        }
+
+        function normalizePreviewCode(code) {
+            return code
+                .replace(/\bNone\b/g, 'null')
+                .replace(/\bTrue\b/g, 'true')
+                .replace(/\bFalse\b/g, 'false');
+        }
+
+        function runJavaCode() {
+            const output = document.getElementById('outputText');
+            try {
+                if (!workspace) {
+                    output.textContent = 'Workspace not initialized';
+                    output.className = 'output-text error';
+                    return;
+                }
+                if (!javaGenerator || typeof javaGenerator.workspaceToCode !== 'function') {
+                    output.textContent = 'Java generator not available';
+                    output.className = 'output-text error';
+                    return;
+                }
+                let code = javaGenerator.workspaceToCode(workspace);
+                if (!code || code.trim() === '') {
+                    output.textContent = 'No code to run. Build your solution first!';
+                    output.className = 'output-text error';
+                    return;
+                }
+                window.lastGeneratedCode = code;
+                code = normalizePreviewCode(code);
+                console.debug('[assessment] Generated JavaScript before execution:', code);
+
+                // Already translated to JavaScript with console.log, so just eval
+                try {
+                    let printOutput = [];
+                    const originalPrint = console.log;
+                    console.log = function(...args) {
+                        printOutput.push(args.join(' '));
+                    };
+                    try {
+                        Function(code)();
+                    } finally {
+                        console.log = originalPrint;
+                    }
+                    if (printOutput.length > 0) {
+                        output.textContent = printOutput.join('\n');
+                        output.className = 'output-text success';
+                    } else {
+                        output.textContent = 'No output printed. Add a System.out.println block to display a result.';
+                        output.className = 'output-text';
+                    }
+                } catch (e) {
+                    output.textContent = 'Execution error: ' + e.message;
+                    output.className = 'output-text error';
+                }
+            } catch (e) {
+                output.textContent = 'Error: ' + e.message;
+                output.className = 'output-text error';
+            }
+        }
+
+        async function submitActivity() {
+            const output = document.getElementById('outputText');
+            const data = window.currentActivityData;
+            if (!data) {
+                alert('No activity loaded');
+                return;
+            }
+            const expected = data.expectedOutput || data.output;
+            const result = output.textContent.trim();
+            const placeholder = 'Run your code to see output';
+            if (result && result !== placeholder && result !== 'Workspace cleared' && !result.startsWith('Error')) {
+                const params = new URLSearchParams(window.location.search);
+                const assessmentNumber = parseInt(params.get('id'), 10) || 1;
+                const codeBlocks = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+                try {
+                    const response = await fetch('/submit_assessment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            language: 'java',
+                            assessment_number: assessmentNumber,
+                            code_blocks: codeBlocks,
+                            generated_code: window.lastGeneratedCode || '',
+                            output: result,
+                            duration_seconds: window.getLearningDurationSeconds()
+                        })
+                    });
+                    const submission = await response.json();
+                    if (!submission.success) {
+                        showToast(submission.message || 'Failed to save assessment score.', 'error');
+                        return;
+                    }
+                    window.showScoreAttemptFeedback(submission, submission.activity_title || data.title, {
+                        returnLabel: 'Back to Assessments',
+                        returnUrl: '/assessments_java'
+                    });
+                    showToast(`${submission.status === 'completed' ? '✓ Completed' : 'Submitted'} · Score: ${submission.points}/${submission.max_points}`, submission.status === 'completed' ? 'success' : 'error');
+                    try { localStorage.setItem('progress_updated', Date.now().toString()); } catch (error) {}
+                } catch (error) {
+                    showToast('Unable to save assessment score.', 'error');
+                    return;
+                }
+            } else {
+                showToast('⚠️ Run your code first and match the expected output.', 'error');
+            }
+        }
+
+        function showToast(message, type) {
+            const box = document.getElementById('toastBox');
+            if (!box) {
+                const div = document.createElement('div');
+                div.id = 'toastBox';
+                document.body.appendChild(div);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg ' + type;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            document.getElementById('toastBox').appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(40px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const id = getActivityId();
+            renderActivity(id);
+            const data = activityData[id];
+            if (data) {
+                setTimeout(() => {
+                    initBlockly();
+                }, 200);
+            }
+        });
+    </script>
+
+</body>
+</html>

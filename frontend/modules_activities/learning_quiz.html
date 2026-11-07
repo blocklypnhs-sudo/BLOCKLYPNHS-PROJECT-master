@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ language_name }} · {{ quiz_title }} · BlockLearn</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background:#f0f6f3; color:#173d31; font-family:system-ui,sans-serif; }
+    main { max-width:860px; }
+    .question-card { background:#fff; border:1px solid #dce9e2; border-radius:14px; padding:18px; margin:14px 0; }
+    .answer-option { display:block; width:100%; text-align:left; margin-top:8px; white-space:normal; }
+    .answer-option.selected { border-color:#12604a; background:#e3f4ec; }
+    #result { display:none; }
+  </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+</head>
+<body>
+  <main class="container py-4">
+    <a class="btn btn-outline-secondary btn-sm mb-3"
+       href="{{ '/module_assessments' if quiz_purpose == 'module' else '/assessments_' + language }}">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+          <span class="badge text-bg-success">{{ language_name }} · Set {{ module_number if quiz_purpose == 'module' else assessment_number }}</span>
+          <span class="badge text-bg-light">5 questions · 10 points</span>
+        </div>
+        <h1 class="h3">{{ quiz_title }}</h1>
+        <p class="text-secondary">
+          Answer each question. Each correct answer is worth 2 points. You need at least 4/5 correct to pass and unlock the next assessment.
+        </p>
+        <div id="quizQuestions"></div>
+        <button id="submitQuiz" class="btn btn-success mt-3" type="button" disabled>
+          Submit answers
+        </button>
+        <div id="result" class="alert mt-4 mb-0" role="status"></div>
+      </div>
+    </div>
+  </main>
+  <script>
+    const questions = {{ quiz_questions|tojson }};
+    const formData = {
+      purpose: {{ quiz_purpose|tojson }},
+      language: {{ language|tojson }},
+      targetId: {{ target_id|tojson }},
+      token: {{ quiz_token|tojson }}
+    };
+    const answers = {};
+    const questionsRoot = document.getElementById('quizQuestions');
+    const submitButton = document.getElementById('submitQuiz');
+
+    questions.forEach((question, questionIndex) => {
+      const card = document.createElement('section');
+      card.className = 'question-card';
+      const heading = document.createElement('h2');
+      heading.className = 'h6';
+      heading.textContent = `${questionIndex + 1}. ${question.question}`;
+      card.appendChild(heading);
+      question.options.forEach((option, optionIndex) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-outline-success answer-option';
+        button.textContent = option;
+        button.addEventListener('click', () => {
+          card.querySelectorAll('.answer-option').forEach(item => item.classList.remove('selected'));
+          button.classList.add('selected');
+          answers[String(questionIndex)] = optionIndex;
+          submitButton.disabled = Object.keys(answers).length !== questions.length;
+        });
+        card.appendChild(button);
+      });
+      questionsRoot.appendChild(card);
+    });
+
+    submitButton.addEventListener('click', async () => {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Submitting…';
+      const endpoint = formData.purpose === 'module'
+        ? '/submit_module_quiz'
+        : '/submit_assessment_quiz';
+      const payload = {
+        language: formData.language,
+        quiz_token: formData.token,
+        answers
+      };
+      if (formData.purpose === 'module') payload.module_id = formData.targetId;
+      else payload.assessment_number = Number(formData.targetId);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || 'Unable to save your quiz score.');
+        }
+        questionsRoot.hidden = true;
+        const result = document.getElementById('result');
+        result.style.display = 'block';
+        result.className = `alert mt-4 mb-0 ${data.passed ? 'alert-success' : 'alert-warning'}`;
+        result.textContent = `Score: ${data.points}/10 (${data.correct_answers}/5 correct). ${data.passed ? 'Passed!' : 'You need at least 4/5 correct. Retry this assessment to continue.'}`;
+        if (data.passed) {
+          const nextLink = document.createElement('a');
+          nextLink.className = 'btn btn-success mt-3';
+          if (formData.purpose === 'module') {
+            nextLink.href = '/module_assessments';
+            nextLink.textContent = 'Return to modules';
+          } else if (Number(formData.targetId) < 5) {
+            nextLink.href = `${window.location.pathname}?id=${Number(formData.targetId) + 1}`;
+            nextLink.textContent = 'Continue to next assessment';
+          } else {
+            nextLink.href = `/assessments_${formData.language}`;
+            nextLink.textContent = 'Return to assessments';
+          }
+          result.appendChild(document.createElement('br'));
+          result.appendChild(nextLink);
+        } else {
+          const retry = document.createElement('button');
+          retry.type = 'button';
+          retry.className = 'btn btn-outline-success mt-3';
+          retry.textContent = 'Try a new set of questions';
+          retry.addEventListener('click', () => window.location.reload());
+          result.appendChild(document.createElement('br'));
+          result.appendChild(retry);
+        }
+      } catch (error) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit answers';
+        window.alert(error.message);
+      }
+    });
+  </script>
+</body>
+</html>

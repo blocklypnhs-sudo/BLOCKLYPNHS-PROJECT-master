@@ -1,0 +1,260 @@
+<div class="activity-score-anchor">
+    <button class="activity-score-button" id="activityScoreButton" type="button" aria-expanded="false" aria-controls="activityScorePanel">
+        <i class="fas fa-chart-simple" aria-hidden="true"></i>
+        View Score
+    </button>
+    <section class="activity-score-panel" id="activityScorePanel" aria-label="{{ score_language_name }} activity scores" hidden>
+    <div class="activity-score-heading">
+        <div>
+            <h2>{{ score_language_name }} Score</h2>
+            <p>Completed activity scores</p>
+        </div>
+        <button class="activity-score-close" id="activityScoreClose" type="button" aria-label="Close score summary">&times;</button>
+    </div>
+    <p class="activity-score-empty" id="activityScoreEmpty" hidden>No scores yet</p>
+    <dl class="activity-score-list" id="activityScoreList" aria-live="polite">
+        <div><dt>Easy</dt><dd id="activityScoreEasy">0 / 20</dd></div>
+        <div><dt>Medium</dt><dd id="activityScoreMedium">0 / 20</dd></div>
+        <div><dt>Hard</dt><dd id="activityScoreHard">0 / 10</dd></div>
+    </dl>
+    <div class="activity-score-total"><span>Total</span><strong id="activityScoreTotal">0 / 50</strong></div>
+    </section>
+</div>
+
+<style>
+    .tabs-wrapper { position: relative; }
+
+    .activity-score-anchor {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+
+    .activity-language-score {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .activity-score-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        margin-left: auto;
+        gap: 0.5rem;
+        min-height: 38px;
+        padding: 0.5rem 1rem;
+        border: 1.5px solid var(--green-main);
+        border-radius: 40px;
+        background: var(--card-glass);
+        color: var(--green-deep);
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .activity-score-button:hover,
+    .activity-score-button[aria-expanded="true"] {
+        background: var(--green-main);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .activity-score-panel {
+        position: absolute;
+        z-index: 1100;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        margin: 0;
+        width: min(330px, calc(100vw - 2rem));
+        padding: 1rem 1.1rem;
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        background: var(--card-white, #fff);
+        color: var(--text-primary);
+        box-shadow: var(--shadow-xl);
+        opacity: 1;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .activity-score-panel[hidden] { display: none; }
+
+    .activity-score-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.65rem;
+    }
+
+    .activity-score-heading h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-weight: 800;
+    }
+
+    .activity-score-heading p {
+        margin: 0.15rem 0 0;
+        color: var(--stone);
+        font-size: 0.68rem;
+    }
+
+    .activity-score-close {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: var(--green-soft);
+        color: var(--green-deep);
+        font-size: 1.2rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .activity-score-list {
+        display: grid;
+        gap: 0;
+        margin: 0;
+    }
+
+    .activity-score-list > div,
+    .activity-score-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.48rem 0;
+        border-bottom: 1px solid var(--glass-border);
+        font-size: 0.78rem;
+    }
+
+    .activity-score-list dt { color: var(--text-secondary); font-weight: 600; }
+    .activity-score-list dd { margin: 0; color: var(--text-primary); font-weight: 750; font-variant-numeric: tabular-nums; }
+
+    .activity-score-empty {
+        margin: 0.55rem 0;
+        padding: 0.55rem 0.65rem;
+        border-radius: 9px;
+        background: var(--green-soft);
+        color: var(--green-deep);
+        font-size: 0.72rem;
+        font-weight: 650;
+    }
+
+    .activity-score-total {
+        padding-top: 0.65rem;
+        border-bottom: 0;
+        color: var(--green-deep);
+        font-weight: 800;
+    }
+
+    .activity-score-total strong { font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+    @media (max-width: 700px) {
+        .activity-language-score { width: 100%; align-items: flex-end; }
+        .activity-score-panel { max-width: calc(100vw - 2rem); }
+    }
+</style>
+
+<script>
+    (function() {
+        var language = '{{ score_language }}';
+        var button = document.getElementById('activityScoreButton');
+        var panel = document.getElementById('activityScorePanel');
+        var closeButton = document.getElementById('activityScoreClose');
+        var list = document.getElementById('activityScoreList');
+        var empty = document.getElementById('activityScoreEmpty');
+        var earned = { easy: 0, medium: 0, hard: 0 };
+        var maximum = { easy: 20, medium: 20, hard: 10 };
+        var labels = { easy: 'activityScoreEasy', medium: 'activityScoreMedium', hard: 'activityScoreHard' };
+
+        function isCompleted(activity) {
+            var status = String(activity.status || '').toLowerCase();
+            return activity.completed === true || ['completed', 'passed', 'done'].includes(status);
+        }
+
+        function renderScores(activities) {
+            earned = { easy: 0, medium: 0, hard: 0 };
+            maximum = { easy: 20, medium: 20, hard: 10 };
+            var completedCount = 0;
+            var seenActivities = Object.create(null);
+
+            activities.filter(function(activity) {
+                return String(activity.language || '').toLowerCase() === language;
+            }).forEach(function(activity) {
+                var level = String(activity.difficulty || '').toLowerCase();
+                var activityName = String(activity.name || '');
+                if (!(level in earned) || !activityName || seenActivities[activityName]) return;
+                seenActivities[activityName] = true;
+
+                var pointsPossible = 10;
+                if (isCompleted(activity)) {
+                    var pointsEarned = Math.max(0, Math.min(pointsPossible, Number(activity.score) || 0));
+                    earned[level] += pointsEarned;
+                    completedCount += 1;
+                }
+            });
+
+            Object.keys(earned).forEach(function(level) {
+                earned[level] = Math.min(earned[level], maximum[level]);
+            });
+
+            Object.keys(labels).forEach(function(level) {
+                document.getElementById(labels[level]).textContent = earned[level] + ' / ' + maximum[level];
+            });
+
+            var totalEarned = earned.easy + earned.medium + earned.hard;
+            var totalMaximum = maximum.easy + maximum.medium + maximum.hard;
+            document.getElementById('activityScoreTotal').textContent = totalEarned + ' / ' + totalMaximum;
+            empty.hidden = completedCount !== 0;
+            list.setAttribute('aria-label', completedCount ? 'Scores by difficulty' : 'No activity scores yet');
+        }
+
+        function refreshScores() {
+            fetch('/get_activities', { headers: { 'Accept': 'application/json' } })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success && Array.isArray(data.activities)) renderScores(data.activities);
+                })
+                .catch(function(error) { console.error('Unable to refresh activity scores:', error); });
+        }
+
+        window.updateActivityScoreSummary = renderScores;
+        document.addEventListener('DOMContentLoaded', function() {
+            var mainContent = panel.closest('.main-content');
+            var easyLevelHeader = mainContent && mainContent.querySelector('.level-section .level-header');
+            var anchor = button.parentElement;
+            if (easyLevelHeader && anchor) easyLevelHeader.appendChild(anchor);
+        });
+
+        button.addEventListener('click', function() {
+            var isOpen = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', String(!isOpen));
+            panel.hidden = isOpen;
+            if (!isOpen) refreshScores();
+        });
+        closeButton.addEventListener('click', function() {
+            panel.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+            button.focus();
+        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !panel.hidden) {
+                panel.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            }
+        });
+    })();
+</script>

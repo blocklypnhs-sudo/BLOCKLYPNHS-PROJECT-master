@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Tech Support · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script>(function(){ try { if (localStorage.getItem('bl-theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e){} })();</script>
+<style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    /* ===== SAME TOKENS AS TEACHER DASHBOARD ===== */
+    :root {
+        --green-deep:#0c3b2d; --green-main:#12604a; --green-bright:#1d8a5f; --green-soft:#e3f4ec;
+        --gold-warm:#e8b93c; --gold-light:#fbeecb; --coral:#e5604f; --coral-soft:#fce8e5;
+        --blue:#4a90d9; --blue-soft:#e4eefb;
+        --stone:#52705f; --stone-light:#6d8a7c;
+        --border-fresh:#e0ebe4; --card-white:#ffffff; --card-tint:#f7fbf9;
+        --row-bg:#ffffff; --row-border:#e3eee7;
+        --tile-bg:#e3f4ec; --tile-color:#147a54;
+        --bg-main:#eef6f1; --text-primary:#10382c; --text-secondary:#3f5f52;
+        --shadow-xs:0 2px 8px rgba(16,56,44,.05); --shadow-sm:0 4px 14px rgba(16,56,44,.06);
+        --shadow-md:0 8px 24px rgba(16,56,44,.10); --shadow-lg:0 14px 40px rgba(16,56,44,.14);
+        --sidebar-w:232px; --sidebar-collapsed-w:70px;
+        --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:22px;
+        --input-bg:#ffffff;
+        --grid-line:rgba(150,195,175,.26); --blob-opacity:.12;
+        --logo-accent:#b8e34e;
+        --sidebar-text:#a9d3c0; --sidebar-text-hover:#ffffff;
+        --sidebar-section:rgba(190,225,208,.45); --sidebar-hover-bg:rgba(255,255,255,.07);
+        --sidebar-icon-toggle:rgba(255,255,255,.08); --sidebar-icon-toggle-hover:rgba(255,255,255,.16);
+        --dropdown-bg:#ffffff; --dropdown-link-hover:var(--green-soft); --dropdown-link-hover-text:var(--green-deep);
+        --pd-sep:var(--border-fresh);
+        --chart-grid:#e8f0ec; --chart-tick:#a8bfb4;
+        --greeting-overlay:rgba(6,44,32,.35);
+        --search-bg:var(--card-white); --dropdown-z-index:99999;
+        --green-on-soft:#0d4d38; --gold-text:#9a7020; --green-accent:#147a54;
+        --toast-bg:#10382c; --btn-dark:#0d4534; --btn-dark-hover:#093626;
+        --row-hover:rgba(29,138,95,.05);
+    }
+    [data-theme="dark"] {
+        --bg-main:#0e1f18; --text-primary:#dcefe6; --text-secondary:#9fc0b1;
+        --border-fresh:#20402f; --card-white:#14291f; --card-tint:#11231a;
+        --row-bg:#182f24; --row-border:#244534;
+        --tile-bg:#1c3a2c; --tile-color:#4ade80;
+        --green-soft:#163328; --gold-light:#2e2510; --coral-soft:#2e1a16; --blue-soft:#152535;
+        --stone:#7fa895; --stone-light:#8fb8a8;
+        --shadow-xs:0 2px 8px rgba(0,0,0,.18); --shadow-sm:0 4px 14px rgba(0,0,0,.22);
+        --shadow-md:0 8px 24px rgba(0,0,0,.28); --shadow-lg:0 14px 40px rgba(0,0,0,.32);
+        --grid-line:rgba(45,85,65,.22); --blob-opacity:.10;
+        --dropdown-bg:#1a3329; --dropdown-link-hover:#163328; --dropdown-link-hover-text:#4ade80;
+        --pd-sep:#20402f; --chart-grid:#1e3a2e; --chart-tick:#5a7a6d;
+        --greeting-overlay:rgba(255,255,255,.06); --search-bg:#1a3329;
+        --green-on-soft:#4ade80; --gold-text:#e0b45c; --green-accent:#4ade80;
+        --toast-bg:#21493a; --btn-dark:#17754f; --btn-dark-hover:#12603f;
+        --row-hover:rgba(74,217,160,.05);
+    }
+
+    html { height:100%; }
+    body {
+        font-family:'Inter', system-ui, -apple-system, sans-serif;
+        background:var(--bg-main); line-height:1.5; color:var(--text-primary);
+        overflow-x:hidden; transition:background .4s, color .4s;
+    }
+    :focus-visible { outline:2px solid var(--green-accent); outline-offset:2px; }
+    ::-webkit-scrollbar { width:9px; }
+    ::-webkit-scrollbar-thumb { background:var(--border-fresh); border-radius:10px; border:2px solid var(--bg-main); }
+    ::-webkit-scrollbar-thumb:hover { background:var(--green-accent); }
+
+    /* ===== BACKGROUND ===== */
+    .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .bg-layer::before {
+        content:''; position:absolute; inset:0;
+        background-image:linear-gradient(var(--grid-line) 1px, transparent 1px),
+                         linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+        background-size:44px 44px; transition:background-image .4s;
+    }
+    .bg-blob { position:absolute; border-radius:50%; filter:blur(90px); opacity:var(--blob-opacity); animation:drift 22s ease-in-out infinite alternate; transition:opacity .4s; }
+    .bg-blob--1 { width:420px; height:420px; top:-12%; right:-6%; background:radial-gradient(circle, rgba(40,168,122,.4), transparent 70%); }
+    .bg-blob--2 { width:340px; height:340px; bottom:-10%; left:8%; background:radial-gradient(circle, rgba(232,185,60,.25), transparent 70%); animation-duration:28s; animation-delay:-6s; }
+    @keyframes drift { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(25px,-30px) scale(1.04)} 100%{transform:translate(-15px,15px) scale(.97)} }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+        width:var(--sidebar-w); height:100vh;
+        background:linear-gradient(178deg,#0a382a 0%,#0e4a37 55%,#0c4332 100%);
+        color:var(--sidebar-text);
+        display:flex; flex-direction:column;
+        position:fixed; top:0; left:0;
+        overflow-y:auto; overflow-x:hidden;
+        border-right:1px solid rgba(255,255,255,.05);
+        box-shadow:5px 0 26px rgba(8,40,30,.22);
+        z-index:1000; transition:width .35s cubic-bezier(.4,0,.2,1);
+        scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.12) transparent;
+    }
+    .sidebar::-webkit-scrollbar { width:3px; }
+    .sidebar::-webkit-scrollbar-track { background:transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:10px; }
+
+    .sidebar-logo {
+        display:flex; flex-direction:row; align-items:center; justify-content:flex-start; gap:0;
+        border-bottom:1px solid rgba(255,255,255,.06);
+        padding:.4rem .15rem; transition:all .35s ease;
+        overflow:hidden; min-height:88px; flex-shrink:0; position:relative;
+    }
+    .logo-image { width:76px; height:76px; object-fit:contain; flex-shrink:0; margin:0; }
+    .logo-full { display:flex; flex-direction:column; align-items:flex-start; flex:1; min-width:0; margin-left:-8px; transition:opacity .2s ease; }
+    .logo-full h2 { font-size:1.3rem; font-weight:800; letter-spacing:-.5px; margin:0; white-space:nowrap; color:#fff; line-height:1.15; }
+    .logo-full h2 em { font-style:normal; color:var(--logo-accent); }
+    .logo-full p { font-size:.53rem; opacity:.55; margin:1px 0 0; white-space:nowrap; text-transform:uppercase; letter-spacing:1.4px; font-weight:600; color:#d6f0e4; }
+    .logo-mono { display:none; width:40px; min-width:40px; text-align:center; flex-shrink:0; align-items:center; justify-content:center; }
+    .logo-mono img { display:block; width:40px; height:40px; object-fit:contain; margin:0 auto; }
+    .logo-mono span { font-size:1.1rem; font-weight:900; letter-spacing:-.5px; color:#fff; }
+    .logo-mono span em { font-style:normal; color:var(--logo-accent); }
+
+    .toggle-btn {
+        background:var(--sidebar-icon-toggle); border:1px solid rgba(255,255,255,.06);
+        color:#d8efe5; font-size:.82rem; width:32px; height:32px;
+        border-radius:9px; cursor:pointer; transition:all .3s ease;
+        display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        position:absolute; top:50%; right:8px; transform:translateY(-65%);
+    }
+    .toggle-btn:hover { background:var(--sidebar-icon-toggle-hover); transform:translateY(-65%) rotate(90deg); }
+    .toggle-btn iconify-icon { font-size:15px; }
+
+    .hamburger-wrap { display:none; padding:.35rem 0 .15rem; justify-content:center; flex-shrink:0; }
+    .hamburger-btn {
+        background:var(--sidebar-icon-toggle); border:1px solid rgba(255,255,255,.06);
+        color:#d8efe5; font-size:.82rem; width:34px; height:34px;
+        border-radius:9px; cursor:pointer; transition:all .3s ease;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .hamburger-btn:hover { background:var(--sidebar-icon-toggle-hover); }
+    .hamburger-btn iconify-icon { font-size:15px; }
+
+    .sidebar.collapsed { width:var(--sidebar-collapsed-w); }
+    .sidebar.collapsed .sidebar-logo { justify-content:center; padding:.75rem .4rem; min-height:62px; }
+    .sidebar.collapsed .logo-image { display:none; }
+    .sidebar.collapsed .logo-full { display:none; }
+    .sidebar.collapsed .logo-mono { display:flex; }
+    .sidebar.collapsed .toggle-btn { display:none; }
+    .sidebar.collapsed .hamburger-wrap { display:flex; }
+    .sidebar.collapsed .nav-link-custom { justify-content:center; padding:.55rem 0; margin:0 .4rem; width:calc(100% - .8rem); }
+    .sidebar.collapsed .nav-link-custom iconify-icon { font-size:1.05rem; }
+    .sidebar.collapsed .nav-text { display:none !important; }
+    .sidebar.collapsed .nav-section-label { height:0; padding:0; margin:0; opacity:0; overflow:hidden; }
+
+    .sidebar:not(.collapsed) .sidebar-logo { justify-content:center; }
+    .sidebar:not(.collapsed) .logo-image { display:block; }
+    .sidebar:not(.collapsed) .logo-full { display:flex; }
+    .sidebar:not(.collapsed) .logo-mono { display:none; }
+    .sidebar:not(.collapsed) .toggle-btn { display:flex; }
+    .sidebar:not(.collapsed) .hamburger-wrap { display:none; }
+    .sidebar:not(.collapsed) .nav-link-custom { justify-content:flex-start; padding:.5rem .85rem; margin:0 .5rem; width:calc(100% - 1rem); }
+    .sidebar:not(.collapsed) .nav-section-label { height:auto; padding:.9rem 1.15rem .3rem; opacity:1; }
+
+    .nav-section-label {
+        font-size:.56rem; text-transform:uppercase; letter-spacing:1.4px;
+        font-weight:700; color:var(--sidebar-section);
+        white-space:nowrap; transition:all .3s ease;
+    }
+    .sidebar-nav { flex:1; padding:.3rem 0 .4rem; min-height:0; }
+    .nav-item { position:relative; margin-bottom:3px; }
+    .nav-link-custom {
+        display:flex; align-items:center; gap:11px;
+        color:var(--sidebar-text); text-decoration:none;
+        border-radius:999px; transition:all .25s ease;
+        font-size:.82rem; font-weight:600; position:relative;
+        white-space:nowrap;
+    }
+    .nav-link-custom iconify-icon { width:20px; flex-shrink:0; font-size:1rem; transition:transform .25s, color .25s; }
+    .nav-link-custom:hover { background:var(--sidebar-hover-bg); color:var(--sidebar-text-hover); }
+    .nav-link-custom:hover iconify-icon { transform:scale(1.08); }
+    .nav-link-custom.active {
+        background:#ffffff; color:#0e4534; font-weight:700;
+        box-shadow:0 4px 14px rgba(0,0,0,.20); border-radius:999px;
+    }
+    .nav-link-custom.active iconify-icon { color:var(--green-accent); }
+    [data-theme="dark"] .nav-link-custom.active { color:var(--green-accent); }
+
+    /* ===== MAIN ===== */
+    .main-content {
+        flex:1; margin-left:var(--sidebar-w);
+        padding:20px 28px 28px;
+        transition:margin-left .35s cubic-bezier(.4,0,.2,1);
+        min-height:100vh; min-width:0; max-width:100%;
+        position:relative; z-index:1;
+    }
+    .main-content.shifted { margin-left:var(--sidebar-collapsed-w); }
+
+    /* ===== TOP BAR ===== */
+    .top-bar {
+        background:transparent; border:none; box-shadow:none; backdrop-filter:none;
+        padding:.1rem .1rem; margin-bottom:1.1rem;
+        display:flex; justify-content:space-between; align-items:center; gap:12px;
+        position:relative; z-index:100;
+    }
+    .page-title {
+        font-size:1.18rem; font-weight:800; color:var(--text-primary);
+        letter-spacing:-.4px; margin:0; transition:color .4s ease;
+        display:flex; align-items:center; gap:10px;
+    }
+    .page-title iconify-icon {
+        width:36px; height:36px; border-radius:11px; flex-shrink:0;
+        background:var(--tile-bg); color:var(--tile-color);
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:.95rem;
+    }
+    .top-bar-right { display:flex; align-items:center; gap:8px; position:relative; z-index:200; }
+
+    .icon-btn {
+        width:38px; height:38px; border-radius:11px; border:none;
+        background:transparent; display:flex; align-items:center; justify-content:center;
+        color:var(--text-secondary); font-size:.95rem; cursor:pointer;
+        transition:all .3s ease; flex-shrink:0; position:relative;
+    }
+    .icon-btn iconify-icon { font-size:1rem; }
+    .icon-btn:hover { background:var(--card-white); color:var(--green-accent); box-shadow:var(--shadow-xs); }
+    .icon-btn .dot {
+        position:absolute; top:6px; right:7px; width:7px; height:7px;
+        background:var(--coral); border-radius:50%; border:2px solid var(--bg-main);
+        animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.4); opacity:.6} }
+
+    .theme-btn .icon-sun { display:none; }
+    .theme-btn .icon-moon { display:flex; }
+    [data-theme="dark"] .theme-btn .icon-sun { display:flex; }
+    [data-theme="dark"] .theme-btn .icon-moon { display:none; }
+
+    /* ===== USER PILL + DROPDOWN (matches dashboard) ===== */
+    .user-menu-wrap { position:relative; z-index:300; }
+    .user-pill {
+        display:flex; align-items:center; gap:9px;
+        background:var(--card-white); border:1px solid var(--border-fresh);
+        border-radius:999px; padding:4px 12px 4px 5px; cursor:pointer;
+        font:inherit; color:inherit; transition:all .25s;
+        box-shadow:var(--shadow-xs); flex-shrink:0;
+    }
+    .user-pill:hover { border-color:var(--green-accent); box-shadow:var(--shadow-sm); }
+    .user-menu-wrap.open .user-pill { border-color:var(--green-accent); box-shadow:0 0 0 3px rgba(29,138,95,.12); }
+    .up-avatar {
+        width:31px; height:31px; border-radius:50%; flex-shrink:0;
+        background:linear-gradient(135deg, var(--green-bright), var(--green-deep));
+        color:#fff; display:flex; align-items:center; justify-content:center;
+        font-size:.72rem; font-weight:700;
+    }
+    .up-avatar iconify-icon { font-size:18px; }
+    .up-info { display:flex; flex-direction:column; align-items:flex-start; line-height:1.25; }
+    .up-info strong { font-size:.75rem; font-weight:700; color:var(--text-primary); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:color .4s; }
+    .up-info small { font-size:.62rem; color:var(--text-secondary); font-weight:600; }
+    .user-pill .chev { font-size:14px; color:var(--stone-light); transition:transform .25s; }
+    .user-menu-wrap.open .user-pill .chev { transform:rotate(180deg); }
+
+    .user-dropdown {
+        position:absolute; top:calc(100% + 10px); right:0; width:240px;
+        background:var(--dropdown-bg); border:1px solid var(--border-fresh);
+        border-radius:var(--radius-md); box-shadow:0 20px 50px rgba(9,42,32,.20);
+        overflow:hidden; opacity:0; transform:translateY(-8px) scale(.97);
+        transform-origin:top right; pointer-events:none;
+        transition:all .25s cubic-bezier(.4,0,.2,1); z-index:var(--dropdown-z-index);
+    }
+    .user-menu-wrap.open .user-dropdown { opacity:1; transform:none; pointer-events:auto; }
+
+    .ud-head {
+        display:flex; align-items:center; gap:10px;
+        padding:.8rem .95rem; border-bottom:1px solid var(--pd-sep);
+    }
+    .ud-head .up-avatar { width:34px; height:34px; }
+    .ud-head strong { display:block; font-size:.78rem; font-weight:700; color:var(--text-primary); }
+    .ud-head small { font-size:.64rem; color:var(--stone-light); font-weight:600; }
+
+    .ud-body { padding:.25rem 0; }
+    .ud-item {
+        display:flex; align-items:center; gap:10px;
+        padding:.5rem .95rem; color:var(--text-secondary); text-decoration:none;
+        font-size:.75rem; font-weight:500; transition:all .2s;
+    }
+    .ud-item iconify-icon { font-size:.9rem; color:var(--stone); transition:color .2s; width:17px; text-align:center; }
+    .ud-item:hover { background:var(--dropdown-link-hover); color:var(--dropdown-link-hover-text); }
+    .ud-item:hover iconify-icon { color:var(--green-accent); }
+
+    .ud-signout {
+        display:flex; align-items:center; gap:10px;
+        padding:.6rem .95rem; margin-top:.2rem;
+        border-top:1px solid var(--pd-sep);
+        color:var(--coral); text-decoration:none;
+        font-size:.75rem; font-weight:600; transition:background .2s;
+    }
+    .ud-signout iconify-icon { font-size:.9rem; width:17px; text-align:center; }
+    .ud-signout:hover { background:var(--coral-soft); color:#b33a2a; }
+    [data-theme="dark"] .ud-signout:hover { color:#f28a7a; }
+
+    /* ===== GREETING BANNER ===== */
+    .greeting-banner {
+        background:linear-gradient(108deg,#0b3d2e 0%,#0f5540 42%,#167152 72%,#1b8a5f 100%);
+        border-radius:var(--radius-xl); padding:1.15rem 1.5rem;
+        margin-bottom:1.1rem; position:relative; overflow:hidden;
+        color:#fff; box-shadow:var(--shadow-md);
+    }
+    .greeting-banner::before {
+        content:''; position:absolute; top:-60%; right:-5%;
+        width:420px; height:420px; border-radius:50%;
+        background:radial-gradient(circle, rgba(255,255,255,.09), transparent 62%);
+        pointer-events:none;
+    }
+    .greeting-banner::after {
+        content:''; position:absolute; bottom:-25%; left:18%;
+        width:200px; height:200px; border-radius:50%;
+        background:radial-gradient(circle, rgba(255,255,255,.05), transparent 60%);
+        pointer-events:none;
+    }
+    .greeting-banner h1 {
+        font-size:1.15rem; font-weight:800; margin-bottom:.2rem;
+        position:relative; z-index:2; letter-spacing:-.4px; line-height:1.25;
+    }
+    .greeting-banner h1 em { font-style:normal; color:var(--gold-warm); }
+    .greeting-banner p {
+        font-size:.72rem; opacity:.8; margin:0;
+        position:relative; z-index:2; max-width:520px; line-height:1.5;
+    }
+    .hero-chips {
+        display:flex; gap:8px; flex-wrap:wrap; margin-top:.6rem;
+        position:relative; z-index:2;
+    }
+    .chip {
+        display:inline-flex; align-items:center; gap:5px;
+        background:var(--greeting-overlay); backdrop-filter:blur(10px);
+        -webkit-backdrop-filter:blur(10px);
+        padding:3px 10px; border-radius:20px; font-size:.62rem;
+        font-weight:600; border:1px solid rgba(255,255,255,.08);
+        transition:background .4s ease;
+    }
+    .chip iconify-icon { font-size:12px; color:var(--gold-warm); }
+    .chip strong { font-weight:800; font-variant-numeric:tabular-nums; }
+    .chip .t { font-variant-numeric:tabular-nums; }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+        display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+        gap:12px; margin-bottom:1.4rem;
+    }
+    .stat-card {
+        background:var(--card-white);
+        border-radius:var(--radius-xl); padding:1.05rem 1.2rem;
+        transition:all .35s cubic-bezier(.4,0,.2,1), background .4s ease, border-color .4s ease;
+        border:1px solid var(--border-fresh); box-shadow:var(--shadow-sm);
+        position:relative; overflow:hidden; display:block;
+        color:inherit; text-decoration:none;
+    }
+    .stat-card::before {
+        content:''; position:absolute; top:0; left:0; right:0; height:2.5px;
+        border-radius:3px 3px 0 0; opacity:0; transition:opacity .3s;
+    }
+    .sc-green::before { background:linear-gradient(90deg, var(--green-bright), var(--green-main)); }
+    .sc-gold::before  { background:linear-gradient(90deg, var(--gold-warm), #f0c060); }
+    .sc-blue::before  { background:linear-gradient(90deg, var(--blue), #6ba8e8); }
+    .sc-coral::before { background:linear-gradient(90deg, var(--coral), #f08070); }
+    .stat-card:hover { transform:translateY(-2px); border-color:var(--green-accent); box-shadow:var(--shadow-md); }
+    .stat-card:hover::before { opacity:1; }
+    .stat-card:focus-visible { outline:2px solid var(--green-accent); outline-offset:3px; }
+    .stat-header {
+        display:flex; justify-content:space-between; align-items:center;
+        margin-bottom:.55rem;
+    }
+    .stat-header span {
+        font-size:.58rem; text-transform:uppercase; font-weight:700;
+        letter-spacing:1px; color:var(--stone); transition:color .4s ease;
+    }
+    .stat-icon {
+        width:40px; height:40px; border-radius:12px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.95rem; transition:transform .35s;
+    }
+    .stat-icon iconify-icon { font-size:.95rem; }
+    .sc-green .stat-icon { background:var(--tile-bg); color:var(--tile-color); }
+    .sc-gold  .stat-icon { background:var(--gold-light); color:var(--gold-text); }
+    .sc-blue  .stat-icon { background:var(--blue-soft); color:var(--blue); }
+    .sc-coral .stat-icon { background:var(--coral-soft); color:var(--coral); }
+    .stat-card:hover .stat-icon { transform:scale(1.08) rotate(-3deg); }
+    .stat-value {
+        font-size:1.8rem; font-weight:900; color:var(--text-primary);
+        margin-bottom:2px; letter-spacing:-1px; line-height:1.1;
+        transition:color .4s ease; font-variant-numeric:tabular-nums;
+    }
+    .stat-label { color:var(--stone-light); font-size:.66rem; font-weight:500; transition:color .4s ease; }
+
+    /* ===== BOTTOM GRID ===== */
+    .bottom-grid {
+        display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(0, 0.75fr);
+        gap:14px; align-items:start;
+    }
+
+    /* Dashboard card */
+    .dash-card {
+        background:var(--card-white);
+        border:1px solid var(--border-fresh); border-radius:var(--radius-xl);
+        box-shadow:var(--shadow-sm); padding:1.1rem 1.2rem;
+        width:100%; transition:background .4s ease, border-color .4s ease;
+    }
+    .dash-card-head {
+        display:flex; align-items:center; justify-content:space-between; gap:1rem;
+        margin-bottom:.7rem;
+    }
+    .dash-card-head h3 {
+        color:var(--text-primary); font-size:.92rem; font-weight:800; margin:0;
+        display:flex; align-items:center; gap:11px;
+    }
+    .dash-card-head h3 iconify-icon {
+        width:34px; height:34px; border-radius:10px; flex-shrink:0;
+        background:var(--tile-bg); color:var(--tile-color);
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:.85rem;
+    }
+    .dash-card-head h3 iconify-icon.gold { background:var(--gold-light); color:var(--gold-text); }
+    .dash-card-head .sub { font-size:.66rem; color:var(--stone-light); margin-top:2px; }
+
+    .panel-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .panel-link { color:var(--green-accent); font-size:.7rem; font-weight:700; text-decoration:none; transition:color .2s; }
+    .panel-link:hover { color:var(--green-on-soft); }
+    .refresh-btn {
+        width:32px; height:32px; border-radius:10px;
+        border:1px solid var(--border-fresh); background:var(--card-white);
+        color:var(--stone); cursor:pointer; display:flex; align-items:center; justify-content:center;
+        transition:all .25s;
+    }
+    .refresh-btn iconify-icon { font-size:14px; }
+    .refresh-btn:hover { border-color:var(--green-accent); color:var(--green-accent); }
+    .refresh-btn.spinning iconify-icon { animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Student rows */
+    .student-row {
+        display:flex; align-items:center; gap:.75rem;
+        padding:.6rem .7rem;
+        border:1px solid var(--border-fresh); border-radius:12px;
+        background:var(--card-tint); margin-bottom:.4rem;
+        color:inherit; text-decoration:none;
+        transition:all .2s ease;
+    }
+    .student-row:last-child { margin-bottom:0; }
+    .student-row:hover { border-color:var(--green-accent); background:var(--card-white); }
+    .student-row:focus-visible { outline:2px solid var(--green-accent); outline-offset:2px; }
+    .avatar {
+        width:34px; height:34px; border-radius:10px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.72rem; font-weight:800;
+    }
+    .a-green { background:var(--tile-bg); color:var(--tile-color); }
+    .a-gold  { background:var(--gold-light); color:var(--gold-text); }
+    .a-blue  { background:var(--blue-soft); color:var(--blue); }
+    .a-coral { background:var(--coral-soft); color:var(--coral); }
+    .s-info { flex:1; min-width:0; }
+    .s-name { font-size:.78rem; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color .4s ease; }
+    .s-lrn { font-size:.64rem; color:var(--stone-light); font-variant-numeric:tabular-nums; }
+    .s-joined {
+        display:inline-flex; align-items:center; gap:5px; flex-shrink:0;
+        font-size:.62rem; color:var(--stone-light); white-space:nowrap;
+    }
+    .s-joined iconify-icon { font-size:11px; }
+
+    /* Quick access rows */
+    .qa-row-list { display:flex; flex-direction:column; gap:.4rem; }
+    .qa-row {
+        display:flex; align-items:center; gap:.65rem;
+        padding:.55rem .65rem;
+        border:1px solid var(--border-fresh); border-radius:12px;
+        background:var(--card-tint); color:var(--text-primary);
+        text-decoration:none; transition:border-color .2s, transform .2s, background .2s;
+    }
+    .qa-row:hover { border-color:var(--green-accent); transform:translateX(3px); background:var(--card-white); }
+    .qa-icon {
+        width:32px; height:32px; border-radius:10px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.82rem;
+    }
+    .qa-icon iconify-icon { font-size:.9rem; }
+    .qa-green .qa-icon { background:var(--tile-bg); color:var(--tile-color); }
+    .qa-blue  .qa-icon { background:var(--blue-soft); color:var(--blue); }
+    .qa-gold  .qa-icon { background:var(--gold-light); color:var(--gold-text); }
+    .qa-coral .qa-icon { background:var(--coral-soft); color:var(--coral); }
+    .qa-info { flex:1; min-width:0; }
+    .qa-info p { font-size:.76rem; font-weight:700; color:var(--text-primary); transition:color .4s ease; }
+    .qa-info span { font-size:.64rem; color:var(--stone-light); }
+    .qa-arrow { color:var(--stone-light); font-size:.7rem; flex-shrink:0; }
+
+    /* Skeleton / states */
+    .skel-row {
+        display:flex; align-items:center; gap:.75rem;
+        padding:.6rem .7rem;
+        border:1px solid var(--border-fresh); border-radius:12px;
+        background:var(--card-tint); margin-bottom:.4rem;
+    }
+    .skel-avatar {
+        width:34px; height:34px; border-radius:10px; flex-shrink:0;
+        background:var(--chart-grid);
+    }
+    .skel-line {
+        height:8px; border-radius:6px; margin-bottom:6px;
+        background:linear-gradient(90deg, var(--chart-grid) 25%, var(--card-tint) 50%, var(--chart-grid) 75%);
+        background-size:200% 100%; animation:sk 1.2s infinite;
+    }
+    .skel-line.w60 { width:60%; }
+    .skel-line.w40 { width:40%; }
+    @keyframes sk { to { background-position:-200% 0; } }
+
+    .state-box { padding:1.8rem 1rem; text-align:center; }
+    .state-box iconify-icon { font-size:1.8rem; color:var(--border-fresh); margin-bottom:.5rem; display:block; }
+    .state-box p { font-size:.76rem; color:var(--stone-light); }
+    .state-box .small { font-size:.66rem; opacity:.75; margin-top:.2rem; }
+    .retry-btn {
+        margin-top:.9rem; border:1px solid var(--border-fresh); background:var(--card-white);
+        color:var(--green-accent); border-radius:40px; padding:.45rem 1rem;
+        font:inherit; font-size:.72rem; font-weight:700; cursor:pointer;
+        display:inline-flex; align-items:center; gap:6px; transition:all .2s;
+    }
+    .retry-btn:hover { border-color:var(--green-accent); background:var(--green-soft); color:var(--green-on-soft); }
+
+    /* Toast */
+    .toast-msg {
+        background:var(--toast-bg); color:#fff; padding:9px 15px; border-radius:11px;
+        font-size:.75rem; font-weight:500; box-shadow:0 8px 28px rgba(0,0,0,.2);
+        display:flex; align-items:center; gap:8px; position:relative; overflow:hidden;
+        animation:tIn .4s cubic-bezier(.4,0,.2,1);
+    }
+    .toast-msg iconify-icon { font-size:15px; color:var(--gold-warm); flex-shrink:0; }
+    @keyframes tIn { from { opacity:0; transform:translateX(40px) scale(.95); } to { opacity:1; transform:none; } }
+
+    .hidden { display:none !important; }
+
+    footer {
+        margin-top:2rem; text-align:center; font-size:.66rem;
+        color:var(--stone-light); border-top:1px solid var(--border-fresh); padding-top:1.4rem;
+    }
+
+    /* Collapsed tooltips */
+    .nav-tip {
+        position:fixed; z-index:99999; pointer-events:none;
+        background:var(--toast-bg); color:#eafff5; padding:5px 12px; border-radius:9px;
+        font-size:.68rem; font-weight:600; white-space:nowrap;
+        transform:translateY(-50%) translateX(-6px); opacity:0; transition:all .18s;
+        box-shadow:0 8px 24px rgba(0,0,0,.3);
+    }
+    .nav-tip.show { opacity:1; transform:translateY(-50%) translateX(0); }
+
+    /* Entrance */
+    .fu { opacity:0; transform:translateY(12px); animation:fuA .45s cubic-bezier(.4,0,.2,1) forwards; }
+    @keyframes fuA { to { opacity:1; transform:translateY(0); } }
+    .e1{animation-delay:.04s} .e2{animation-delay:.08s} .e3{animation-delay:.12s} .e4{animation-delay:.16s}
+
+    /* Responsive */
+    @media (max-width:960px) {
+        .bottom-grid { grid-template-columns:1fr; }
+    }
+    @media (max-width:768px) {
+        .sidebar { width:var(--sidebar-collapsed-w); }
+        .sidebar .logo-full, .sidebar .toggle-btn { display:none !important; }
+        .sidebar .logo-image { display:none !important; }
+        .sidebar .logo-mono { display:flex !important; }
+        .sidebar .hamburger-wrap { display:flex !important; }
+        .sidebar .sidebar-logo { justify-content:center; padding:.75rem .4rem; min-height:62px; }
+        .sidebar .nav-link-custom { justify-content:center; padding:.55rem 0; margin:0 .3rem; width:calc(100% - .6rem); }
+        .sidebar .nav-link-custom iconify-icon { font-size:1.05rem; }
+        .sidebar .nav-text { display:none !important; }
+        .sidebar .nav-section-label { height:0; padding:0; margin:0; opacity:0; overflow:hidden; }
+        .main-content, .main-content.shifted { margin-left:var(--sidebar-collapsed-w); padding:14px; }
+        .page-title { font-size:1.02rem; }
+        .page-title iconify-icon { width:32px; height:32px; }
+        .greeting-banner { padding:1rem 1.15rem; }
+        .greeting-banner h1 { font-size:1.02rem; }
+        .greeting-banner p { font-size:.68rem; }
+    }
+    @media (max-width:520px) {
+        .up-info { display:none; }
+        .user-pill { padding:4px 9px 4px 4px; }
+        .user-pill .chev { display:none; }
+        .stats-grid { grid-template-columns:1fr 1fr; gap:8px; }
+        .stat-card { padding:.85rem .95rem; }
+        .stat-value { font-size:1.4rem; }
+        .stat-icon { width:34px; height:34px; font-size:.85rem; }
+        .top-bar { flex-wrap:wrap; gap:8px; }
+        .top-bar-right { margin-left:auto; flex-wrap:wrap; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+        *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    }
+</style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true">
+    <div class="bg-blob bg-blob--1"></div>
+    <div class="bg-blob bg-blob--2"></div>
+</div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="logo-image">
+        <div class="logo-full">
+            <h2>Block<em>Learn</em></h2>
+            <p>PNHS · ICT Studio</p>
+        </div>
+        <div class="logo-mono"><img src="/static/BL-LOGO.png" alt="BlockLearn Logo"></div>
+        <button class="toggle-btn" id="toggleSidebar" title="Collapse sidebar" aria-label="Collapse sidebar">
+            <iconify-icon icon="lucide:panel-left-close"></iconify-icon>
+        </button>
+    </div>
+    <div class="hamburger-wrap">
+        <button class="hamburger-btn" id="hamburgerBtn" title="Expand sidebar" aria-label="Expand sidebar">
+            <iconify-icon icon="lucide:panel-left-open"></iconify-icon>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <p class="nav-section-label">Main</p>
+        <div class="nav-item"><a href="/ict_support_dashboard" class="nav-link-custom active" data-tip="Dashboard">
+            <iconify-icon icon="lucide:layout-dashboard"></iconify-icon><span class="nav-text">Dashboard</span>
+        </a></div>
+
+        <p class="nav-section-label">Operations</p>
+        <div class="nav-item"><a href="/ict_support_tickets" class="nav-link-custom" data-tip="Tickets">
+            <iconify-icon icon="lucide:ticket"></iconify-icon><span class="nav-text">Tickets</span>
+        </a></div>
+        <div class="nav-item"><a href="/ict_support_students" class="nav-link-custom" data-tip="Users">
+            <iconify-icon icon="lucide:users"></iconify-icon><span class="nav-text">Users</span>
+        </a></div>
+
+        <p class="nav-section-label">Insights</p>
+        <div class="nav-item"><a href="/ict_support_reports" class="nav-link-custom" data-tip="Reports">
+            <iconify-icon icon="lucide:file-text"></iconify-icon><span class="nav-text">Reports</span>
+        </a></div>
+        <div class="nav-item"><a href="/ict_feedback_analytics" class="nav-link-custom" data-tip="Feedback Analytics">
+            <iconify-icon icon="lucide:message-square-more"></iconify-icon><span class="nav-text">Feedback Analytics</span>
+        </a></div>
+        <p class="nav-section-label">System</p>
+        <div class="nav-item"><a href="/ict_support_audit_logs" class="nav-link-custom" data-tip="Audit Logs">
+            <iconify-icon icon="lucide:scroll-text"></iconify-icon><span class="nav-text">Audit Logs</span>
+        </a></div>
+        <div class="nav-item"><a href="/ict_support_settings" class="nav-link-custom" data-tip="Settings">
+            <iconify-icon icon="lucide:settings"></iconify-icon><span class="nav-text">Settings</span>
+        </a></div>
+    </nav>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-content" id="mainContent">
+
+    <div class="top-bar fu e1">
+        <h2 class="page-title"><iconify-icon icon="lucide:layout-dashboard"></iconify-icon>Dashboard</h2>
+        <div class="top-bar-right">
+            <button class="icon-btn theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+                <iconify-icon icon="lucide:moon" class="icon-moon"></iconify-icon>
+                <iconify-icon icon="lucide:sun" class="icon-sun"></iconify-icon>
+            </button>
+            <button class="icon-btn" onclick="showNotification()" title="Notifications" aria-label="Notifications">
+                <iconify-icon icon="lucide:bell"></iconify-icon>
+                <span class="dot"></span>
+            </button>
+
+            <!-- ═══ USER PILL + DROPDOWN ═══ -->
+            <div class="user-menu-wrap" id="userMenuWrap">
+                <button class="user-pill" id="userPill" aria-haspopup="true" aria-expanded="false">
+                    <span class="up-avatar">{{ (full_name or username or 'U')[:1]|upper }}</span>
+                    <span class="up-info">
+                        <strong>{{ full_name or username or 'ICT Support' }}</strong>
+                        <small>ICT Tech Support</small>
+                    </span>
+                    <iconify-icon icon="lucide:chevron-down" class="chev"></iconify-icon>
+                </button>
+
+                <div class="user-dropdown" role="menu">
+                    <div class="ud-head">
+                        <span class="up-avatar">{{ (full_name or username or 'U')[:1]|upper }}</span>
+                        <div>
+                            <strong>{{ full_name or username or 'ICT Support' }}</strong>
+                            <small>ICT Tech Support</small>
+                        </div>
+                    </div>
+                    <div class="ud-body">
+                        <a href="#" class="ud-item" role="menuitem">
+                            <iconify-icon icon="lucide:user-round"></iconify-icon>My Profile
+                        </a>
+                        <a href="/ict_support_settings" class="ud-item" role="menuitem">
+                            <iconify-icon icon="lucide:sliders-horizontal"></iconify-icon>Settings
+                        </a>
+                    </div>
+                    <a href="/logout" class="ud-signout" role="menuitem">
+                        <iconify-icon icon="lucide:log-out"></iconify-icon>Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ GREETING BANNER ═══ -->
+    <header class="greeting-banner fu e2">
+        <h1>Welcome back, <em>{{ full_name or username or 'User' }}</em></h1>
+        <p>Here's what's happening across the student portal today.</p>
+        <div class="hero-chips">
+            <span class="chip"><iconify-icon icon="lucide:calendar"></iconify-icon><span id="heroDate">—</span></span>
+            <span class="chip"><iconify-icon icon="lucide:clock"></iconify-icon><span class="t" id="heroClock">--:--</span></span>
+            <span class="chip"><iconify-icon icon="lucide:users"></iconify-icon><strong id="heroStudents">0</strong>&nbsp;students</span>
+        </div>
+    </header>
+
+    <!-- ═══ STATS ═══ -->
+    <div class="stats-grid fu e3">
+        <a class="stat-card sc-green" href="/ict_support_students" aria-label="View all students">
+            <div class="stat-header">
+                <span>Total Students</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:users"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="totalStudents">0</p>
+            <p class="stat-label">From student accounts</p>
+        </a>
+        <a class="stat-card sc-gold" href="/ict_support_students?registered=today" aria-label="View students registered today">
+            <div class="stat-header">
+                <span>Registered Today</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:user-plus"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="registeredToday">0</p>
+            <p class="stat-label" id="dashboardDate">—</p>
+        </a>
+        <div class="stat-card sc-blue" id="statTicketsCard" style="display:none">
+            <div class="stat-header">
+                <span>Total Tickets</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:ticket"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="totalTickets">0</p>
+            <p class="stat-label">All time</p>
+        </div>
+        <div class="stat-card sc-coral" id="statPendingCard" style="display:none">
+            <div class="stat-header">
+                <span>Pending Tickets</span>
+                <div class="stat-icon"><iconify-icon icon="lucide:hourglass"></iconify-icon></div>
+            </div>
+            <p class="stat-value" id="pendingTickets">0</p>
+            <p class="stat-label">Awaiting response</p>
+        </div>
+    </div>
+
+    <div class="bottom-grid">
+        <!-- Recent students -->
+        <section class="dash-card fu e4">
+            <div class="dash-card-head">
+                <div>
+                    <h3><iconify-icon icon="lucide:user-cog"></iconify-icon>Recently Registered Students</h3>
+                    <p class="sub">Latest student accounts from the database</p>
+                </div>
+                <div class="panel-actions">
+                    <button class="refresh-btn" id="refreshBtn" title="Refresh" aria-label="Refresh data">
+                        <iconify-icon icon="lucide:rotate-cw"></iconify-icon>
+                    </button>
+                    <a href="/ict_support_students" class="panel-link">View All</a>
+                </div>
+            </div>
+            <div id="recentStudentsList"></div>
+        </section>
+
+        <!-- Quick actions -->
+        <section class="dash-card fu e4">
+            <div class="dash-card-head">
+                <div>
+                    <h3><iconify-icon icon="lucide:zap" class="gold"></iconify-icon>Quick Actions</h3>
+                    <p class="sub">Jump straight into your workflow</p>
+                </div>
+            </div>
+            <div class="qa-row-list">
+                <a href="/ict_support_tickets" class="qa-row qa-green">
+                    <div class="qa-icon"><iconify-icon icon="lucide:ticket"></iconify-icon></div>
+                    <div class="qa-info"><p>Manage Tickets</p><span>Respond to student requests</span></div>
+                    <iconify-icon icon="lucide:arrow-right" class="qa-arrow"></iconify-icon>
+                </a>
+                <a href="/ict_support_students" class="qa-row qa-blue">
+                    <div class="qa-icon"><iconify-icon icon="lucide:users"></iconify-icon></div>
+                    <div class="qa-info"><p>Browse Students</p><span>Search registered accounts</span></div>
+                    <iconify-icon icon="lucide:arrow-right" class="qa-arrow"></iconify-icon>
+                </a>
+                <a href="/ict_support_reports" class="qa-row qa-gold">
+                    <div class="qa-icon"><iconify-icon icon="lucide:chart-bar"></iconify-icon></div>
+                    <div class="qa-info"><p>View Reports</p><span>Analytics &amp; insights</span></div>
+                    <iconify-icon icon="lucide:arrow-right" class="qa-arrow"></iconify-icon>
+                </a>
+                <a href="/ict_feedback_analytics" class="qa-row qa-blue">
+                    <div class="qa-icon"><iconify-icon icon="lucide:message-square-more"></iconify-icon></div>
+                    <div class="qa-info"><p>Feedback Analytics</p><span>Review technical feedback from students</span></div>
+                    <iconify-icon icon="lucide:arrow-right" class="qa-arrow"></iconify-icon>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer>PNHS-Main · ICT Tech Support Portal v2.0</footer>
+</div>
+
+<!-- Notification Toast -->
+<div id="notificationToast" class="toast-msg hidden" style="position:fixed; bottom:20px; right:20px; z-index:99999; max-width:340px;">
+    <iconify-icon icon="lucide:bell"></iconify-icon>
+    <div>
+        <p style="font-weight:600">New Notification</p>
+        <p style="font-size:.68rem; opacity:.75">You have 3 new ticket updates</p>
+        <button onclick="closeNotification()" style="background:none; border:none; color:var(--gold-warm); font:inherit; font-size:.68rem; font-weight:700; cursor:pointer; padding:2px 0 0;">Mark as read</button>
+    </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const escapeHtml = value => String(value || '').replace(/[&<>'"]/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const getInitials = name => String(name || '?').split(' ').filter(Boolean).slice(0, 2)
+    .map(p => p.charAt(0).toUpperCase()).join('') || '?';
+
+/* ── Theme (same key: bl-theme) ── */
+const applyTheme = t => { document.documentElement.dataset.theme = t; localStorage.setItem('bl-theme', t); };
+applyTheme(localStorage.getItem('bl-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+$('themeBtn').addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+/* ── User dropdown ── */
+const userMenuWrap = $('userMenuWrap');
+const userPill = $('userPill');
+const closeUserMenu = () => {
+    userMenuWrap.classList.remove('open');
+    userPill.setAttribute('aria-expanded', 'false');
+};
+userPill.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = userMenuWrap.classList.toggle('open');
+    userPill.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', e => { if (!userMenuWrap.contains(e.target)) closeUserMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUserMenu(); });
+
+/* ── Sidebar collapse (same key: bl-ict-sidebar) ── */
+const applySidebar = collapsed => {
+    $('sidebar').classList.toggle('collapsed', collapsed);
+    $('mainContent').classList.toggle('shifted', collapsed);
+    localStorage.setItem('bl-ict-sidebar', collapsed ? '1' : '0');
+};
+applySidebar(localStorage.getItem('bl-ict-sidebar') === '1');
+$('toggleSidebar').addEventListener('click', () => applySidebar(true));
+$('hamburgerBtn').addEventListener('click', () => applySidebar(false));
+
+/* ── Collapsed tooltips ── */
+const tip = document.createElement('div');
+tip.className = 'nav-tip';
+document.body.appendChild(tip);
+document.addEventListener('mouseover', e => {
+    const link = e.target.closest('.sidebar.collapsed .nav-link-custom[data-tip]');
+    if (!link) { tip.classList.remove('show'); return; }
+    const r = link.getBoundingClientRect();
+    tip.textContent = link.dataset.tip;
+    tip.style.top = (r.top + r.height / 2) + 'px';
+    tip.style.left = (r.right + 12) + 'px';
+    tip.classList.add('show');
+});
+document.addEventListener('mouseout', e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest('.nav-link-custom[data-tip]')) tip.classList.remove('show');
+});
+
+/* ── Live clock + date ── */
+const updateClock = () => $('heroClock').textContent = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+updateClock(); setInterval(updateClock, 10000);
+$('heroDate').textContent = new Date().toLocaleDateString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+$('dashboardDate').textContent = $('heroDate').textContent;
+
+/* ── Count-up ── */
+function countUp(el, target) {
+    target = Number(target) || 0;
+    let t0 = null;
+    const step = now => {
+        if (!t0) t0 = now;
+        const p = Math.min((now - t0) / 1100, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+/* ── Time helpers ── */
+const parseDate = s => { if (!s) return null; const d = new Date(String(s).replace(' ', 'T')); return isNaN(d) ? null : d; };
+function timeAgo(s) {
+    const d = parseDate(s); if (!d) return '';
+    const sec = (Date.now() - d.getTime()) / 1000;
+    if (sec < 0 || sec < 60) return sec < 0 ? '' : 'just now';
+    if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
+    if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
+    if (sec < 604800) return Math.floor(sec / 86400) + 'd ago';
+    return d.toLocaleDateString();
+}
+const fullDate = s => { const d = parseDate(s); return d ? d.toLocaleString() : ''; };
+
+/* ── Notification ── */
+function showNotification() {
+    const t = $('notificationToast');
+    t.classList.remove('hidden');
+    clearTimeout(window.toastTimeout);
+    window.toastTimeout = setTimeout(closeNotification, 5000);
+}
+function closeNotification() { $('notificationToast').classList.add('hidden'); }
+
+/* ── Data ── */
+const AV_COLORS = ['a-green', 'a-gold', 'a-blue', 'a-coral'];
+
+function renderSkeleton() {
+    $('recentStudentsList').innerHTML = Array(4).fill(
+        '<div class="skel-row"><div class="skel-avatar"></div><div style="flex:1"><div class="skel-line w60"></div><div class="skel-line w40"></div></div></div>'
+    ).join('');
+}
+
+function loadDashboardData() {
+    renderSkeleton();
+    $('refreshBtn').classList.add('spinning');
+    fetch('/get_ict_dashboard_data', { headers: { 'Accept': 'application/json' } })
+        .then(response => {
+            if (!response.ok) throw new Error('Dashboard request failed (' + response.status + ')');
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success) throw new Error(data.message || 'Dashboard data is unavailable');
+
+            countUp($('totalStudents'), data.total_students || 0);
+            $('heroStudents').textContent = data.total_students || 0;
+            countUp($('registeredToday'), data.registered_today || 0);
+
+            if (data.total_tickets !== null && data.total_tickets !== undefined) {
+                $('statTicketsCard').style.display = '';
+                countUp($('totalTickets'), data.total_tickets);
+            }
+            if (data.pending_tickets !== null && data.pending_tickets !== undefined) {
+                $('statPendingCard').style.display = '';
+                countUp($('pendingTickets'), data.pending_tickets);
+            }
+
+            const students = data.students || [];
+            const list = $('recentStudentsList');
+
+            list.innerHTML = students.slice(0, 5).map((student, i) => {
+                const name = student.full_name || student.username || 'Unnamed student';
+                const ago = timeAgo(student.created_at);
+                return '<a class="student-row" href="/ict_support_students?lrn=' +
+                    encodeURIComponent(student.lrn || '') + '" title="' +
+                    escapeHtml(fullDate(student.created_at)) + '">' +
+                    '<div class="avatar ' + AV_COLORS[i % AV_COLORS.length] + '">' + escapeHtml(getInitials(name)) + '</div>' +
+                    '<div class="s-info"><p class="s-name">' + escapeHtml(name) + '</p>' +
+                    '<p class="s-lrn">LRN: ' + escapeHtml(student.lrn) + '</p></div>' +
+                    '<span class="s-joined"><iconify-icon icon="lucide:clock"></iconify-icon>' +
+                    escapeHtml(ago || student.created_at || '') + '</span></a>';
+            }).join('') || '<div class="state-box"><iconify-icon icon="lucide:inbox"></iconify-icon>' +
+                '<p>No students found.</p><p class="small">Newly registered accounts will appear here.</p></div>';
+        })
+        .catch(error => {
+            console.error('Unable to load ICT dashboard data:', error);
+            $('totalStudents').textContent = '—';
+            $('heroStudents').textContent = '—';
+            $('registeredToday').textContent = '—';
+            $('recentStudentsList').innerHTML =
+                '<div class="state-box"><iconify-icon icon="lucide:triangle-alert"></iconify-icon>' +
+                '<p>Unable to load student data.</p>' +
+                '<button class="retry-btn" onclick="loadDashboardData()"><iconify-icon icon="lucide:rotate-cw"></iconify-icon>Try Again</button></div>';
+        })
+        .finally(() => $('refreshBtn').classList.remove('spinning'));
+}
+
+$('refreshBtn').addEventListener('cligck', loadDashboardData);
+document.addEventListener('DOMContentLoaded', loadDashboardData);
+</script>
+</body>
+</html>

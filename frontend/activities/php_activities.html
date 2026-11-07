@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Activities · BlockLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== DESIGN TOKENS (compact, matches Dashboard / Help & FAQ) ===== */
+        :root {
+            --green-deep: #0c3b2d;
+            --green-main: #12604a;
+            --green-bright: #1d8a5f;
+            --green-soft: #e3f4ec;
+            --gold-warm: #e8b93c;
+            --gold-light: #fbeecb;
+            --coral: #e5604f;
+            --coral-soft: #fce8e5;
+            --blue: #4a90d9;
+            --blue-soft: #e4eefb;
+            --stone: #52705f;
+            --stone-light: #6d8a7c;
+            --border-fresh: #e0ebe4;
+            --card-white: #ffffff;
+            --card-tint: #f7fbf9;
+            --row-bg: #ffffff;
+            --row-border: #e3eee7;
+            --tile-bg: #e3f4ec;
+            --tile-color: #147a54;
+            --bg-main: #eef6f1;
+            --text-primary: #10382c;
+            --text-secondary: #3f5f52;
+            --shadow-xs: 0 2px 8px rgba(16,56,44,0.05);
+            --shadow-sm: 0 4px 14px rgba(16,56,44,0.06);
+            --shadow-md: 0 8px 24px rgba(16,56,44,0.10);
+            --shadow-lg: 0 14px 40px rgba(16,56,44,0.14);
+            --sidebar-w: 232px;
+            --sidebar-collapsed-w: 70px;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+            --input-bg: #ffffff;
+            --grid-line: rgba(150,195,175,0.26);
+            --blob-opacity: 0.12;
+            --logo-accent: #b8e34e;
+            --sidebar-text: #a9d3c0;
+            --sidebar-text-hover: #ffffff;
+            --sidebar-section: rgba(190,225,208,0.45);
+            --sidebar-hover-bg: rgba(255,255,255,0.07);
+            --sidebar-icon-toggle: rgba(255,255,255,0.08);
+            --sidebar-icon-toggle-hover: rgba(255,255,255,0.16);
+            --dropdown-bg: #ffffff;
+            --dropdown-link-hover: var(--green-soft);
+            --dropdown-link-hover-text: var(--green-deep);
+            --pd-sep: var(--border-fresh);
+            --chart-grid: #e8f0ec;
+            --chart-tick: #a8bfb4;
+            --greeting-overlay: rgba(6,44,32,0.35);
+            --search-bg: var(--card-white);
+            --dropdown-z-index: 99999;
+            --green-on-soft: #0d4d38;
+            --gold-text: #9a7020;
+            --green-accent: #147a54;
+            --toast-bg: #10382c;
+            --btn-dark: #0d4534;
+            --btn-dark-hover: #093626;
+            --php-color: #777bb4;
+            --php-light: #eef0fa;
+            --php-dark: #4d5b96;
+            --php-accent: #147a54;
+        }
+
+        /* ===== DARK MODE ===== */
+        [data-theme="dark"] {
+            --bg-main: #0e1f18;
+            --text-primary: #dcefe6;
+            --text-secondary: #9fc0b1;
+            --border-fresh: #20402f;
+            --card-white: #14291f;
+            --card-tint: #11231a;
+            --row-bg: #182f24;
+            --row-border: #244534;
+            --tile-bg: #1c3a2c;
+            --tile-color: #4ade80;
+            --green-soft: #163328;
+            --gold-light: #2e2510;
+            --coral-soft: #2e1a16;
+            --blue-soft: #152535;
+            --stone: #7fa895;
+            --stone-light: #8fb8a8;
+            --shadow-xs: 0 2px 8px rgba(0,0,0,0.18);
+            --shadow-sm: 0 4px 14px rgba(0,0,0,0.22);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.28);
+            --shadow-lg: 0 14px 40px rgba(0,0,0,0.32);
+            --grid-line: rgba(45,85,65,0.22);
+            --blob-opacity: 0.10;
+            --sidebar-text: #a9d3c0;
+            --sidebar-text-hover: #ffffff;
+            --sidebar-section: rgba(190,225,208,0.45);
+            --sidebar-hover-bg: rgba(255,255,255,0.07);
+            --sidebar-icon-toggle: rgba(255,255,255,0.08);
+            --sidebar-icon-toggle-hover: rgba(255,255,255,0.16);
+            --dropdown-bg: #1a3329;
+            --dropdown-link-hover: #163328;
+            --dropdown-link-hover-text: #4ade80;
+            --pd-sep: #20402f;
+            --chart-grid: #1e3a2e;
+            --chart-tick: #5a7a6d;
+            --greeting-overlay: rgba(255,255,255,0.06);
+            --search-bg: #1a3329;
+            --green-on-soft: #4ade80;
+            --gold-text: #e0b45c;
+            --green-accent: #4ade80;
+            --toast-bg: #21493a;
+            --btn-dark: #17754f;
+            --btn-dark-hover: #12603f;
+            --php-light: #1a1a2e;
+            --php-dark: #a8b0e8;
+        }
+
+        html { height: 100%; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-main);
+            line-height: 1.5;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        :focus-visible { outline: 2px solid var(--green-accent); outline-offset: 2px; }
+
+        /* ===== BACKGROUND: light mint + subtle grid ===== */
+        .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-layer::before {
+            content: ''; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 44px 44px;
+            transition: background-image 0.4s ease;
+        }
+        .bg-blob {
+            position: absolute; border-radius: 50%; filter: blur(90px);
+            opacity: var(--blob-opacity);
+            animation: blobDrift 22s ease-in-out infinite alternate;
+            transition: opacity 0.4s ease;
+        }
+        .bg-blob--1 { width: 420px; height: 420px; top: -12%; right: -6%; background: radial-gradient(circle, rgba(119,123,180,0.25), transparent 70%); }
+        .bg-blob--2 { width: 340px; height: 340px; bottom: -10%; left: 8%; background: radial-gradient(circle, rgba(40,168,122,0.25), transparent 70%); animation-duration: 28s; animation-delay: -6s; }
+        @keyframes blobDrift {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(25px, -30px) scale(1.04); }
+            100% { transform: translate(-15px, 15px) scale(0.97); }
+        }
+
+        .app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+        /* ===== SIDEBAR: compact, fits viewport height ===== */
+        .sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: linear-gradient(178deg, #0a382a 0%, #0e4a37 55%, #0c4332 100%);
+            color: var(--sidebar-text);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0;
+            overflow-y: auto; overflow-x: hidden;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 5px 0 26px rgba(8,40,30,0.22);
+            z-index: 1000;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.12) transparent;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+
+        .sidebar-logo {
+            display: flex; align-items: center; justify-content: center; gap: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0.4rem 0.15rem;
+            transition: all 0.35s ease;
+            overflow: hidden; min-height: 88px; flex-shrink: 0; position: relative;
+        }
+        .logo-image { width: 76px; height: 76px; object-fit: contain; flex-shrink: 0; margin: 0; }
+        .logo-full { display: flex; flex-direction: column; align-items: flex-start; flex: 1; min-width: 0; margin-left: -8px; transition: opacity 0.2s ease; }
+        .logo-full h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; white-space: nowrap; color: #ffffff; line-height: 1.15; }
+        .logo-full h2 em { font-style: normal; color: var(--logo-accent); }
+        .logo-full p { font-size: 0.53rem; opacity: 0.55; margin: 1px 0 0; white-space: nowrap; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 600; color: #d6f0e4; }
+        .logo-mono {
+            display: none; width: 40px; min-width: 40px; text-align: center; flex-shrink: 0;
+            align-items: center; justify-content: center;
+        }
+        .logo-mono img { display: block; width: 40px; height: 40px; object-fit: contain; margin: 0 auto; }
+        .logo-mono span { font-size: 1.1rem; font-weight: 900; letter-spacing: -0.5px; }
+        .logo-mono span em { font-style: normal; color: var(--logo-accent); }
+
+        .toggle-btn {
+            background: var(--sidebar-icon-toggle); border: 1px solid rgba(255,255,255,0.06);
+            color: #d8efe5; font-size: 0.82rem; width: 32px; height: 32px;
+            border-radius: 9px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            position: absolute; top: 50%; right: 8px; transform: translateY(-65%);
+        }
+        .toggle-btn:hover { background: var(--sidebar-icon-toggle-hover); transform: translateY(-65%) rotate(90deg); }
+
+        .hamburger-wrap { display: none; padding: 0.35rem 0 0.15rem; justify-content: center; flex-shrink: 0; }
+        .hamburger-btn {
+            background: var(--sidebar-icon-toggle); border: 1px solid rgba(255,255,255,0.06);
+            color: #d8efe5; font-size: 0.82rem; width: 34px; height: 34px;
+            border-radius: 9px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hamburger-btn:hover { background: var(--sidebar-icon-toggle-hover); }
+
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar.collapsed .sidebar-logo { justify-content: center; padding: 0.75rem 0.4rem; }
+        .sidebar.collapsed .logo-image { display: none; }
+        .sidebar.collapsed .logo-full { display: none; }
+        .sidebar.collapsed .logo-mono { display: flex; }
+        .sidebar.collapsed .toggle-btn { display: none; }
+        .sidebar.collapsed .hamburger-wrap { display: flex; }
+        .sidebar.collapsed .nav-link-custom { justify-content: center; padding: 0.55rem 0; margin: 0 0.4rem; width: calc(100% - 0.8rem); }
+        .sidebar.collapsed .nav-link-custom iconify-icon,
+        .sidebar.collapsed .nav-link-custom i { font-size: 1.05rem; }
+        .sidebar.collapsed .nav-text { display: none !important; }
+        .sidebar.collapsed .nav-section-label { height: 0; padding: 0; margin: 0; opacity: 0; overflow: hidden; }
+        .sidebar.collapsed .nav-badge { left: auto; right: 9px; top: 50%; }
+
+        .sidebar:not(.collapsed) .sidebar-logo { justify-content: center; }
+        .sidebar:not(.collapsed) .logo-image { display: block; }
+        .sidebar:not(.collapsed) .logo-full { display: flex; }
+        .sidebar:not(.collapsed) .logo-mono { display: none; }
+        .sidebar:not(.collapsed) .toggle-btn { display: flex; }
+        .sidebar:not(.collapsed) .hamburger-wrap { display: none; }
+        .sidebar:not(.collapsed) .nav-link-custom { justify-content: flex-start; padding: 0.5rem 0.85rem; margin: 0 0.5rem; width: calc(100% - 1rem); }
+        .sidebar:not(.collapsed) .nav-section-label { height: auto; padding: 0.9rem 1.15rem 0.3rem; opacity: 1; }
+
+        .nav-section-label {
+            font-size: 0.56rem; text-transform: uppercase; letter-spacing: 1.4px;
+            font-weight: 700; color: var(--sidebar-section);
+            white-space: nowrap; transition: all 0.3s ease;
+        }
+        .sidebar-nav {
+            flex: 1; padding: 0.3rem 0 0.4rem; min-height: 0;
+            overflow-y: auto; overscroll-behavior: contain;
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent;
+        }
+        .nav-item { position: relative; margin-bottom: 3px; }
+        .nav-link-custom {
+            display: flex; align-items: center; gap: 11px;
+            color: var(--sidebar-text); text-decoration: none;
+            border-radius: 999px; transition: all 0.25s ease;
+            font-size: 0.82rem; font-weight: 600; position: relative;
+            white-space: nowrap; border: 0;
+            background: transparent; cursor: pointer; text-align: left;
+            line-height: 1.35;
+        }
+        .nav-link-custom i { width: 20px; flex-shrink: 0; text-align: center; transition: all 0.25s; font-size: 0.85rem; }
+        .nav-link-custom iconify-icon { width: 20px; flex-shrink: 0; font-size: 1rem; transition: all 0.25s; }
+        .php-logo-mark {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 23px; min-width: 23px; height: 15px; padding: 0 3px;
+            border: 1px solid rgba(184,190,228,0.75); border-radius: 999px;
+            background: #f7f8ff; color: #39478b;
+            font: italic 900 0.62rem/1 Inter, sans-serif; letter-spacing: -0.7px;
+            text-transform: lowercase; vertical-align: middle;
+        }
+        .lang-tab .php-logo-mark { width: 21px; min-width: 21px; height: 14px; font-size: 0.58rem; }
+        .nav-link-custom:hover { background: var(--sidebar-hover-bg); color: var(--sidebar-text-hover); }
+        .nav-link-custom:hover i,
+        .nav-link-custom:hover iconify-icon { transform: scale(1.08); }
+
+        .nav-link-custom.active {
+            background: #ffffff; color: #0e4534; font-weight: 700;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.20);
+            border-radius: 999px;
+        }
+        .nav-link-custom.active i,
+        .nav-link-custom.active iconify-icon { color: var(--php-color); }
+
+        .nav-badge {
+            position: absolute; top: 50%; left: 22px; transform: translateY(-50%);
+            width: 7px; height: 7px; background: var(--coral);
+            border-radius: 50%; border: 2px solid #0e4a37;
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+        .nav-link-custom.active .nav-badge { border-color: #ffffff; }
+        @keyframes pulseDot {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.5); opacity: 0.6; }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1; margin-left: var(--sidebar-w);
+            padding: 20px 28px 28px;
+            transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh; min-width: 0;
+            max-width: 100%;
+        }
+        .main-content.shifted { margin-left: var(--sidebar-collapsed-w); }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: transparent; border: none; box-shadow: none; backdrop-filter: none;
+            padding: 0.1rem 0.1rem;
+            margin-bottom: 1.1rem; display: flex;
+            justify-content: space-between; align-items: center; gap: 12px;
+            position: relative; z-index: 100;
+        }
+        .page-title {
+            font-size: 1.18rem; font-weight: 800; color: var(--text-primary);
+            letter-spacing: -0.4px; margin: 0; transition: color 0.4s ease;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .page-title iconify-icon,
+        .page-title i {
+            width: 36px; height: 36px; border-radius: 11px; flex-shrink: 0;
+            background: var(--php-light); color: var(--php-color);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.88rem;
+        }
+        .page-title .php-logo-mark {
+            width: 36px; min-width: 36px; height: 36px; padding: 0;
+            border: 0; border-radius: 11px; background: var(--php-light);
+            font-size: 0.78rem;
+        }
+        .top-bar-right { display: flex; align-items: center; gap: 8px; position: relative; z-index: 200; }
+
+        .top-search { position: relative; display: flex; align-items: center; }
+        .top-search i { position: absolute; left: 11px; color: var(--stone-light); font-size: 0.75rem; pointer-events: none; transition: color 0.2s; }
+        .top-search input {
+            width: 190px; padding: 0.4rem 0.7rem 0.4rem 2.1rem;
+            border: 1.5px solid var(--border-fresh); border-radius: 10px;
+            font-size: 0.76rem; font-family: inherit; background: var(--search-bg);
+            color: var(--text-primary); transition: all 0.25s ease;
+        }
+        .top-search input::placeholder { color: var(--stone-light); font-weight: 400; }
+        .top-search input:focus {
+            outline: none; border-color: var(--green-accent);
+            box-shadow: 0 0 0 3px rgba(29,138,95,0.12);
+        }
+        .top-search:focus-within i { color: var(--green-accent); }
+
+        .theme-btn {
+            width: 38px; height: 38px; border-radius: 11px; border: none;
+            background: transparent; display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); font-size: 0.95rem; cursor: pointer;
+            transition: all 0.3s ease; flex-shrink: 0;
+        }
+        .theme-btn:hover { background: var(--card-white); color: var(--gold-warm); box-shadow: var(--shadow-xs); }
+        .theme-btn .icon-sun { display: none; }
+        .theme-btn .icon-moon { display: inline; }
+        [data-theme="dark"] .theme-btn .icon-sun { display: inline; }
+        [data-theme="dark"] .theme-btn .icon-moon { display: none; }
+
+        .notif-btn {
+            width: 38px; height: 38px; border-radius: 11px; border: none;
+            background: transparent; display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); font-size: 0.95rem; cursor: pointer;
+            transition: all 0.25s ease; position: relative; flex-shrink: 0;
+        }
+        .notif-btn:hover { background: var(--card-white); color: var(--green-accent); box-shadow: var(--shadow-xs); }
+        .notif-btn .notif-badge {
+            position: absolute; top: 2px; right: 2px;
+            background: var(--coral); color: white;
+            font-size: 0.52rem; font-weight: 700;
+            min-width: 17px; height: 17px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-main);
+        }
+        .notif-badge.hidden { display: none; }
+
+        .notif-dropdown {
+            display: none; position: absolute; top: calc(100% + 10px); right: 0;
+            width: min(360px, calc(100vw - 32px));
+            max-height: 400px;
+            background: var(--dropdown-bg); border-radius: var(--radius-md);
+            border: 1px solid var(--border-fresh);
+            box-shadow: 0 20px 50px rgba(9,42,32,0.20);
+            z-index: var(--dropdown-z-index); overflow: hidden;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+        .notif-dropdown.open { display: block; animation: dropIn 0.25s ease; }
+        .notif-dropdown .notif-header {
+            padding: 0.7rem 1.1rem; border-bottom: 1px solid var(--pd-sep);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .notif-dropdown .notif-header h6 { font-weight: 700; color: var(--text-primary); margin: 0; font-size: 0.8rem; }
+        .notif-dropdown .notif-header h6 i { color: var(--gold-warm); margin-right: 6px; }
+        .notif-dropdown .notif-header .mark-read-btn {
+            font-size: 0.62rem; color: var(--green-accent); cursor: pointer;
+            background: none; border: none; font-weight: 600; transition: color 0.2s;
+        }
+        .notif-dropdown .notif-header .mark-read-btn:hover { color: var(--green-on-soft); }
+        .notif-dropdown .notif-list {
+            max-height: 320px; overflow-y: auto; padding: 0.25rem 0;
+            scrollbar-width: thin; scrollbar-color: var(--border-fresh) transparent;
+        }
+        .notif-dropdown .notif-list::-webkit-scrollbar { width: 4px; }
+        .notif-dropdown .notif-list::-webkit-scrollbar-thumb { background: var(--border-fresh); border-radius: 10px; }
+        .notif-item { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-fresh); transition: all 0.2s; cursor: default; }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: var(--green-soft); }
+        .notif-item.unread { background: var(--blue-soft); border-left: 3px solid var(--blue); }
+        [data-theme="dark"] .notif-item.unread:hover { background: #1a3040; }
+        .notif-item .notif-title { font-size: 0.76rem; font-weight: 600; color: var(--text-primary); }
+        .notif-item .notif-message { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
+        .notif-item .notif-time { font-size: 0.58rem; color: var(--stone-light); margin-top: 4px; display: block; }
+        .notif-item .score-badge {
+            display: inline-block; background: var(--green-soft); color: var(--green-on-soft);
+            padding: 2px 9px; border-radius: 20px; font-size: 0.66rem; font-weight: 700; margin-top: 4px;
+        }
+        .notif-empty { padding: 1.8rem 1.1rem; text-align: center; color: var(--stone-light); }
+        .notif-empty i { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--border-fresh); }
+        .notif-empty p { font-size: 0.76rem; margin: 0; }
+
+        .profile-trigger {
+            display: flex; align-items: center; gap: 9px;
+            cursor: pointer; padding: 4px 12px 4px 5px;
+            border-radius: 999px; border: 1px solid var(--border-fresh);
+            background: var(--card-white); box-shadow: var(--shadow-xs);
+            transition: all 0.25s ease;
+            flex-shrink: 0; position: relative; z-index: 300;
+        }
+        .profile-trigger:hover { border-color: var(--green-accent); box-shadow: var(--shadow-sm); }
+        .profile-trigger.open { border-color: var(--green-accent); box-shadow: 0 0 0 3px rgba(29,138,95,0.12); }
+        .profile-trigger-avatar {
+            width: 31px; height: 31px;
+            background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+        }
+        .profile-trigger-info { display: flex; flex-direction: column; }
+        .profile-trigger-name { font-size: 0.75rem; font-weight: 700; color: var(--text-primary); line-height: 1.25; white-space: nowrap; transition: color 0.4s ease; }
+        .profile-trigger-role { font-size: 0.62rem; color: var(--text-secondary); line-height: 1.25; white-space: nowrap; }
+        .profile-trigger-chevron { color: var(--stone-light); font-size: 0.55rem; margin-left: 2px; transition: transform 0.25s ease; }
+        .profile-trigger.open .profile-trigger-chevron { transform: rotate(180deg); }
+
+        .profile-dropdown {
+            display: none; position: absolute; top: calc(100% + 10px); right: 0;
+            min-width: 210px; background: var(--dropdown-bg);
+            border-radius: var(--radius-md); border: 1px solid var(--border-fresh);
+            box-shadow: 0 20px 50px rgba(9,42,32,0.20);
+            z-index: var(--dropdown-z-index); overflow: visible;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+        .profile-dropdown.open { display: block !important; animation: dropIn 0.25s ease; }
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .pd-header { padding: 0.8rem 0.95rem; border-bottom: 1px solid var(--pd-sep); display: flex; align-items: center; gap: 10px; }
+        .pd-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+        }
+        .pd-name { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); transition: color 0.4s ease; }
+        .pd-grade { font-size: 0.64rem; color: var(--stone-light); }
+        .pd-links { padding: 0.25rem 0; }
+        .pd-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 0.5rem 0.95rem; color: var(--text-secondary); text-decoration: none;
+            font-size: 0.75rem; font-weight: 500; transition: all 0.2s;
+            cursor: pointer; border: none; background: transparent; width: 100%;
+        }
+        .pd-link:hover { background: var(--dropdown-link-hover); color: var(--dropdown-link-hover-text); }
+        .pd-link i { width: 17px; text-align: center; font-size: 0.75rem; color: var(--stone); transition: color 0.2s; }
+        .pd-link:hover i { color: var(--green-accent); }
+        .pd-sep { height: 1px; background: var(--pd-sep); margin: 0.25rem 0; transition: background 0.4s ease; }
+        .pd-link.logout { color: var(--coral); }
+        .pd-link.logout i { color: var(--coral); }
+        .pd-link.logout:hover { background: var(--coral-soft); color: #b33a2a; }
+        [data-theme="dark"] .pd-link.logout:hover { color: #f28a7a; }
+
+        /* ============================================ */
+        /* ACTIVITIES CONTENT (Help & FAQ style)         */
+        /* ============================================ */
+
+        .tabs-wrapper {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+        }
+        .assessments-btn {
+            padding: 8px 18px; border-radius: 999px; border: none;
+            background: var(--btn-dark); color: #ffffff; font-weight: 700; cursor: pointer;
+            transition: all 0.25s; display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: inherit; font-size: 0.78rem;
+            box-shadow: 0 4px 12px rgba(13,69,52,0.22);
+        }
+        .assessments-btn:hover { background: var(--btn-dark-hover); transform: translateY(-1px); color: #ffffff; }
+        .assessments-btn .badge-count {
+            background: rgba(255,255,255,0.22); color: #ffffff;
+            font-size: 0.68rem; padding: 2px 8px; border-radius: 999px;
+        }
+        .activity-language-score { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .language-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .lang-tab {
+            padding: 7px 16px; border-radius: 999px;
+            background: var(--card-white);
+            border: 1px solid var(--border-fresh);
+            color: var(--text-secondary); font-weight: 700; font-size: 0.74rem;
+            cursor: pointer; transition: all 0.25s ease;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+            box-shadow: var(--shadow-xs);
+        }
+        .lang-tab iconify-icon { font-size: 0.95rem; }
+        .lang-tab:hover { border-color: var(--green-accent); color: var(--green-accent); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .lang-tab.active {
+            background: var(--php-color); border-color: var(--php-color); color: #ffffff;
+            box-shadow: 0 4px 14px rgba(119,123,180,0.30);
+        }
+        .lang-tab.active:hover { color: #ffffff; transform: translateY(-1px); }
+
+        /* level sections */
+        .level-section { margin-bottom: 1.6rem; }
+        .level-header {
+            display: flex; align-items: center; gap: 11px; margin-bottom: 0.8rem;
+        }
+        .level-icon {
+            width: 34px; height: 34px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; flex-shrink: 0;
+        }
+        .level-icon.easy-icon { background: var(--tile-bg); color: var(--tile-color); }
+        .level-icon.medium-icon { background: var(--gold-light); color: var(--gold-text); }
+        .level-icon.hard-icon { background: var(--coral-soft); color: var(--coral); }
+        .level-header h5 {
+            font-size: 0.92rem; font-weight: 800; margin: 0;
+            color: var(--text-primary); transition: color 0.4s ease;
+        }
+        .level-count {
+            font-size: 0.6rem; font-weight: 700; padding: 4px 12px;
+            border-radius: 999px; background: var(--green-soft);
+            color: var(--green-on-soft); transition: all 0.4s ease;
+        }
+
+        /* activity cards */
+        .activity-card {
+            background: var(--card-white);
+            border-radius: var(--radius-xl); padding: 1.05rem 1.15rem 1rem;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease, border-color 0.4s ease;
+            border: 1px solid var(--border-fresh);
+            box-shadow: var(--shadow-sm); height: 100%;
+            position: relative; overflow: hidden; text-decoration: none;
+            color: inherit; display: flex; flex-direction: column;
+        }
+        .card-accent-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+            border-radius: 3px 3px 0 0; opacity: 0; transition: opacity 0.3s;
+        }
+        .activity-card:hover {
+            transform: translateY(-3px); border-color: var(--php-color);
+            box-shadow: var(--shadow-md);
+        }
+        .activity-card.activity-locked { opacity: 0.62; cursor: not-allowed; filter: grayscale(0.25); }
+        .activity-card.activity-locked:hover { transform: none; border-color: var(--border-fresh); box-shadow: var(--shadow-sm); }
+        .activity-card:hover .card-accent-bar { opacity: 1; }
+        .activity-card:hover .card-arrow { opacity: 1; transform: translateY(0); }
+        .activity-card.activity-completed .card-arrow { opacity: 1; transform: translateY(0); }
+
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.55rem; gap: 6px; }
+        .difficulty-badge { font-size: 0.56rem; padding: 3px 11px; border-radius: 999px; font-weight: 800; letter-spacing: 0.4px; }
+        .easy { background: var(--green-soft); color: var(--green-on-soft); }
+        .medium { background: var(--gold-light); color: var(--gold-text); }
+        .hard { background: var(--coral-soft); color: #991b1b; }
+        [data-theme="dark"] .hard { color: #f08080; }
+        .status-badge {
+            font-size: 0.58rem; padding: 3px 11px; border-radius: 999px; font-weight: 700;
+            margin-left: auto; letter-spacing: 0.3px;
+        }
+        .status-completed { background: var(--green-soft); color: var(--green-on-soft); }
+        .status-pending { background: var(--gold-light); color: var(--gold-text); }
+        .status-locked { background: var(--coral-soft); color: #a33a2e; }
+        [data-theme="dark"] .status-locked { color: #f08080; }
+
+        .activity-card h6 {
+            font-size: 0.86rem; font-weight: 800; margin: 0 0 4px;
+            color: var(--text-primary); transition: color 0.4s ease;
+            letter-spacing: -0.2px;
+        }
+        .step-badge {
+            display: inline-block; background: var(--php-color); color: #ffffff;
+            padding: 2px 10px; border-radius: 999px; font-size: 0.54rem;
+            font-weight: 800; margin-left: 6px; letter-spacing: 0.3px;
+        }
+        .activity-card .card-desc {
+            font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 10px;
+            line-height: 1.55; transition: color 0.4s ease;
+        }
+        .blocks-available { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+        .block-pill {
+            background: var(--php-light); padding: 3px 10px; border-radius: 999px;
+            font-size: 0.56rem; font-weight: 800; color: var(--php-dark);
+            letter-spacing: 0.4px; transition: background 0.4s ease, color 0.4s ease;
+            text-transform: uppercase;
+        }
+        .block-pill i { margin-right: 3px; font-size: 0.6rem; }
+        .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+        .card-meta-badge {
+            font-size: 0.6rem; padding: 4px 10px; border-radius: 999px;
+            font-weight: 700; background: var(--card-tint);
+            border: 1px solid var(--border-fresh);
+            color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px;
+            transition: all 0.4s ease;
+        }
+        .card-meta-badge i { font-size: 0.6rem; color: var(--green-accent); }
+        .card-meta-badge .gold { color: var(--gold-warm); }
+
+        .card-arrow {
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-top: 10px; color: var(--php-color); font-size: 0.72rem; font-weight: 800;
+            opacity: 0; transform: translateY(5px); transition: all 0.3s ease;
+        }
+        [data-theme="dark"] .card-arrow { color: var(--php-dark); }
+        .card-arrow i { transition: transform 0.3s; }
+        .activity-card:hover .card-arrow i { transform: translateX(3px); }
+
+        /* instruction panel */
+        .instruction-panel {
+            position: fixed; top: 0; right: -520px; width: 500px; height: 100vh;
+            background: var(--card-white);
+            box-shadow: -8px 0 40px rgba(9,42,32,0.18);
+            border-left: 1px solid var(--border-fresh);
+            transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s ease, border-color 0.4s ease;
+            z-index: 2000; padding: 1.6rem 1.8rem 1.4rem;
+            overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .instruction-panel.open { right: 0; }
+        .instruction-panel .close-btn {
+            background: transparent; border: 1px solid var(--border-fresh);
+            font-size: 0.85rem; color: var(--text-secondary); padding: 7px 12px;
+            border-radius: 10px; transition: all 0.25s; align-self: flex-end;
+            margin-bottom: 0.8rem; cursor: pointer;
+        }
+        .instruction-panel .close-btn:hover {
+            background: var(--coral-soft); border-color: var(--coral); color: var(--coral);
+        }
+        .instruction-panel h4 {
+            font-weight: 800; color: var(--text-primary);
+            margin-bottom: 0.35rem; font-size: 1.15rem; letter-spacing: -0.4px;
+            transition: color 0.4s ease;
+        }
+        .instruction-panel .step-number {
+            display: inline-block; background: var(--php-color); color: #ffffff;
+            padding: 3px 13px; border-radius: 999px; font-size: 0.62rem;
+            font-weight: 800; margin-bottom: 0.85rem; letter-spacing: 0.3px;
+        }
+        .instruction-panel .meta-row {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.1rem;
+        }
+        .instruction-panel .meta-row span {
+            background: var(--card-tint); padding: 4px 14px; border-radius: 999px;
+            font-size: 0.66rem; font-weight: 700; color: var(--text-secondary);
+            display: inline-flex; align-items: center; gap: 5px;
+            border: 1px solid var(--border-fresh);
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        .instruction-panel .instruction-text {
+            background: var(--card-tint); padding: 1.1rem 1.3rem; border-radius: var(--radius-md);
+            border-left: 4px solid var(--php-color); font-size: 0.85rem;
+            color: var(--text-secondary); line-height: 1.75; margin-bottom: 1rem;
+            flex: 1; transition: background 0.4s ease, color 0.4s ease;
+        }
+        .instruction-panel .instruction-text .step-item {
+            display: flex; gap: 12px; padding: 7px 0;
+            border-bottom: 1px solid var(--border-fresh);
+            transition: border-color 0.4s ease;
+        }
+        .instruction-panel .instruction-text .step-item:last-child { border-bottom: none; }
+        .instruction-panel .instruction-text .step-num {
+            font-weight: 800; color: var(--php-color); min-width: 26px; font-size: 0.8rem;
+        }
+        [data-theme="dark"] .instruction-panel .instruction-text .step-num { color: var(--php-dark); }
+        .instruction-panel .instruction-text .step-desc { flex: 1; font-size: 0.8rem; }
+        .instruction-panel .instruction-text .step-desc code {
+            background: var(--card-white); padding: 1px 7px; border-radius: 6px;
+            font-size: 0.74rem; color: var(--php-dark); border: 1px solid var(--border-fresh);
+            transition: all 0.4s ease;
+        }
+        .instruction-panel .instruction-text .step-desc strong { color: var(--text-primary); transition: color 0.4s ease; }
+        .instruction-panel .block-list {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem;
+        }
+        .instruction-panel .block-list .block-pill { font-size: 0.66rem; padding: 4px 13px; }
+        .instruction-panel .btn-start {
+            background: var(--php-color); border: none; color: #ffffff;
+            font-weight: 800; padding: 12px 20px; border-radius: 999px;
+            width: 100%; transition: all 0.25s; margin-top: auto;
+            font-family: inherit; font-size: 0.82rem;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 14px rgba(119,123,180,0.30);
+        }
+        .instruction-panel .btn-start:hover {
+            background: #4d5b96; transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .instruction-panel .hint-box {
+            background: var(--gold-light); border-radius: var(--radius-sm);
+            padding: 0.7rem 1rem; margin-bottom: 1rem;
+            border-left: 4px solid var(--gold-warm);
+            font-size: 0.76rem; color: var(--gold-text); transition: all 0.4s ease;
+        }
+        [data-theme="dark"] .instruction-panel .hint-box { color: var(--gold-text); }
+        .instruction-panel .hint-box i { margin-right: 6px; color: var(--gold-warm); }
+        .instruction-panel .expected-output {
+            background: #1a2a22; color: #d4d4d4;
+            padding: 10px 16px; border-radius: var(--radius-sm);
+            font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.76rem;
+            margin-bottom: 1rem; border: 1px solid #2a3a32;
+        }
+        .instruction-panel .expected-output label {
+            font-size: 0.56rem; text-transform: uppercase; letter-spacing: 1px;
+            color: #8aa89a; display: block; margin-bottom: 4px; font-weight: 700;
+        }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.25); backdrop-filter: blur(3px);
+            z-index: 1999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .overlay.show { opacity: 1; pointer-events: auto; }
+
+        .toast-box {
+            position: fixed; bottom: 20px; right: 20px; z-index: 99999;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast-msg {
+            background: var(--toast-bg); color: white; padding: 9px 15px;
+            border-radius: 11px; font-size: 0.75rem; font-weight: 500;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 8px;
+            animation: tIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+        }
+        .toast-msg.out { opacity: 0; transform: translateX(40px); }
+        .toast-msg.success i { color: #4ade80; }
+        .toast-msg.error i { color: #ff8a7a; }
+        @keyframes tIn {
+            from { opacity: 0; transform: translateX(40px) scale(0.95); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        .fu { opacity: 0; transform: translateY(12px); animation: fuA 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fuA { to { opacity: 1; transform: translateY(0); } }
+        .e1 { animation-delay: 0.04s; } .e2 { animation-delay: 0.08s; }
+        .e3 { animation-delay: 0.12s; } .e4 { animation-delay: 0.16s; }
+        .e5 { animation-delay: 0.2s; } .e6 { animation-delay: 0.24s; }
+        .e7 { animation-delay: 0.28s; }
+
+        /* responsiveness */
+        @media (max-width: 992px) {
+            .activity-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+            .tabs-wrapper { flex-direction: column; align-items: stretch; }
+            .assessments-btn { justify-content: center; width: 100%; }
+            .language-tabs { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: var(--sidebar-collapsed-w); }
+            .sidebar .logo-full { display: none !important; }
+            .sidebar .logo-mono { display: flex !important; }
+            .sidebar .toggle-btn { display: none !important; }
+            .sidebar .hamburger-wrap { display: flex !important; }
+            .sidebar .sidebar-logo { justify-content: center; padding: 0.75rem 0.4rem; }
+            .sidebar .nav-link-custom { justify-content: center; padding: 0.55rem 0; margin: 0 0.3rem; width: calc(100% - 0.6rem); }
+            .sidebar .nav-link-custom i,
+            .sidebar .nav-link-custom iconify-icon { font-size: 1.05rem; }
+            .sidebar .nav-text { display: none !important; }
+            .sidebar .nav-section-label { height: 0; padding: 0; margin: 0; opacity: 0; overflow: hidden; }
+            .sidebar .nav-badge { left: auto; right: 9px; top: 50%; }
+            .main-content, .main-content.shifted { margin-left: var(--sidebar-collapsed-w); padding: 14px; }
+            .page-title { font-size: 1.02rem; }
+            .page-title iconify-icon,
+            .page-title i { width: 32px; height: 32px; font-size: 0.8rem; }
+            .top-search input { width: 130px; }
+            .profile-trigger-info { display: none; }
+            .profile-trigger { padding: 4px 9px 4px 4px; }
+            .profile-dropdown { right: 0; left: auto; min-width: 200px; }
+            .notif-dropdown { right: 0; left: auto; }
+            .language-tabs { gap: 0.4rem; }
+            .lang-tab { font-size: 0.7rem; padding: 5px 12px; }
+            .instruction-panel { width: 100%; right: -100%; padding: 1.4rem 1.5rem; }
+            .activity-grid-2 { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 576px) {
+            .main-content, .main-content.shifted { padding: 12px; }
+            .activity-grid-2 { grid-template-columns: 1fr !important; }
+            .top-bar { flex-wrap: wrap; gap: 8px; }
+            .top-bar-right { margin-left: auto; flex-wrap: wrap; }
+            .top-search { order: 10; width: 100%; }
+            .top-search input { width: 100% !important; }
+            .profile-dropdown { right: 0; left: auto; min-width: 180px; }
+            .notif-dropdown { width: min(320px, calc(100vw - 24px)); right: 0; left: auto; }
+            .language-tabs { flex-direction: column; width: 100%; }
+            .lang-tab { justify-content: center; width: 100%; }
+            .col-md-6 { width: 100%; }
+        }
+        @media (max-width: 768px) {
+            .sidebar:not(.collapsed) { width: min(var(--sidebar-w), 85vw); }
+            .sidebar:not(.collapsed) .logo-image,
+            .sidebar:not(.collapsed) .logo-full,
+            .sidebar:not(.collapsed) .toggle-btn { display: flex !important; }
+            .sidebar:not(.collapsed) .logo-image { display: block !important; }
+            .sidebar:not(.collapsed) .logo-mono,
+            .sidebar:not(.collapsed) .hamburger-wrap { display: none !important; }
+            .sidebar:not(.collapsed) .nav-link-custom {
+                justify-content: flex-start; width: calc(100% - 0.8rem);
+                padding: 0.55rem 0.7rem; margin: 0 0.4rem;
+            }
+            .sidebar:not(.collapsed) .nav-text { display: inline !important; }
+            .sidebar:not(.collapsed) .nav-section-label {
+                height: auto; padding: 0.6rem 1rem 0.25rem; margin: 0.45rem 0.7rem 0.2rem;
+                opacity: 1; overflow: visible;
+            }
+            .sidebar:not(.collapsed) .activities-submenu.open,
+            .sidebar:not(.collapsed) .nav-subnav { display: flex !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+    <script defer src="/static/js/portal_consistency.js"></script>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true">
+    <div class="bg-blob bg-blob--1"></div>
+    <div class="bg-blob bg-blob--2"></div>
+</div>
+
+<div class="app">
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-logo">
+            <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="logo-image">
+            <div class="logo-full">
+                <h2>Block<em>Learn</em></h2>
+                <p>PNHS &middot; ICT Studio</p>
+            </div>
+            <div class="logo-mono"><img src="/static/BL-LOGO.png" alt="BlockLearn Logo"></div>
+            <button class="toggle-btn" onclick="collapseSidebar()" aria-label="Collapse sidebar">
+                <iconify-icon icon="lucide:panel-left-close"></iconify-icon>
+            </button>
+        </div>
+        <div class="hamburger-wrap">
+            <button class="hamburger-btn" onclick="expandSidebar()" aria-label="Expand sidebar">
+                <iconify-icon icon="lucide:menu"></iconify-icon>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <div class="nav-item"><a href="/student_dashboard" class="nav-link-custom"><iconify-icon icon="lucide:house"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
+            <div class="nav-item"><a href="/assessments" class="nav-link-custom"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a></div>
+            <div class="nav-item"><a href="/student_modules" class="nav-link-custom"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a></div>
+            <div class="nav-item"><a href="/student_progress" class="nav-link-custom"><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon><span class="nav-text">Progress</span></a></div>
+            <div class="nav-section-label">Activities</div>
+            <div class="nav-item"><a href="/student_activities" class="nav-link-custom"><iconify-icon icon="lucide:code"></iconify-icon><span class="nav-text">All Activities</span></a></div>
+            <div class="nav-item"><a href="/student_activities_php" class="nav-link-custom active" aria-current="page"><span class="php-logo-mark" aria-hidden="true">php</span><span class="nav-text">PHP</span></a></div>
+            <div class="nav-item"><a href="/student_activities_javascript" class="nav-link-custom"><iconify-icon icon="logos:javascript"></iconify-icon><span class="nav-text">JavaScript</span></a></div>
+            <div class="nav-item"><a href="/student_activities_cpp" class="nav-link-custom"><iconify-icon icon="simple-icons:cplusplus"></iconify-icon><span class="nav-text">C++</span></a></div>
+            <div class="nav-section-label">Account</div>
+            <div class="nav-item"><a href="/student_profile" class="nav-link-custom"><iconify-icon icon="lucide:circle-user-round"></iconify-icon><span class="nav-text">Profile</span></a></div>
+            <div class="nav-item"><a href="/student_settings" class="nav-link-custom"><iconify-icon icon="lucide:sliders-horizontal"></iconify-icon><span class="nav-text">Settings</span></a></div>
+            <div class="nav-section-label">Support</div>
+            <div class="nav-item"><a href="/student_help" class="nav-link-custom"><iconify-icon icon="lucide:circle-help"></iconify-icon><span class="nav-text">Help &amp; FAQ</span></a></div>
+            <div class="nav-item"><a href="/student_tickets" class="nav-link-custom"><iconify-icon icon="lucide:ticket"></iconify-icon><span class="nav-text">Support Tickets</span></a></div>
+        </nav>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <header class="top-bar fu e1">
+            <div><h1 class="page-title"><span class="php-logo-mark" aria-hidden="true">php</span>PHP Activities</h1></div>
+            <div class="top-bar-right">
+                <div class="top-search">
+                    <input type="text" placeholder="Search..." id="topSearchInput" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </div>
+                <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
+                </button>
+                <div style="position: relative;">
+                    <button class="notif-btn" id="notifBtn" onclick="toggleNotifications()" aria-label="Notifications"><i class="fas fa-bell"></i><span class="notif-badge hidden" id="notifBadge">0</span></button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header"><h6><i class="fas fa-bell"></i> Notifications</h6><button class="mark-read-btn" onclick="markAllRead()">Mark all as read</button></div>
+                        <div class="notif-list" id="notifList"><div class="notif-empty"><i class="fas fa-spinner fa-spin"></i><p>Loading notifications...</p></div></div>
+                    </div>
+                </div>
+                <div class="profile-trigger" id="profileTrigger" onclick="toggleProfile()">
+                    <div class="profile-trigger-avatar"><i class="fas fa-user"></i></div>
+                    <div class="profile-trigger-info"><span class="profile-trigger-name" id="triggerName">Student</span><span class="profile-trigger-role" id="triggerRole">Grade 11</span></div>
+                    <i class="fas fa-chevron-down profile-trigger-chevron"></i>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="pd-header"><div class="pd-avatar"><i class="fas fa-user"></i></div><div><div class="pd-name" id="pdName">Student</div><div class="pd-grade" id="pdGrade">Grade 11 - ICT</div></div></div>
+                        <div class="pd-links">
+                            <a href="/student_profile" class="pd-link"><i class="fas fa-circle-user"></i> My Profile</a>
+                            <a href="/student_settings" class="pd-link"><i class="fas fa-sliders"></i> Settings</a>
+                            <div class="pd-sep"></div>
+                            <a href="/logout" class="pd-link logout"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tabs Wrapper -->
+        <div class="tabs-wrapper fu e2">
+            <button class="assessments-btn" onclick="window.location.href='/assessments'">
+                <i class="fas fa-clipboard-list"></i> Assessments &amp; Quizzes
+                <span class="badge-count">5</span>
+            </button>
+            <div class="activity-language-score">
+                <nav class="language-tabs" aria-label="Programming language">
+                    <a href="/student_activities_php" class="lang-tab active"><span class="php-logo-mark" aria-hidden="true">php</span> PHP</a>
+                    <a href="/student_activities_javascript" class="lang-tab"><iconify-icon icon="logos:javascript"></iconify-icon> JavaScript</a>
+                    <a href="/student_activities_cpp" class="lang-tab"><iconify-icon icon="simple-icons:cplusplus"></iconify-icon> C++</a>
+                </nav>
+                {% set score_language = 'php' %}{% set score_language_name = 'PHP' %}
+                {% include 'activities/activity_score_panel.html' %}
+            </div>
+        </div>
+
+        <!-- Easy Level -->
+        <section class="level-section fu e3">
+            <div class="level-header">
+                <div class="level-icon easy-icon"><i class="fas fa-seedling"></i></div>
+                <h5>Easy Level</h5>
+                <span class="level-count">2 activities</span>
+            </div>
+            <div class="row g-3 activity-grid-2" style="display:grid; grid-template-columns: repeat(2, 1fr);">
+                <div>
+                    <div class="activity-card" data-activity="hello-php">
+                        <div class="card-accent-bar" style="background: linear-gradient(90deg, var(--php-color), #9999cc);"></div>
+                        <div class="card-top">
+                            <span class="difficulty-badge easy">Easy</span>
+                            <span class="status-badge status-pending" id="status-hellophp">Not Started</span>
+                        </div>
+                        <h6>Hello, PHP! <span class="step-badge">Activity 1</span></h6>
+                        <p class="card-desc">Create a PHP program that displays "Hello, PHP!"</p>
+                        <div class="blocks-available"><span class="block-pill"><i class="fas fa-print"></i> echo</span><span class="block-pill"><i class="fas fa-font"></i> TEXT</span></div>
+                        <div class="card-meta">
+                            <span class="card-meta-badge"><i class="far fa-clock"></i> 5 min</span>
+                            <span class="card-meta-badge"><i class="fas fa-star gold"></i> 10 pts</span>
+                        </div>
+                        <div class="card-arrow">Start <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="activity-card" data-activity="store-name">
+                        <div class="card-accent-bar" style="background: linear-gradient(90deg, var(--php-color), #9999cc);"></div>
+                        <div class="card-top">
+                            <span class="difficulty-badge easy">Easy</span>
+                            <span class="status-badge status-pending" id="status-storename">Not Started</span>
+                        </div>
+                        <h6>Store a Name <span class="step-badge">Activity 2</span></h6>
+                        <p class="card-desc">Create a variable "name" with value "Anna" and display it</p>
+                        <div class="blocks-available"><span class="block-pill"><i class="fas fa-cube"></i> $variable</span><span class="block-pill"><i class="fas fa-print"></i> echo</span><span class="block-pill"><i class="fas fa-font"></i> TEXT</span></div>
+                        <div class="card-meta">
+                            <span class="card-meta-badge"><i class="far fa-clock"></i> 5 min</span>
+                            <span class="card-meta-badge"><i class="fas fa-star gold"></i> 10 pts</span>
+                        </div>
+                        <div class="card-arrow">Start <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Medium Level -->
+        <section class="level-section fu e5">
+            <div class="level-header">
+                <div class="level-icon medium-icon"><i class="fas fa-chart-line"></i></div>
+                <h5>Medium Level</h5>
+                <span class="level-count">2 activities</span>
+            </div>
+            <div class="row g-3 activity-grid-2" style="display:grid; grid-template-columns: repeat(2, 1fr);">
+                <div>
+                    <div class="activity-card" data-activity="subtract-numbers">
+                        <div class="card-accent-bar" style="background: linear-gradient(90deg, #9999cc, #b0b0dd);"></div>
+                        <div class="card-top">
+                            <span class="difficulty-badge medium">Medium</span>
+                            <span class="status-badge status-pending" id="status-subtract">Not Started</span>
+                        </div>
+                        <h6>Subtract Two Numbers <span class="step-badge">Activity 3</span></h6>
+                        <p class="card-desc">Subtract 50 from 80 and display the result</p>
+                        <div class="blocks-available"><span class="block-pill"><i class="fas fa-print"></i> echo</span><span class="block-pill"><i class="fas fa-minus"></i> SUBTRACT</span><span class="block-pill"><i class="fas fa-hashtag"></i> NUMBER</span></div>
+                        <div class="card-meta">
+                            <span class="card-meta-badge"><i class="far fa-clock"></i> 8 min</span>
+                            <span class="card-meta-badge"><i class="fas fa-star gold"></i> 10 pts</span>
+                        </div>
+                        <div class="card-arrow">Start <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="activity-card" data-activity="greater-than-php">
+                        <div class="card-accent-bar" style="background: linear-gradient(90deg, #9999cc, #b0b0dd);"></div>
+                        <div class="card-top">
+                            <span class="difficulty-badge medium">Medium</span>
+                            <span class="status-badge status-pending" id="status-greaterthanphp">Not Started</span>
+                        </div>
+                        <h6>Greater Than <span class="step-badge">Activity 4</span></h6>
+                        <p class="card-desc">Check if 25 > 18 and display "25 is greater than 18"</p>
+                        <div class="blocks-available"><span class="block-pill"><i class="fas fa-code-branch"></i> if</span><span class="block-pill"><i class="fas fa-greater-than"></i> ></span><span class="block-pill"><i class="fas fa-print"></i> echo</span><span class="block-pill"><i class="fas fa-font"></i> TEXT</span></div>
+                        <div class="card-meta">
+                            <span class="card-meta-badge"><i class="far fa-clock"></i> 10 min</span>
+                            <span class="card-meta-badge"><i class="fas fa-star gold"></i> 10 pts</span>
+                        </div>
+                        <div class="card-arrow">Start <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hard Level -->
+        <section class="level-section fu e7">
+            <div class="level-header">
+                <div class="level-icon hard-icon"><i class="fas fa-trophy"></i></div>
+                <h5>Hard Level</h5>
+                <span class="level-count">1 activity</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="activity-card" data-activity="repeat-php">
+                        <div class="card-accent-bar" style="background: linear-gradient(90deg, var(--coral), #f08070);"></div>
+                        <div class="card-top">
+                            <span class="difficulty-badge hard">Hard</span>
+                            <span class="status-badge status-pending" id="status-repeatphp">Not Started</span>
+                        </div>
+                        <h6>Repeat a Message Three Times <span class="step-badge">Activity 5</span></h6>
+                        <p class="card-desc">Display "Learning PHP!" 3 times using a loop</p>
+                        <div class="blocks-available"><span class="block-pill"><i class="fas fa-sync"></i> FOR LOOP</span><span class="block-pill"><i class="fas fa-print"></i> echo</span><span class="block-pill"><i class="fas fa-hashtag"></i> NUMBER</span><span class="block-pill"><i class="fas fa-font"></i> TEXT</span></div>
+                        <div class="card-meta">
+                            <span class="card-meta-badge"><i class="far fa-clock"></i> 12 min</span>
+                            <span class="card-meta-badge"><i class="fas fa-star gold"></i> 10 pts</span>
+                        </div>
+                        <div class="card-arrow">Start <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="instruction-panel" id="instructionPanel">
+    <button class="close-btn" id="closePanelBtn"><i class="fas fa-times"></i></button>
+    <h4 id="panelTitle">Hello, PHP!</h4>
+    <span class="step-number" id="panelStep">Activity 1</span>
+    <div class="meta-row" id="panelMeta">
+        <span class="difficulty-badge easy" id="panelDifficulty">Easy</span>
+        <span><i class="far fa-clock me-1"></i><span id="panelTime">5 min</span></span>
+        <span><i class="fas fa-star me-1" style="color:var(--gold-warm)"></i><span id="panelPoints">10 pts</span></span>
+    </div>
+    <div class="instruction-text" id="panelInstructions"></div>
+    <div class="expected-output" id="panelOutput">
+        <label><i class="fas fa-eye me-1"></i> Expected Output</label>
+        <span id="outputText">Hello, PHP!</span>
+    </div>
+    <div class="block-list" id="panelBlocks"></div>
+    <button class="btn-start" id="panelStartBtn"><i class="fas fa-play"></i> Start Activity</button>
+</div>
+
+<div class="toast-box" id="toastBox"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function collapseSidebar() {
+        document.getElementById('sidebar').classList.add('collapsed');
+        document.getElementById('mainContent').classList.add('shifted');
+        try { localStorage.setItem('blocklearn-sidebar', 'collapsed'); } catch (e) {}
+    }
+    function expandSidebar() {
+        document.getElementById('sidebar').classList.remove('collapsed');
+        document.getElementById('mainContent').classList.remove('shifted');
+        try { localStorage.setItem('blocklearn-sidebar', 'expanded'); } catch (e) {}
+    }
+    function checkSidebarState() {
+        var collapsed = window.innerWidth <= 768;
+        try {
+            if (!collapsed) collapsed = localStorage.getItem('blocklearn-sidebar') === 'collapsed';
+        } catch (e) {}
+        document.getElementById('sidebar').classList.toggle('collapsed', collapsed);
+        document.getElementById('mainContent').classList.toggle('shifted', collapsed);
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        localStorage.setItem('blocklearn-theme', isDark ? 'light' : 'dark');
+    }
+    (function() { try { if (localStorage.getItem('blocklearn-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();
+
+    function toggleNotifications() {
+        const dd = document.getElementById('notifDropdown');
+        document.getElementById('profileDropdown').classList.remove('open');
+        document.getElementById('profileTrigger').classList.remove('open');
+        dd.classList.toggle('open');
+    }
+    function markAllRead() {
+        document.querySelectorAll('.notif-item.unread').forEach(i => i.classList.remove('unread'));
+        updateNotifBadge();
+        showToast('All notifications marked as read', 'success');
+    }
+    function updateNotifBadge() {
+        const u = document.querySelectorAll('.notif-item.unread').length;
+        const b = document.getElementById('notifBadge');
+        if (u > 0) { b.textContent = u; b.classList.remove('hidden'); } else { b.classList.add('hidden'); }
+    }
+    function loadNotifications() {
+        fetch('/get_notifications').then(r => r.json()).then(d => {
+            const l = document.getElementById('notifList');
+            if (d.success && d.notifications && d.notifications.length > 0) {
+                l.innerHTML = d.notifications.map(n => {
+                    const c = n.is_read ? '' : ' unread';
+                    const sc = n.score != null ? `<span class="score-badge">${n.score}%</span>` : '';
+                    return `<div class="notif-item${c}" data-id="${n.id}"><div class="notif-title">${n.title}</div><div class="notif-message">${n.message}</div>${sc}<span class="notif-time">${n.time_ago}</span></div>`;
+                }).join('');
+                updateNotifBadge();
+            } else { l.innerHTML = `<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>`; }
+        }).catch(() => { document.getElementById('notifList').innerHTML = `<div class="notif-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>`; });
+    }
+
+    function toggleProfile() {
+        const dd = document.getElementById('profileDropdown');
+        document.getElementById('notifDropdown').classList.remove('open');
+        dd.classList.toggle('open');
+        document.getElementById('profileTrigger').classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(e) {
+        const nb = document.getElementById('notifBtn'), nd = document.getElementById('notifDropdown');
+        const pt = document.getElementById('profileTrigger'), pd = document.getElementById('profileDropdown');
+        if (!nb.contains(e.target) && !nd.contains(e.target)) nd.classList.remove('open');
+        if (!pt.contains(e.target) && !pd.contains(e.target)) { pd.classList.remove('open'); pt.classList.remove('open'); }
+    });
+
+    function showToast(message, type) {
+        const box = document.getElementById('toastBox');
+        const t = document.createElement('div');
+        t.className = `toast-msg ${type || 'success'}`;
+        t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+        box.appendChild(t);
+        setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 3000);
+    }
+
+    document.querySelectorAll('.activity-card').forEach(card => {
+        card.addEventListener('mouseenter', function() { const b = this.querySelector('.card-accent-bar'); if (b) b.style.opacity = '1'; });
+        card.addEventListener('mouseleave', function() { const b = this.querySelector('.card-accent-bar'); if (b) b.style.opacity = '0'; });
+    });
+
+    const activityData = {
+        'hello-php': {
+            title: 'Hello, PHP!', step: 'Activity 1', difficulty: 'Easy', time: '1 hour', points: '10 pts',
+            steps: [
+                'Find the <strong>echo</strong> block in the <span class="category-name">BASIC</span> category.',
+                'Drag the <strong>echo</strong> block to the workspace.',
+                'Find the <strong>TEXT</strong> block in the <span class="category-name">VARIABLES</span> category.',
+                'Drag the <strong>TEXT</strong> block and attach it <span class="highlight">inside</span> the echo block.',
+                'Click on the <strong>TEXT</strong> block and type: <span class="highlight">"Hello, PHP!"</span>',
+                'Click <span class="highlight">Start Activity</span> to continue to the playground.'
+            ],
+            output: 'Hello, PHP!',
+            hint: 'Use <code>echo "Hello, PHP!";</code> in PHP.',
+            blocks: ['echo', 'TEXT']
+        },
+        'store-name': {
+            title: 'Store a Name', step: 'Activity 2', difficulty: 'Easy', time: '1 hour', points: '10 pts',
+            steps: [
+                'Find the <strong>$variable</strong> block in the <span class="category-name">VARIABLES</span> category.',
+                'Change the variable name from "myVar" to <span class="highlight">"name"</span>.',
+                'Attach a <strong>TEXT</strong> block with value <span class="highlight">"Caryll"</span>.',
+                'Find the <strong>echo</strong> block in the <span class="category-name">BASIC</span> category.',
+                'Inside echo, add a <strong>GET VARIABLE</strong> block and select <span class="highlight">"name"</span>.',
+                'Click <span class="highlight">Start Activity</span> to continue to the playground.'
+            ],
+            output: 'Caryll',
+            hint: 'Use <code>$name = "Caryll"; echo $name;</code>',
+            blocks: ['$variable', 'echo', 'TEXT', 'GET VARIABLE']
+        },
+        'subtract-numbers': {
+            title: 'Subtract Two Numbers', step: 'Activity 3', difficulty: 'Medium', time: '1 hour', points: '10 pts',
+            steps: [
+                'Find the <strong>echo</strong> block in the <span class="category-name">BASIC</span> category.',
+                'Inside echo, add a <strong>SUBTRACT</strong> block from the <span class="category-name">MATH</span> category.',
+                'Add two <strong>NUMBER</strong> blocks: <span class="highlight">80</span> and <span class="highlight">50</span>.',
+                'Click <span class="highlight">Start Activity</span> to continue to the playground.'
+            ],
+            output: '30',
+            hint: 'Use <code>echo 80 - 50;</code>',
+            blocks: ['echo', 'SUBTRACT', 'NUMBER']
+        },
+        'greater-than-php': {
+            title: 'Greater Than', step: 'Activity 4', difficulty: 'Medium', time: '1 hour', points: '10 pts',
+            steps: [
+                'Find the <strong>if</strong> block in the <span class="category-name">LOGIC</span> category.',
+                'Add a <strong>></strong> block from the <span class="category-name">LOGIC</span> category as the condition.',
+                'Set the values: <span class="highlight">25</span> and <span class="highlight">18</span>.',
+                'Inside the if block, add a <strong>echo</strong> block with the text <span class="highlight">"25 is greater than 18"</span>.',
+                'Click <span class="highlight">Start Activity</span> to continue to the playground.'
+            ],
+            output: '25 is greater than 18',
+            hint: 'Use <code>if (25 > 18) { echo "25 is greater than 18"; }</code>',
+            blocks: ['if', '>', 'echo', 'NUMBER', 'TEXT']
+        },
+        'repeat-php': {
+            title: 'Repeat a Message Three Times', step: 'Activity 5', difficulty: 'Hard', time: '1 hour', points: '10 pts',
+            steps: [
+                'Find the <strong>FOR LOOP</strong> block in the <span class="category-name">LOOPS</span> category.',
+                'Set the loop to run <span class="highlight">3</span> times.',
+                'Inside the loop, add a <strong>echo</strong> block with the text <span class="highlight">"Learning PHP!"</span>.',
+                'Click <span class="highlight">Start Activity</span> to continue to the playground.'
+            ],
+            output: 'Learning PHP!\nLearning PHP!\nLearning PHP!',
+            hint: 'Use <code>for ($i = 0; $i < 3; $i++) { echo "Learning PHP!"; }</code>',
+            blocks: ['FOR LOOP', 'echo', 'NUMBER', 'TEXT']
+        }
+    };
+
+    const panel = document.getElementById('instructionPanel');
+    const overlay = document.getElementById('overlay');
+    const closeBtn = document.getElementById('closePanelBtn');
+
+    function openPanel(key) {
+        const d = activityData[key];
+        if (!d) return;
+        const card = document.querySelector(`[data-activity="${key}"]`);
+        if (card && card.classList.contains('activity-locked')) {
+            showToast('Complete all required assessments to unlock activities.', 'error');
+            return;
+        }
+        document.getElementById('panelTitle').textContent = d.title;
+        document.getElementById('panelStep').textContent = d.step;
+        const db = document.getElementById('panelDifficulty');
+        db.textContent = d.difficulty;
+        db.className = 'difficulty-badge ' + d.difficulty.toLowerCase();
+        document.getElementById('panelTime').textContent = d.time;
+        document.getElementById('panelPoints').textContent = d.points;
+        document.getElementById('panelInstructions').innerHTML = d.steps.map((s, i) =>
+            `<div class="step-item"><span class="step-num">${i + 1}.</span><span class="step-desc">${s}</span></div>`
+        ).join('');
+        document.getElementById('outputText').textContent = d.output;
+        document.getElementById('panelBlocks').innerHTML = d.blocks.map(b => `<span class="block-pill">${b}</span>`).join('');
+        document.getElementById('panelStartBtn').onclick = function() { window.location.href = `/playground_php?activity=${key}`; };
+        panel.classList.add('open');
+        overlay.classList.add('show');
+    }
+
+    function closePanel() { panel.classList.remove('open'); overlay.classList.remove('show'); }
+    closeBtn.addEventListener('click', closePanel);
+    overlay.addEventListener('click', closePanel);
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePanel(); });
+
+    document.querySelectorAll('.activity-card[data-activity]').forEach(card => {
+        card.addEventListener('click', function(e) { e.preventDefault(); if (!this.classList.contains('activity-locked')) openPanel(this.dataset.activity); });
+    });
+
+    function loadActivityStatuses() {
+        fetch('/get_activities').then(r => r.json()).then(data => {
+            if (data.success && data.activities) {
+                if (window.updateActivityScoreSummary) window.updateActivityScoreSummary(data.activities);
+                const m = {
+                    'Hello, PHP!': 'status-hellophp',
+                    'Store a Name': 'status-storename',
+                    'Subtract Two Numbers': 'status-subtract',
+                    'Greater Than': 'status-greaterthanphp',
+                    'Repeat a Message Three Times': 'status-repeatphp'
+                };
+                data.activities
+                    .filter(a => a.language === 'php')
+                    .forEach(a => {
+                        const id = m[a.name];
+                        if (id) {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                const done = typeof a.passed === 'boolean'
+                                    ? a.passed
+                                    : a.status === 'COMPLETED' || a.status === 'passed' || a.status === 'done';
+                                const submitted = a.status === 'SUBMITTED';
+                                const inProgress = a.status === 'in_progress';
+                                const locked = a.status === 'LOCKED';
+                                const card = el.closest('.activity-card');
+                                el.textContent = done ? ' Passed' : submitted ? ' Not Passed' : inProgress ? ' In Progress' : locked ? ' Locked' : ' Unlocked';
+                                el.className = `status-badge ${done ? 'status-completed' : locked ? 'status-locked' : 'status-pending'}`;
+                                if (card) {
+                                    card.classList.toggle('activity-locked', locked);
+                                    card.classList.toggle('activity-completed', done);
+                                    const action = card.querySelector('.card-arrow');
+                                    if (action) {
+                                        action.innerHTML = done
+                                            ? 'Review <i class="fas fa-arrow-right"></i>'
+                                            : 'Start <i class="fas fa-arrow-right"></i>';
+                                    }
+                                }
+                            }
+                        }
+                    });
+            }
+        }).catch(e => console.error('Error loading statuses:', e));
+    }
+
+    function loadUserInfo() {
+        fetch('/student_profile_data').then(r => r.json()).then(d => {
+            if (d.success) {
+                const n = d.full_name || 'Student', g = d.grade_level || 'Grade 11';
+                document.getElementById('triggerName').innerText = n;
+                document.getElementById('triggerRole').innerText = g;
+                document.getElementById('pdName').innerText = n;
+                document.getElementById('pdGrade').innerText = g + ' - ICT';
+            }
+        }).catch(err => console.error('Error loading user info:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.activity-card[data-activity]').forEach(card => card.classList.add('activity-locked'));
+        checkSidebarState(); loadActivityStatuses(); loadNotifications(); loadUserInfo();
+        window.activityStatusTimer = window.setInterval(loadActivityStatuses, 10000);
+    });
+    window.addEventListener('resize', checkSidebarState);
+</script>
+</body>
+</html>

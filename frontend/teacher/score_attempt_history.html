@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Score Attempt History · BlockLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
+    <style>
+        :root { --green: #12604a; --green-soft: #e3f4ec; --ink: #10382c; --muted: #52705f; --line: #e0ebe4; --bg: #eef6f1; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+        main { max-width: 1440px; margin: auto; padding: 24px; }
+        .page-header, .panel { background: white; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 4px 14px rgba(16,56,44,.06); }
+        .page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 22px; margin-bottom: 18px; }
+        h1 { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .page-header p { color: var(--muted); font-size: .85rem; margin: 4px 0 0; }
+        .panel { padding: 18px; }
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+        .filters input, .filters select { min-height: 40px; border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; color: var(--ink); background: white; }
+        .filters input { flex: 1 1 220px; }
+        .filters select { flex: 0 1 180px; }
+        .layout { display: grid; grid-template-columns: minmax(340px, .9fr) minmax(420px, 1.3fr); gap: 16px; }
+        .table-wrap { max-height: 70vh; overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+        th { position: sticky; top: 0; background: #f7fbf9; color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
+        tbody tr { cursor: pointer; }
+        tbody tr:hover, tbody tr.selected { background: var(--green-soft); }
+        .badge-status { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: .68rem; font-weight: 750; text-transform: capitalize; }
+        .badge-passed { background: #dcfce7; color: #166534; }
+        .badge-failed { background: #fee2e2; color: #991b1b; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .detail h2 { font-size: 1.05rem; font-weight: 800; margin: 0 0 4px; }
+        .detail-subtitle { color: var(--muted); font-size: .8rem; margin-bottom: 14px; }
+        .score-summary { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 12px; border-radius: 10px; background: #f7fbf9; }
+        .score-number { color: var(--green); font-size: 1.4rem; font-weight: 850; }
+        .detail-section { margin-top: 14px; }
+        .detail-section h3 { font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 6px; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; margin: 0; padding: 10px; border-radius: 9px; background: #f7fbf9; color: var(--ink); font-size: .78rem; }
+        .breakdown { width: 100%; border-collapse: collapse; font-size: .78rem; }
+        .breakdown th, .breakdown td { padding: 8px; border-bottom: 1px solid var(--line); }
+        .breakdown th { position: static; }
+        .correct { color: #166534; font-weight: 750; }
+        .incorrect { color: #991b1b; font-weight: 750; }
+        .pagination { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; font-size: .8rem; }
+        .pagination button, .back-link { border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; background: white; color: var(--ink); text-decoration: none; }
+        .pagination button:disabled { opacity: .45; cursor: not-allowed; }
+        .empty { color: var(--muted); padding: 28px 10px; text-align: center; font-size: .85rem; }
+        .error { color: #991b1b; }
+        .portal-shell > .portal-main { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0; }
+        @media (max-width: 850px) { main { padding: 12px; } .layout { grid-template-columns: 1fr; } .table-wrap { max-height: 45vh; } }
+        @media (max-width: 520px) { .page-header { align-items: flex-start; flex-direction: column; } .panel { padding: 12px; } }
+    </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+    <script defer src="/static/js/portal_consistency.js"></script>
+</head>
+<body>
+<div class="portal-shell">
+    {% include 'teacher/_sidebar.html' %}
+<main class="portal-main">
+    <header class="page-header">
+        <div>
+            <h1><i class="fa-solid fa-clock-rotate-left me-2" aria-hidden="true"></i>Student Score Attempt History</h1>
+            <p>Review every coding activity and module final assessment submission, including the student's answer and score breakdown.</p>
+        </div>
+        <a class="back-link" href="/teacher_score_results"><i class="fa-solid fa-arrow-left me-1"></i> Score Results</a>
+    </header>
+
+    <section class="panel">
+        <div class="filters" aria-label="Filter score attempts">
+            <input id="search" type="search" placeholder="Search student or activity">
+            <select id="typeFilter" aria-label="Attempt type">
+                <option value="all">All activity types</option>
+                <option value="Activity">Activities</option>
+                <option value="Assessment">Assessments</option>
+                <option value="Module Final">Module final assessments</option>
+            </select>
+            <select id="languageFilter" aria-label="Programming language">
+                <option value="all">All languages</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="php">PHP</option>
+                <option value="javascript">JavaScript</option>
+                <option value="cpp">C++</option>
+            </select>
+            <select id="statusFilter" aria-label="Result status">
+                <option value="all">All results</option>
+                <option value="passed">Passed</option>
+                <option value="failed">Failed</option>
+                <option value="pending">Pending review</option>
+            </select>
+        </div>
+        <div class="layout">
+            <div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Student / Item</th><th>Score</th><th>Result</th></tr></thead>
+                        <tbody id="attemptRows"><tr><td class="empty" colspan="3">Loading attempt history...</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button id="previousPage" type="button">Previous</button>
+                    <span id="pageLabel">Page 1</span>
+                    <button id="nextPage" type="button">Next</button>
+                </div>
+            </div>
+            <article id="attemptDetail" class="detail" aria-live="polite">
+                <div class="empty">Select a submission to review its answer and scoring details.</div>
+            </article>
+        </div>
+    </section>
+</main></div>
+<script>
+    const PAGE_SIZE = 40;
+    let currentPage = 1;
+    let totalAttempts = 0;
+    let attempts = [];
+    let selectedRow = null;
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+    }
+
+    function showError(message) {
+        const rows = document.getElementById('attemptRows');
+        rows.innerHTML = `<tr><td class="empty error" colspan="3">${escapeHtml(message)}</td></tr>`;
+    }
+
+    async function loadAttempts() {
+        document.getElementById('attemptRows').innerHTML =
+            '<tr><td class="empty" colspan="3">Loading attempt history...</td></tr>';
+        try {
+            const response = await fetch(`/api/teacher/score-attempts?page=${currentPage}&page_size=${PAGE_SIZE}`);
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Could not load score history.');
+            attempts = data.attempts || [];
+            totalAttempts = data.total || 0;
+            renderAttempts();
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+
+    function filteredAttempts() {
+        const search = document.getElementById('search').value.trim().toLowerCase();
+        const type = document.getElementById('typeFilter').value;
+        const language = document.getElementById('languageFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        return attempts.filter(item =>
+            (!search || `${item.student_name} ${item.student_lrn} ${item.title}`.toLowerCase().includes(search)) &&
+            (type === 'all' || item.item_type === type) &&
+            (language === 'all' || item.language === language) &&
+            (status === 'all' || item.result_status === status)
+        );
+    }
+
+    function renderAttempts() {
+        const rows = document.getElementById('attemptRows');
+        const filtered = filteredAttempts();
+        rows.innerHTML = '';
+        if (!filtered.length) {
+            rows.innerHTML = `<tr><td class="empty" colspan="3">${totalAttempts ? 'No attempts match these filters.' : 'No score attempts have been recorded yet.'}</td></tr>`;
+        } else {
+            filtered.forEach(item => {
+                const row = document.createElement('tr');
+                if (selectedRow && selectedRow.attempt_id === item.attempt_id &&
+                    selectedRow.attempt_type === item.attempt_type) row.classList.add('selected');
+                row.innerHTML = `
+                    <td><strong>${escapeHtml(item.student_name || 'Student')}</strong><br>
+                        ${escapeHtml(item.title)}<br>
+                        <small>${escapeHtml(item.item_type)} · ${escapeHtml(item.language)} · ${escapeHtml(item.submitted_at)}</small>
+                    </td>
+                    <td>${escapeHtml(item.points_earned)} / ${escapeHtml(item.max_points)}<br><small>${escapeHtml(item.score)}%</small></td>
+                    <td><span class="badge-status badge-${item.result_status === 'passed' ? 'passed' : item.result_status === 'pending' ? 'pending' : 'failed'}">${escapeHtml(item.result_status)}</span></td>`;
+                row.addEventListener('click', () => loadAttemptDetail(item));
+                rows.appendChild(row);
+            });
+        }
+        const lastPage = Math.max(1, Math.ceil(totalAttempts / PAGE_SIZE));
+        document.getElementById('pageLabel').textContent = `Page ${currentPage} of ${lastPage} · ${totalAttempts} attempts`;
+        document.getElementById('previousPage').disabled = currentPage <= 1;
+        document.getElementById('nextPage').disabled = currentPage >= lastPage;
+    }
+
+    async function loadAttemptDetail(item) {
+        selectedRow = item;
+        renderAttempts();
+        const detail = document.getElementById('attemptDetail');
+        detail.innerHTML = '<div class="empty">Loading submission details...</div>';
+        try {
+            const response = await fetch(`/api/teacher/score-attempts/${encodeURIComponent(item.attempt_type)}/${item.attempt_id}`);
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Could not load submission details.');
+            renderDetail(data.attempt);
+        } catch (error) {
+            detail.innerHTML = `<div class="empty error">${escapeHtml(error.message)}</div>`;
+        }
+    }
+
+    function renderDetail(attempt) {
+        const detail = document.getElementById('attemptDetail');
+        const breakdown = Array.isArray(attempt.answer_breakdown) ? attempt.answer_breakdown : [];
+        detail.innerHTML = `
+            <h2>${escapeHtml(attempt.title)}</h2>
+            <div class="detail-subtitle">${escapeHtml(attempt.student_name)} · ${escapeHtml(attempt.student_lrn)} · ${escapeHtml(attempt.language)} · ${escapeHtml(attempt.submitted_at)}</div>
+            <div class="score-summary">
+                <span class="score-number">${escapeHtml(attempt.points_earned)} / ${escapeHtml(attempt.max_points)} pts</span>
+                <span>${escapeHtml(attempt.score)}% · <span class="badge-status badge-${attempt.result_status === 'passed' ? 'passed' : ['pending', 'pending_review'].includes(attempt.result_status) ? 'pending' : 'failed'}">${escapeHtml(attempt.result_status)}</span></span>
+            </div>
+            ${attempt.question ? `<section class="detail-section"><h3>Activity instructions</h3><pre>${escapeHtml(attempt.question)}</pre></section>` : ''}
+            <section class="detail-section"><h3>Score breakdown · 10 whole-number points</h3>
+                <table class="breakdown"><thead><tr><th>Question / criterion</th><th>Result</th><th>Points</th></tr></thead>
+                    <tbody>${breakdown.map(row => `<tr>
+                        <td>${row.criterion_number ? `${escapeHtml(row.criterion_number)}. ` : ''}${escapeHtml(row.criterion)}</td>
+                        <td class="${row.correct === true ? 'correct' : row.correct === false ? 'incorrect' : ''}">${row.correct === true ? 'Correct' : row.correct === false ? 'Incorrect' : 'Needs review'}<br><small>${escapeHtml(row.feedback || '')}</small></td>
+                        <td>${escapeHtml(row.points_earned)} / ${escapeHtml(row.max_points)}</td>
+                    </tr>
+                    <tr><td colspan="3"><small>Expected: <code>${escapeHtml(row.expected_answer)}</code><br>Student answer: <code>${escapeHtml(row.student_answer)}</code></small></td></tr>`).join('')}</tbody>
+                </table>
+            </section>
+            <section class="detail-section"><h3>Student output</h3><pre>${escapeHtml(attempt.student_answer || '(empty)')}</pre></section>
+            <section class="detail-section"><h3>Expected output</h3><pre>${escapeHtml(attempt.expected_output || '(not available)')}</pre></section>
+            <section class="detail-section"><h3>Generated code</h3><pre>${escapeHtml(attempt.generated_code || '(not available)')}</pre></section>
+            <section class="detail-section"><h3>Blockly answer</h3><pre>${escapeHtml(attempt.code_blocks || '(not available)')}</pre></section>`;
+    }
+
+    ['search', 'typeFilter', 'languageFilter', 'statusFilter'].forEach(id =>
+        document.getElementById(id).addEventListener('input', renderAttempts)
+    );
+    document.getElementById('previousPage').addEventListener('click', () => {
+        if (currentPage > 1) { currentPage -= 1; loadAttempts(); }
+    });
+    document.getElementById('nextPage').addEventListener('click', () => {
+        if (currentPage * PAGE_SIZE < totalAttempts) { currentPage += 1; loadAttempts(); }
+    });
+    loadAttempts();
+</script>
+</body>
+</html>

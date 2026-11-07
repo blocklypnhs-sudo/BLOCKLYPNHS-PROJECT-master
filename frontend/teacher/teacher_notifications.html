@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teacher Notifications · BlockLearn</title>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        body { margin: 0; font-family: Inter, Arial, sans-serif; background: #f0f6f3; color: #1a463a; }
+        main { max-width: 760px; margin: 40px auto; padding: 0 20px; }
+        .portal-shell > .portal-main { max-width: 760px; margin: 0 auto; padding: 0; }
+        .header, .notification { background: #fff; border: 1px solid #dde9e3; border-radius: 16px; box-shadow: 0 4px 16px rgba(20,90,66,.06); }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; }
+        h1 { margin: 0; font-size: 20px; } button { border: 0; border-radius: 999px; padding: 9px 14px; cursor: pointer; background: #145a42; color: #fff; }
+        #badge { background: #e8a838; color: #1a463a; padding: 2px 7px; border-radius: 999px; font-size: 11px; } #list { display: grid; gap: 12px; margin-top: 16px; }
+        .notification { padding: 16px 18px; } .notification.unread { border-left: 4px solid #e8a838; } .notification h2 { margin: 0 0 6px; font-size: 15px; } .notification p { margin: 0 0 8px; color: #4a6b5e; } small { color: #7f9e92; }
+    </style>
+    <link href="/static/mobile_responsive.css" rel="stylesheet">
+    <script defer src="/static/js/portal_consistency.js"></script>
+</head>
+<body><div class="portal-shell">
+    {% include 'teacher/_sidebar.html' %}
+    <main class="portal-main">
+    <section class="header"><h1>Teacher Notifications <span id="badge">0</span></h1><button id="read">Mark all as read</button></section>
+    <section id="list"><p>Loading notifications...</p></section>
+</main></div>
+<script>
+async function loadNotifications() { const response = await fetch('/get_notifications'); const data = await response.json(); const list = document.getElementById('list'); document.getElementById('badge').textContent = data.unread_count || 0; list.innerHTML = data.notifications?.length ? data.notifications.map(n => `<article class="notification ${n.is_read ? '' : 'unread'}"><h2>${n.title}</h2><p>${n.message}</p><small>${n.created_at || ''}</small></article>`).join('') : '<p>No notifications yet.</p>'; }
+document.getElementById('read').onclick = async () => { await fetch('/mark_notifications_read', {method: 'POST'}); loadNotifications(); }; loadNotifications();
+</script></body></html>
