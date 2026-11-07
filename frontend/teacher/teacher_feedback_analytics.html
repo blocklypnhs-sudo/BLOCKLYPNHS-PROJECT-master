@@ -8,6 +8,15 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  try {
+    if (localStorage.getItem('blocklearn-theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (error) {
+    console.warn('Unable to load saved theme preference.', error);
+  }
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -107,6 +116,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-main);color:va
   animation-duration:28s;animation-delay:-6s}
 @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(25px,-30px) scale(1.04)}}
 
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
 main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-index:1}
 
 /* ===== TOP BAR ===== */
@@ -114,14 +124,6 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
   background:transparent;border:none;box-shadow:none;backdrop-filter:none;
   padding:.1rem .1rem;margin-bottom:1.1rem;gap:12px;
   position:relative;z-index:100}
-.back-pill{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
-  color:var(--green-accent);font-size:.78rem;font-weight:700;
-  padding:6px 14px 6px 8px;border-radius:999px;transition:all .25s;
-  background:var(--card-white);border:1px solid var(--border-fresh);
-  box-shadow:var(--shadow-xs)}
-.back-pill:hover{background:var(--green-soft);border-color:var(--green-accent)}
-.back-pill i{width:24px;height:24px;display:flex;align-items:center;justify-content:center;
-  background:var(--tile-bg);color:var(--tile-color);border-radius:8px;font-size:.68rem}
 .theme-btn{width:38px;height:38px;border-radius:11px;border:none;
   background:transparent;color:var(--text-secondary);font-size:.95rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .3s}
@@ -140,14 +142,6 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
 .hero h1{font-size:1.2rem;font-weight:800;letter-spacing:-.4px;position:relative;z-index:1;line-height:1.25}
 .hero h1 em{font-style:normal;color:var(--gold-warm)}
 .hero p{font-size:.74rem;opacity:.8;max-width:560px;position:relative;z-index:1;margin-top:.15rem;line-height:1.5}
-.hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:.75rem;position:relative;z-index:1}
-.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.10);
-  padding:3px 12px;border-radius:999px;font-size:.66rem;font-weight:700}
-.chip i{font-size:.62rem}
-.chip strong{font-weight:800;font-variant-numeric:tabular-nums}
-
 /* ===== FILTER BAR ===== */
 .filter-bar{background:var(--card-white);border:1px solid var(--border-fresh);
   border-radius:var(--radius-xl);padding:.85rem 1.1rem;margin-bottom:1.2rem;
@@ -282,12 +276,11 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
   <div class="bg-blob bg-blob--2"></div>
 </div>
 
-<div class="portal-shell">
+<div class="app">
   {% include 'teacher/_sidebar.html' %}
-<main class="portal-main">
+<main class="main-content" id="mainContent">
   <nav class="top-bar">
-    <a class="back-pill" href="/teacher_dashboard"><i class="fas fa-arrow-left"></i>Back to Teacher Dashboard</a>
-    <button class="theme-btn" id="themeBtn" title="Toggle theme">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme" title="Toggle theme">
       <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
     </button>
   </nav>
@@ -295,12 +288,7 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
   <header class="hero">
     <h1>Learning <em>Feedback Analytics</em></h1>
     <p>Insights from student feedback about assessments, activities, and modules.</p>
-    <div class="hero-chips">
-      <span class="chip"><i class="fas fa-comments"></i>Total <strong id="chipTotal">0</strong></span>
-      <span class="chip"><i class="fas fa-star"></i>Avg Rating <strong id="chipAvg">0.0</strong></span>
-      <span class="chip"><i class="fas fa-fire"></i>Top Category <strong id="chipCat">—</strong></span>
-    </div>
-  </header>
+    </header>
 
   <!-- Filters -->
   <div class="filter-bar">
@@ -386,8 +374,14 @@ const $ = id => document.getElementById(id);
 const escapeHtml = v => String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 
 /* Theme */
-const applyTheme = t => { document.documentElement.dataset.theme = t; localStorage.setItem('bl-theme', t); };
-applyTheme(localStorage.getItem('bl-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+const applyTheme = t => {
+  document.documentElement.dataset.theme = t;
+  try {
+    localStorage.setItem('blocklearn-theme', t);
+  } catch (error) {
+    console.warn('Unable to save theme preference.', error);
+  }
+};
 $('themeBtn').addEventListener('click', () =>
   applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
 
@@ -439,9 +433,6 @@ async function loadSummary() {
   $('sumTotal').textContent = d.total;
   $('sumAvg').textContent = d.avg_rating.toFixed(1);
   $('sumCat').textContent = d.most_common_category || '—';
-  $('chipTotal').textContent = d.total;
-  $('chipAvg').textContent = d.avg_rating.toFixed(1);
-  $('chipCat').textContent = d.most_common_category || '—';
   ratingChart.data.datasets[0].data = [
     d.distribution['1'], d.distribution['2'], d.distribution['3'],
     d.distribution['4'], d.distribution['5'],

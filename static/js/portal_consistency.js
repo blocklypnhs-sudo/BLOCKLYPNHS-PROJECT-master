@@ -16,6 +16,18 @@
         const sidebar = document.querySelector('.sidebar');
         if (!sidebar) return;
 
+        if (sidebar.classList.contains('teacher-sidebar') &&
+            window.matchMedia('(min-width: 769px)').matches) {
+            try {
+                const collapsed = localStorage.getItem('teacher-sidebar-collapsed');
+                if (collapsed === '1' || collapsed === '0') {
+                    window.portalSetSidebarCollapsed(collapsed === '1');
+                }
+            } catch (error) {
+                console.warn('Unable to load saved sidebar preference.', error);
+            }
+        }
+
         if (!sidebar.querySelector('.sidebar-deco')) {
             const decoration = document.createElement('template');
             decoration.innerHTML = sproutDecoration.trim();

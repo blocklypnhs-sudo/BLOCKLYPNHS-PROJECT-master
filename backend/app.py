@@ -627,13 +627,13 @@ def init_database():
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         """)
         cursor.execute("SHOW INDEX FROM assessment_attempts WHERE Key_name = 'uq_student_learning_item_attempt'")
-        if not cursor.fetchone():
+        if not cursor.fetchall():
             cursor.execute("""
                 ALTER TABLE assessment_attempts
                 ADD UNIQUE KEY uq_student_learning_item_attempt (language, assessment_id, student_id)
             """)
         cursor.execute("SHOW INDEX FROM activity_attempt_sessions WHERE Key_name = 'PRIMARY'")
-        if not cursor.fetchone():
+        if not cursor.fetchall():
             cursor.execute("""
                 ALTER TABLE activity_attempt_sessions
                 ADD PRIMARY KEY (student_id, language, assessment_number)
@@ -799,7 +799,7 @@ def init_database():
             """)
 
         cursor.execute("SHOW INDEX FROM module_assessment_attempts WHERE Key_name = 'uq_student_module_assessment'")
-        if not cursor.fetchone():
+        if not cursor.fetchall():
             cursor.execute("""
                 ALTER TABLE module_assessment_attempts
                 ADD UNIQUE KEY uq_student_module_assessment (student_id, module_id)

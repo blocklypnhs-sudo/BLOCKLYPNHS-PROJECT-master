@@ -8,25 +8,49 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
+    <script>
+        try {
+            if (localStorage.getItem('blocklearn-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        } catch (error) {
+            console.warn('Unable to load saved theme preference.', error);
+        }
+    </script>
     <style>
-        :root { --green: #12604a; --green-soft: #e3f4ec; --ink: #10382c; --muted: #52705f; --line: #e0ebe4; --bg: #eef6f1; }
+        :root {
+            --bg-main: #eef6f1; --text-primary: #10382c; --text-secondary: #3f5f52;
+            --border-fresh: #e0ebe4; --card-white: #fff; --card-tint: #f7fbf9;
+            --green-soft: #e3f4ec; --green-accent: #147a54; --tile-bg: #e3f4ec;
+            --tile-color: #147a54; --gold-warm: #e8b93c; --grid-line: rgba(150,195,175,.26);
+            --shadow-sm: 0 4px 14px rgba(16,56,44,.06);
+        }
+        [data-theme="dark"] {
+            --bg-main: #0e1f18; --text-primary: #dcefe6; --text-secondary: #9fc0b1;
+            --border-fresh: #20402f; --card-white: #14291f; --card-tint: #11231a;
+            --green-soft: #163328; --green-accent: #4ade80; --tile-bg: #1c3a2c;
+            --tile-color: #4ade80; --grid-line: rgba(45,85,65,.22);
+            --shadow-sm: 0 4px 14px rgba(0,0,0,.22);
+        }
         * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
-        main { max-width: 1440px; margin: auto; padding: 24px; }
-        .page-header, .panel { background: white; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 4px 14px rgba(16,56,44,.06); }
+        body { margin: 0; min-height: 100vh; background: var(--bg-main); color: var(--text-primary); font-family: Inter, system-ui, sans-serif; transition: background .4s ease, color .4s ease; }
+        .app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+        main.main-content { flex: 1; min-width: 0; max-width: 1440px; margin: 0 0 0 var(--sidebar-w); padding: 20px 28px 28px; }
+        main.main-content.shifted { margin-left: var(--sidebar-collapsed-w); }
+        .page-header, .panel { background: var(--card-white); border: 1px solid var(--border-fresh); border-radius: 16px; box-shadow: var(--shadow-sm); }
         .page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 22px; margin-bottom: 18px; }
         h1 { font-size: 1.3rem; font-weight: 800; margin: 0; }
-        .page-header p { color: var(--muted); font-size: .85rem; margin: 4px 0 0; }
+        .page-header p { color: var(--text-secondary); font-size: .85rem; margin: 4px 0 0; }
         .panel { padding: 18px; }
         .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-        .filters input, .filters select { min-height: 40px; border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; color: var(--ink); background: white; }
+        .filters input, .filters select { min-height: 40px; border: 1px solid var(--border-fresh); border-radius: 9px; padding: 7px 10px; color: var(--text-primary); background: var(--card-tint); }
         .filters input { flex: 1 1 220px; }
         .filters select { flex: 0 1 180px; }
         .layout { display: grid; grid-template-columns: minmax(340px, .9fr) minmax(420px, 1.3fr); gap: 16px; }
         .table-wrap { max-height: 70vh; overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: .82rem; }
-        th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
-        th { position: sticky; top: 0; background: #f7fbf9; color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
+        th, td { padding: 10px 8px; border-bottom: 1px solid var(--border-fresh); text-align: left; vertical-align: middle; }
+        th { position: sticky; top: 0; background: var(--card-tint); color: var(--text-secondary); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
         tbody tr { cursor: pointer; }
         tbody tr:hover, tbody tr.selected { background: var(--green-soft); }
         .badge-status { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: .68rem; font-weight: 750; text-transform: capitalize; }
@@ -34,39 +58,50 @@
         .badge-failed { background: #fee2e2; color: #991b1b; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .detail h2 { font-size: 1.05rem; font-weight: 800; margin: 0 0 4px; }
-        .detail-subtitle { color: var(--muted); font-size: .8rem; margin-bottom: 14px; }
-        .score-summary { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 12px; border-radius: 10px; background: #f7fbf9; }
-        .score-number { color: var(--green); font-size: 1.4rem; font-weight: 850; }
+        .detail-subtitle { color: var(--text-secondary); font-size: .8rem; margin-bottom: 14px; }
+        .score-summary { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 12px; border-radius: 10px; background: var(--card-tint); }
+        .score-number { color: var(--green-accent); font-size: 1.4rem; font-weight: 850; }
         .detail-section { margin-top: 14px; }
-        .detail-section h3 { font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 6px; }
-        pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; margin: 0; padding: 10px; border-radius: 9px; background: #f7fbf9; color: var(--ink); font-size: .78rem; }
+        .detail-section h3 { font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); margin: 0 0 6px; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; margin: 0; padding: 10px; border-radius: 9px; background: var(--card-tint); color: var(--text-primary); font-size: .78rem; }
         .breakdown { width: 100%; border-collapse: collapse; font-size: .78rem; }
-        .breakdown th, .breakdown td { padding: 8px; border-bottom: 1px solid var(--line); }
+        .breakdown th, .breakdown td { padding: 8px; border-bottom: 1px solid var(--border-fresh); }
         .breakdown th { position: static; }
         .correct { color: #166534; font-weight: 750; }
         .incorrect { color: #991b1b; font-weight: 750; }
         .pagination { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; font-size: .8rem; }
-        .pagination button, .back-link { border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; background: white; color: var(--ink); text-decoration: none; }
+        .pagination button, .back-link { border: 1px solid var(--border-fresh); border-radius: 999px; padding: 7px 13px; background: var(--card-white); color: var(--text-secondary); text-decoration: none; font-weight: 700; }
+        .pagination button:hover, .back-link:hover { border-color: var(--green-accent); color: var(--green-accent); }
         .pagination button:disabled { opacity: .45; cursor: not-allowed; }
-        .empty { color: var(--muted); padding: 28px 10px; text-align: center; font-size: .85rem; }
+        .empty { color: var(--text-secondary); padding: 28px 10px; text-align: center; font-size: .85rem; }
         .error { color: #991b1b; }
-        .portal-shell > .portal-main { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0; }
-        @media (max-width: 850px) { main { padding: 12px; } .layout { grid-template-columns: 1fr; } .table-wrap { max-height: 45vh; } }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .theme-btn { width: 38px; height: 38px; border: 0; border-radius: 11px; background: transparent; color: var(--text-secondary); cursor: pointer; }
+        .theme-btn:hover { background: var(--card-white); color: var(--gold-warm); box-shadow: var(--shadow-sm); }
+        .theme-btn .icon-sun { display: none; }
+        [data-theme="dark"] .theme-btn .icon-sun { display: inline; }
+        [data-theme="dark"] .theme-btn .icon-moon { display: none; }
+        @media (max-width: 850px) { main.main-content { padding: 72px 14px 20px; } .layout { grid-template-columns: 1fr; } .table-wrap { max-height: 45vh; } }
         @media (max-width: 520px) { .page-header { align-items: flex-start; flex-direction: column; } .panel { padding: 12px; } }
     </style>
     <link href="/static/mobile_responsive.css" rel="stylesheet">
     <script defer src="/static/js/portal_consistency.js"></script>
 </head>
 <body>
-<div class="portal-shell">
+<div class="app">
     {% include 'teacher/_sidebar.html' %}
-<main class="portal-main">
+<main class="main-content" id="mainContent">
     <header class="page-header">
         <div>
             <h1><i class="fa-solid fa-clock-rotate-left me-2" aria-hidden="true"></i>Student Score Attempt History</h1>
             <p>Review every coding activity and module final assessment submission, including the student's answer and score breakdown.</p>
         </div>
-        <a class="back-link" href="/teacher_score_results"><i class="fa-solid fa-arrow-left me-1"></i> Score Results</a>
+        <div class="header-actions">
+            <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme" title="Toggle light/dark mode">
+                <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
+            </button>
+            <a class="back-link" href="/teacher_score_results"><i class="fa-solid fa-arrow-left me-1"></i> Score Results</a>
+        </div>
     </header>
 
     <section class="panel">
@@ -114,6 +149,16 @@
     </section>
 </main></div>
 <script>
+    document.getElementById('themeBtn').addEventListener('click', () => {
+        const dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        try {
+            localStorage.setItem('blocklearn-theme', dark ? 'dark' : 'light');
+        } catch (error) {
+            console.warn('Unable to save theme preference.', error);
+        }
+    });
+
     const PAGE_SIZE = 40;
     let currentPage = 1;
     let totalAttempts = 0;

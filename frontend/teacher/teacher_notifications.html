@@ -1,30 +1,182 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Teacher Notifications · BlockLearn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications · BlockLearn</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <script>
+        try {
+            if (localStorage.getItem('blocklearn-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        } catch (error) {
+            console.warn('Unable to load saved theme preference.', error);
+        }
+    </script>
     <style>
-        body { margin: 0; font-family: Inter, Arial, sans-serif; background: #f0f6f3; color: #1a463a; }
-        main { max-width: 760px; margin: 40px auto; padding: 0 20px; }
-        .portal-shell > .portal-main { max-width: 760px; margin: 0 auto; padding: 0; }
-        .header, .notification { background: #fff; border: 1px solid #dde9e3; border-radius: 16px; box-shadow: 0 4px 16px rgba(20,90,66,.06); }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; }
-        h1 { margin: 0; font-size: 20px; } button { border: 0; border-radius: 999px; padding: 9px 14px; cursor: pointer; background: #145a42; color: #fff; }
-        #badge { background: #e8a838; color: #1a463a; padding: 2px 7px; border-radius: 999px; font-size: 11px; } #list { display: grid; gap: 12px; margin-top: 16px; }
-        .notification { padding: 16px 18px; } .notification.unread { border-left: 4px solid #e8a838; } .notification h2 { margin: 0 0 6px; font-size: 15px; } .notification p { margin: 0 0 8px; color: #4a6b5e; } small { color: #7f9e92; }
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            --bg-main: #eef6f1; --text-primary: #10382c; --text-secondary: #3f5f52;
+            --card-white: #fff; --border-fresh: #e0ebe4; --green-soft: #e3f4ec;
+            --green-accent: #147a54; --tile-bg: #e3f4ec; --tile-color: #147a54;
+            --gold-warm: #e8b93c; --grid-line: rgba(150,195,175,.26);
+            --shadow-sm: 0 4px 14px rgba(16,56,44,.06);
+        }
+        [data-theme="dark"] {
+            --bg-main: #0e1f18; --text-primary: #dcefe6; --text-secondary: #9fc0b1;
+            --card-white: #14291f; --border-fresh: #20402f; --green-soft: #163328;
+            --green-accent: #4ade80; --tile-bg: #1c3a2c; --tile-color: #4ade80;
+            --grid-line: rgba(45,85,65,.22); --shadow-sm: 0 4px 14px rgba(0,0,0,.22);
+        }
+        body {
+            min-height: 100vh; margin: 0; overflow-x: hidden;
+            background: var(--bg-main); color: var(--text-primary);
+            font-family: Inter, system-ui, -apple-system, sans-serif; line-height: 1.5;
+            transition: background .4s ease, color .4s ease;
+        }
+        .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-layer::before {
+            position: absolute; inset: 0; content: '';
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        .bg-blob {
+            position: absolute; top: -12%; right: -6%; width: 420px; height: 420px;
+            border-radius: 50%; filter: blur(90px); opacity: .12;
+            background: radial-gradient(circle, rgba(40,168,122,.4), transparent 70%);
+        }
+        .app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+        .main-content { max-width: 1000px; }
+        .top-bar {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            margin-bottom: 1.1rem; position: relative; z-index: 2;
+        }
+        .page-title {
+            display: flex; align-items: center; gap: 10px; margin: 0;
+            color: var(--text-primary); font-size: 1.18rem; font-weight: 800; letter-spacing: -.4px;
+        }
+        .page-title i {
+            display: inline-flex; width: 36px; height: 36px; align-items: center; justify-content: center;
+            border-radius: 11px; background: var(--tile-bg); color: var(--tile-color); font-size: .88rem;
+        }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .theme-btn {
+            width: 38px; height: 38px; border: 0; border-radius: 11px;
+            background: transparent; color: var(--text-secondary); cursor: pointer; font-size: .95rem;
+        }
+        .theme-btn:hover { background: var(--card-white); color: var(--gold-warm); box-shadow: var(--shadow-sm); }
+        .theme-btn .icon-sun { display: none; }
+        [data-theme="dark"] .theme-btn .icon-sun { display: inline; }
+        [data-theme="dark"] .theme-btn .icon-moon { display: none; }
+        .action-btn {
+            min-height: 38px; padding: 8px 16px; border: 1px solid var(--border-fresh);
+            border-radius: 999px; background: var(--card-white); color: var(--text-secondary);
+            font: 700 .75rem Inter, sans-serif; cursor: pointer;
+        }
+        .action-btn:hover { border-color: var(--green-accent); color: var(--green-accent); }
+        #badge {
+            margin-left: 5px; padding: 2px 7px; border-radius: 999px;
+            background: var(--tile-bg); color: var(--tile-color); font-size: .68rem;
+        }
+        #list { display: grid; gap: 12px; }
+        .notification {
+            padding: 16px 18px; border: 1px solid var(--border-fresh); border-radius: 16px;
+            background: var(--card-white); box-shadow: var(--shadow-sm);
+        }
+        .notification.unread { border-left: 4px solid var(--gold-warm); }
+        .notification h2 { margin: 0 0 6px; color: var(--text-primary); font-size: .94rem; font-weight: 750; }
+        .notification p { margin: 0 0 8px; color: var(--text-secondary); font-size: .82rem; }
+        .notification small, .empty-state { color: var(--text-secondary); font-size: .72rem; }
+        .empty-state { padding: 24px; text-align: center; }
+        .error-state { color: #b42318; }
+        @media (max-width: 768px) {
+            .main-content { width: 100%; padding: 72px 14px 24px; }
+            .top-bar { align-items: flex-start; }
+            .page-title { font-size: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .header-actions { align-items: flex-end; flex-direction: column-reverse; }
+            .action-btn { white-space: nowrap; }
+        }
     </style>
     <link href="/static/mobile_responsive.css" rel="stylesheet">
     <script defer src="/static/js/portal_consistency.js"></script>
 </head>
-<body><div class="portal-shell">
-    {% include 'teacher/_sidebar.html' %}
-    <main class="portal-main">
-    <section class="header"><h1>Teacher Notifications <span id="badge">0</span></h1><button id="read">Mark all as read</button></section>
-    <section id="list"><p>Loading notifications...</p></section>
-</main></div>
-<script>
-async function loadNotifications() { const response = await fetch('/get_notifications'); const data = await response.json(); const list = document.getElementById('list'); document.getElementById('badge').textContent = data.unread_count || 0; list.innerHTML = data.notifications?.length ? data.notifications.map(n => `<article class="notification ${n.is_read ? '' : 'unread'}"><h2>${n.title}</h2><p>${n.message}</p><small>${n.created_at || ''}</small></article>`).join('') : '<p>No notifications yet.</p>'; }
-document.getElementById('read').onclick = async () => { await fetch('/mark_notifications_read', {method: 'POST'}); loadNotifications(); }; loadNotifications();
-</script></body></html>
+<body>
+    <div class="bg-layer" aria-hidden="true"><div class="bg-blob"></div></div>
+    <div class="app">
+        {% include 'teacher/_sidebar.html' %}
+        <main class="main-content" id="mainContent">
+            <header class="top-bar">
+                <h1 class="page-title"><i class="fas fa-bell" aria-hidden="true"></i>Notifications <span id="badge">0</span></h1>
+                <div class="header-actions">
+                    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme" title="Toggle light/dark mode">
+                        <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
+                    </button>
+                    <button class="action-btn" id="read" type="button">Mark all as read</button>
+                </div>
+            </header>
+            <section id="list" aria-live="polite"><p class="empty-state">Loading notifications...</p></section>
+        </main>
+    </div>
+    <script>
+        const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[character]);
+
+        document.getElementById('themeBtn').addEventListener('click', () => {
+            const dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+            try {
+                localStorage.setItem('blocklearn-theme', dark ? 'dark' : 'light');
+            } catch (error) {
+                console.warn('Unable to save theme preference.', error);
+            }
+        });
+
+        async function loadNotifications() {
+            const list = document.getElementById('list');
+            try {
+                const response = await fetch('/get_notifications');
+                if (!response.ok) throw new Error(`Could not load notifications (HTTP ${response.status}).`);
+                const data = await response.json();
+                document.getElementById('badge').textContent = data.unread_count || 0;
+                list.innerHTML = data.notifications?.length
+                    ? data.notifications.map(notification => `
+                        <article class="notification ${notification.is_read ? '' : 'unread'}">
+                            <h2>${escapeHtml(notification.title)}</h2>
+                            <p>${escapeHtml(notification.message)}</p>
+                            <small>${escapeHtml(notification.created_at || '')}</small>
+                        </article>`).join('')
+                    : '<p class="empty-state">No notifications yet.</p>';
+            } catch (error) {
+                console.error('Unable to load notifications.', error);
+                list.innerHTML = `<p class="empty-state error-state">${escapeHtml(error.message)}</p>`;
+            }
+        }
+
+        document.getElementById('read').addEventListener('click', async () => {
+            const button = document.getElementById('read');
+            button.disabled = true;
+            try {
+                const response = await fetch('/mark_notifications_read', {method: 'POST'});
+                if (!response.ok) throw new Error(`Could not mark notifications as read (HTTP ${response.status}).`);
+                await loadNotifications();
+            } catch (error) {
+                console.error('Unable to mark notifications as read.', error);
+                document.getElementById('list').insertAdjacentHTML(
+                    'afterbegin',
+                    `<p class="empty-state error-state">${escapeHtml(error.message)}</p>`
+                );
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        loadNotifications();
+    </script>
+</body>
+</html>

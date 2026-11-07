@@ -61,22 +61,35 @@ def test_init_database_moves_activity_definitions_before_cleaning_assessments(mo
                 )
                 self._fetchone_result = None
                 return
-            if "SHOW INDEX FROM module_assessment_attempts" in query:
+            if "SHOW INDEX FROM activity_attempt_sessions" in query:
                 self._has_unread_index_result = True
                 self._show_index_result = [
-                    {
-                        'Key_name': 'uq_student_module_number',
-                        'Non_unique': 0,
-                        'Seq_in_index': 1,
-                        'Column_name': 'student_id',
-                    },
-                    {
-                        'Key_name': 'uq_student_module_number',
-                        'Non_unique': 0,
-                        'Seq_in_index': 2,
-                        'Column_name': 'module_number',
-                    },
+                    {'Key_name': 'PRIMARY', 'Seq_in_index': 1},
+                    {'Key_name': 'PRIMARY', 'Seq_in_index': 2},
+                    {'Key_name': 'PRIMARY', 'Seq_in_index': 3},
                 ]
+                self._fetchone_result = None
+                return
+            if "SHOW INDEX FROM module_assessment_attempts" in query:
+                self._has_unread_index_result = True
+                self._show_index_result = (
+                    []
+                    if "WHERE Key_name = 'uq_student_module_assessment'" in query
+                    else [
+                        {
+                            'Key_name': 'uq_student_module_number',
+                            'Non_unique': 0,
+                            'Seq_in_index': 1,
+                            'Column_name': 'student_id',
+                        },
+                        {
+                            'Key_name': 'uq_student_module_number',
+                            'Non_unique': 0,
+                            'Seq_in_index': 2,
+                            'Column_name': 'module_number',
+                        },
+                    ]
+                )
                 self._fetchone_result = None
                 return
             if 'SHOW COLUMNS FROM students LIKE' in query or 'SHOW COLUMNS FROM teachers LIKE' in query:
