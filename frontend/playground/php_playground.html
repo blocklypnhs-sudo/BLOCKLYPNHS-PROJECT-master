@@ -226,6 +226,28 @@
             font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 11px;
         }
+        .activity-guide {
+            margin: 8px 0 10px;
+            padding: 8px 10px;
+            border-left: 3px solid #fbbf24;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.12);
+        }
+        .activity-guide .label {
+            display: block;
+            margin-bottom: 2px;
+            color: #fde68a;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .activity-guide .text {
+            margin: 0;
+            color: #fff;
+            font-size: 11px;
+            line-height: 1.45;
+        }
         .activity-banner-info .expected-output-box {
             background: rgba(255,255,255,0.15);
             border-radius: 10px;
@@ -480,6 +502,10 @@
                     <span class="difficulty-tag difficulty-easy" id="bannerDifficulty">Easy</span>
                 </h4>
                 <p class="instructions" id="bannerInstructions">Build a PHP program that prints "Hello, PHP!"</p>
+                <div class="activity-guide">
+                    <span class="label"><i class="fas fa-lightbulb me-1"></i>Clue</span>
+                    <p class="text" id="bannerGuide">Use echo with a TEXT block connected inside it.</p>
+                </div>
                 <div class="expected-output-box">
                     <span class="label"><i class="fas fa-eye me-1"></i>Expected Output</span>
                     <span class="value" id="bannerExpectedOutput">Hello, PHP!</span>
@@ -548,7 +574,7 @@
 
         Blockly.Blocks['php_variable_get'] = {
             init: function() {
-                this.appendDummyInput().appendField('$').appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
+                this.appendDummyInput().appendField('get variable $').appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
                 this.setOutput(true, ['String', 'Number']);
                 this.setColour('#8b5cf6');
                 this.setTooltip('Get variable value');
@@ -709,6 +735,7 @@
                 toolboxCategories: ['PHP Basic'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
                 instructions: `TASK: Print "Hello, PHP!" to the output.\n\nBLOCKS NEEDED: echo, TEXT\n\nSTEPS:\n1. Drag echo from BASIC\n2. Drag TEXT from BASIC and attach INSIDE echo\n3. Type "Hello, PHP!" in TEXT\n4. Click RUN CODE`,
+                guide: 'BASIC: connect a TEXT block inside echo, then enter "Hello, PHP!".',
                 expected: 'Hello, PHP!'
             },
             'store-name': {
@@ -717,7 +744,8 @@
                 step: 2,
                 toolboxCategories: ['PHP Basic', 'PHP Variables'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Create a variable called "name" with value "Caryll" and print it.\n\nBLOCKS NEEDED: $variable, echo, TEXT, variable_get\n\nSTEPS:\n1. Drag "$myVar =" from VARIABLES\n2. Change "myVar" to "name"\n3. Attach a TEXT block with value "Caryll"\n4. Drag echo from BASIC\n5. Drag variable_get from VARIABLES and attach INSIDE echo\n6. Change variable_get to "name"\n7. Click RUN CODE`,
+                instructions: `TASK: Create a variable called "name" with value "Caryll" and print it.\n\nBLOCKS NEEDED: $variable, echo, TEXT, GET VARIABLE $\n\nSTEPS:\n1. Drag "$myVar =" from VARIABLES\n2. Change "myVar" to "name"\n3. Attach a TEXT block from BASIC with value "Caryll"\n4. Drag echo from BASIC\n5. Drag GET VARIABLE $ from VARIABLES and attach INSIDE echo\n6. Change GET VARIABLE $ to "name"\n7. Click RUN CODE`,
+                guide: 'VARIABLES: set $name to "Caryll". BASIC: put get variable $name inside echo.',
                 expected: 'Caryll'
             },
             'subtract-numbers': {
@@ -726,7 +754,8 @@
                 step: 3,
                 toolboxCategories: ['PHP Basic', 'PHP Math'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Subtract 50 from 80 and print the result.\n\nBLOCKS NEEDED: echo, math_operation, number\n\nSTEPS:\n1. Drag echo\n2. Inside echo, add math_operation (-)\n3. Add two number blocks: 80 and 50\n4. Click RUN CODE`,
+                instructions: `TASK: Subtract 50 from 80 and print the result.\n\nBLOCKS NEEDED: echo, math operation, number\n\nSTEPS:\n1. Drag echo from BASIC\n2. Inside echo, add the math block from MATH and choose -\n3. Add two number blocks from MATH: 80 and 50\n4. Click RUN CODE`,
+                guide: 'MATH: choose subtraction and connect 80 then 50. Put the math result inside BASIC echo.',
                 expected: '30'
             },
             'greater-than-php': {
@@ -750,7 +779,8 @@
                         </statement>
                     </block>
                 </xml>`,
-                instructions: `TASK: Check if 25 is greater than 18. If true, print "25 is greater than 18".\n\nBLOCKS NEEDED: if, compare, echo, number, text\n\nSTEPS:\n1. Drag if block\n2. Add compare (>) block as condition\n3. Set values: 25 and 18\n4. Inside if, add echo with text "25 is greater than 18"\n5. Click RUN CODE`,
+                instructions: `TASK: Check if 25 is greater than 18. If true, print "25 is greater than 18".\n\nBLOCKS NEEDED: if, compare, echo, number, text\n\nSTEPS:\n1. Drag if and compare from LOGIC; choose >\n2. Add number blocks from MATH: 25 and 18\n3. Inside if, add echo from BASIC with a BASIC TEXT block containing "25 is greater than 18"\n4. Click RUN CODE`,
+                guide: 'LOGIC: compare 25 > 18. Inside IF, place BASIC echo with the message in a TEXT block.',
                 expected: '25 is greater than 18'
             },
             'repeat-php': {
@@ -759,7 +789,8 @@
                 step: 5,
                 toolboxCategories: ['PHP Basic', 'PHP Math', 'PHP Loops'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Display "Learning PHP!" 3 times using a for loop.\n\nBLOCKS NEEDED: for loop, echo, number, text\n\nSTEPS:\n1. Drag for loop\n2. Set counter to "i"\n3. Set from: 0, to: 2 (or 1 to 3)\n4. Inside loop, add echo with text "Learning PHP!"\n5. Click RUN CODE`,
+                instructions: `TASK: Display "Learning PHP!" 3 times using a for loop.\n\nBLOCKS NEEDED: for loop, echo, number, text\n\nSTEPS:\n1. Drag for loop from LOOPS\n2. Set counter to "i"\n3. Use number blocks from MATH to set the range to 0 through 2\n4. Inside loop, add echo from BASIC with a BASIC TEXT block containing "Learning PHP!"\n5. Click RUN CODE`,
+                guide: 'LOOPS: repeat with counter i from 0 to 2. Inside the loop, place echo with TEXT "Learning PHP!".',
                 expected: 'Learning PHP!\nLearning PHP!\nLearning PHP!'
             },
             'free-play': {
@@ -768,7 +799,8 @@
                 step: 0,
                 toolboxCategories: ['All'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: echo, TEXT\nMATH: math_operation, number\nVARIABLES: $variable, variable_get\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: echo, TEXT\nMATH: math, number\nVARIABLES: $myVar =, get variable $\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                guide: 'Start with BASIC echo and TEXT. Add MATH, VARIABLES, LOGIC, or LOOPS to build a larger program.',
                 expected: 'Your Code'
             }
         };
@@ -877,7 +909,9 @@
             else if (activity.difficulty === 'Hard') diffTag.classList.add('difficulty-hard');
             else diffTag.classList.add('difficulty-easy');
             
-            document.getElementById('bannerInstructions').textContent = activity.instructions;
+            const taskPrompt = activity.instructions.split(/\n\s*\n/)[0].replace(/^TASK:\s*/, '');
+            document.getElementById('bannerInstructions').textContent = taskPrompt;
+            document.getElementById('bannerGuide').textContent = activity.guide;
             document.getElementById('bannerExpectedOutput').textContent = activity.expected || '—';
 
             const toolboxXml = getPhpToolbox(activity.toolboxCategories);

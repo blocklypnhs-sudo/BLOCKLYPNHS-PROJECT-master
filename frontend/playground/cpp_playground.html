@@ -221,6 +221,28 @@
             font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 11px;
         }
+        .activity-guide {
+            margin: 8px 0 10px;
+            padding: 8px 10px;
+            border-left: 3px solid #fbbf24;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.12);
+        }
+        .activity-guide .label {
+            display: block;
+            margin-bottom: 2px;
+            color: #fde68a;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .activity-guide .text {
+            margin: 0;
+            color: #fff;
+            font-size: 11px;
+            line-height: 1.45;
+        }
         .activity-banner-info .expected-output-box {
             background: rgba(255,255,255,0.15);
             border-radius: 10px;
@@ -475,6 +497,10 @@
                     <span class="difficulty-tag difficulty-easy" id="bannerDifficulty">Easy</span>
                 </h4>
                 <p class="instructions" id="bannerInstructions">Build a C++ program that prints "Hello, C++!"</p>
+                <div class="activity-guide">
+                    <span class="label"><i class="fas fa-lightbulb me-1"></i>Clue</span>
+                    <p class="text" id="bannerGuide">Use cout with a TEXT block connected inside it.</p>
+                </div>
                 <div class="expected-output-box">
                     <span class="label"><i class="fas fa-eye me-1"></i>Expected Output</span>
                     <span class="value" id="bannerExpectedOutput">"Hello, C++!"</span>
@@ -548,7 +574,7 @@
 
         Blockly.Blocks['cpp_variable_get'] = {
             init: function() {
-                this.appendDummyInput().appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
+                this.appendDummyInput().appendField('get variable').appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
                 this.setOutput(true, ['String', 'Number']);
                 this.setColour('#8b5cf6');
                 this.setTooltip('Get variable value');
@@ -712,15 +738,17 @@
                 toolboxCategories: ['CPP Basic'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
                 instructions: `TASK: Print "Hello, C++!" to the console.\n\nBLOCKS NEEDED: cout, TEXT\n\nSTEPS:\n1. Drag cout from BASIC\n2. Drag TEXT from BASIC and attach INSIDE cout\n3. Type "Hello, C++!" in TEXT\n4. Click RUN CODE`,
+                guide: 'BASIC: connect a TEXT block inside cout, then enter "Hello, C++!".',
                 expected: '"Hello, C++!"'
             },
             'store-age': {
                 name: 'Store Age',
                 difficulty: 'Easy',
                 step: 2,
-                toolboxCategories: ['CPP Basic', 'CPP Variables'],
+                toolboxCategories: ['CPP Basic', 'CPP Variables', 'CPP Math'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Create a variable called "age" with value 17 and print it.\n\nBLOCKS NEEDED: int variable, cout, NUMBER, variable_get\n\nSTEPS:\n1. Drag "int myVar =" from VARIABLES\n2. Change "myVar" to "age"\n3. Attach a NUMBER block with value 17\n4. Drag cout from BASIC\n5. Drag variable_get from VARIABLES and attach INSIDE cout\n6. Change variable_get to "age"\n7. Click RUN CODE`,
+                instructions: `TASK: Create a variable called "age" with value 17 and print it.\n\nBLOCKS NEEDED: int variable, cout, NUMBER, GET VARIABLE\n\nSTEPS:\n1. Drag "int myVar =" from VARIABLES\n2. Change "myVar" to "age"\n3. Attach a NUMBER block from MATH with value 17\n4. Drag cout from BASIC\n5. Drag GET VARIABLE from VARIABLES into cout\n6. Change GET VARIABLE to "age"\n7. Click RUN CODE`,
+                guide: 'VARIABLES: set int age to 17. BASIC: put get variable age inside cout.',
                 expected: '17'
             },
             'multiply-numbers': {
@@ -729,16 +757,18 @@
                 step: 3,
                 toolboxCategories: ['CPP Basic', 'CPP Math'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Multiply 6 × 5 and print the result.\n\nBLOCKS NEEDED: cout, math_operation, number\n\nSTEPS:\n1. Drag cout\n2. Inside cout, add math_operation (×)\n3. Add two number blocks: 6 and 5\n4. Click RUN CODE`,
+                instructions: `TASK: Multiply 6 × 5 and print the result.\n\nBLOCKS NEEDED: cout, math operation, number\n\nSTEPS:\n1. Drag cout from BASIC\n2. Inside cout, add the math block from MATH and choose ×\n3. Add two number blocks from MATH: 6 and 5\n4. Click RUN CODE`,
+                guide: 'MATH: choose multiplication and connect 6 and 5. Put the math result inside BASIC cout.',
                 expected: '30'
             },
             'less-than': {
                 name: 'Less Than',
                 difficulty: 'Medium',
                 step: 4,
-                toolboxCategories: ['CPP Basic', 'CPP Logic'],
+                toolboxCategories: ['CPP Basic', 'CPP Math', 'CPP Logic'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Check if 15 is less than 20. If true, print "15 is less than 20".\n\nBLOCKS NEEDED: if, compare, cout, number, text\n\nSTEPS:\n1. Drag if block\n2. Add compare (<) block as condition\n3. Set values: 15 and 20\n4. Inside if, add cout with text "15 is less than 20"\n5. Click RUN CODE`,
+                instructions: `TASK: Check if 15 is less than 20. If true, print "15 is less than 20".\n\nBLOCKS NEEDED: if, compare, cout, number, text\n\nSTEPS:\n1. Drag if and compare from LOGIC; choose <\n2. Add number blocks from MATH: 15 and 20\n3. Inside if, add cout from BASIC with a BASIC TEXT block containing "15 is less than 20"\n4. Click RUN CODE`,
+                guide: 'LOGIC: compare 15 < 20. Inside IF, place BASIC cout with the message in a TEXT block.',
                 expected: '15 is less than 20'
             },
             'display-numbers': {
@@ -747,7 +777,8 @@
                 step: 5,
                 toolboxCategories: ['CPP Basic', 'CPP Math', 'CPP Variables', 'CPP Loops'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Display numbers 1 to 5 using a for loop.\n\nBLOCKS NEEDED: for loop, number, cout, variable_get\n\nSTEPS:\n1. Drag the for loop block from LOOPS\n2. Set the counter names to "i"\n3. Drag NUMBER blocks from MATH into the FROM and TO inputs; set them to 1 and 5\n4. Drag cout from BASIC into the loop body\n5. Drag variable_get from VARIABLES into cout and set its name to "i"\n6. Click RUN CODE`,
+                instructions: `TASK: Display numbers 1 to 5 using a for loop.\n\nBLOCKS NEEDED: for loop, number, cout, GET VARIABLE\n\nSTEPS:\n1. Drag the for loop block from LOOPS\n2. Set the counter names to "i"\n3. Drag NUMBER blocks from MATH into the FROM and TO inputs; set them to 1 and 5\n4. Drag cout from BASIC into the loop body\n5. Drag GET VARIABLE from VARIABLES into cout and set its name to "i"\n6. Click RUN CODE`,
+                guide: 'LOOPS: count with i from 1 to 5. Inside the loop, put get variable i inside BASIC cout.',
                 expected: '1\n2\n3\n4\n5'
             },
             'free-play': {
@@ -756,7 +787,8 @@
                 step: 0,
                 toolboxCategories: ['All'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: cout, TEXT\nMATH: math_operation, number\nVARIABLES: int variable, variable_get\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: cout, TEXT\nMATH: math, number\nVARIABLES: int myVar =, get variable\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                guide: 'Start with BASIC cout and TEXT. Add MATH, VARIABLES, LOGIC, or LOOPS to build a larger program.',
                 expected: 'Your Code'
             }
         };
@@ -864,7 +896,9 @@
             else if (activity.difficulty === 'Hard') diffTag.classList.add('difficulty-hard');
             else diffTag.classList.add('difficulty-easy');
             
-            document.getElementById('bannerInstructions').textContent = activity.instructions;
+            const taskPrompt = activity.instructions.split(/\n\s*\n/)[0].replace(/^TASK:\s*/, '');
+            document.getElementById('bannerInstructions').textContent = taskPrompt;
+            document.getElementById('bannerGuide').textContent = activity.guide;
             document.getElementById('bannerExpectedOutput').textContent = activity.expected || '—';
 
             const toolboxXml = getCppToolbox(activity.toolboxCategories);

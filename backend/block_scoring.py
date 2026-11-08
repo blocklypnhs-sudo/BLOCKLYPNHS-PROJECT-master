@@ -70,14 +70,22 @@ BLOCK_TYPES = {
         'cpp': {'cpp_for', 'cpp_while', 'cpp_do_while'},
     },
     'function_definition': {
-        'python': {'procedures_defnoreturn', 'procedures_defreturn'},
+        'python': {
+            'procedures_defnoreturn',
+            'procedures_defreturn',
+            'python_function_def',
+        },
         'java': {'java_method'},
         'php': {'php_function_def'},
         'javascript': {'js_function_def'},
         'cpp': {'cpp_function_def'},
     },
     'function_call': {
-        'python': {'procedures_callnoreturn', 'procedures_callreturn'},
+        'python': {
+            'procedures_callnoreturn',
+            'procedures_callreturn',
+            'python_function_call',
+        },
         'java': {'java_method_call'},
         'php': {'php_function_call'},
         'javascript': {'js_function_call', 'js_function_call_value'},

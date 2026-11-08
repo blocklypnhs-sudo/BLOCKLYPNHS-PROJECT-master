@@ -1164,7 +1164,7 @@
             steps: [
                 'Find the <strong>echo</strong> block in the <span class="category-name">BASIC</span> category.',
                 'Drag the <strong>echo</strong> block to the workspace.',
-                'Find the <strong>TEXT</strong> block in the <span class="category-name">VARIABLES</span> category.',
+                'Find the <strong>TEXT</strong> block in the <span class="category-name">BASIC</span> category.',
                 'Drag the <strong>TEXT</strong> block and attach it <span class="highlight">inside</span> the echo block.',
                 'Click on the <strong>TEXT</strong> block and type: <span class="highlight">"Hello, PHP!"</span>',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
@@ -1178,9 +1178,9 @@
             steps: [
                 'Find the <strong>$variable</strong> block in the <span class="category-name">VARIABLES</span> category.',
                 'Change the variable name from "myVar" to <span class="highlight">"name"</span>.',
-                'Attach a <strong>TEXT</strong> block with value <span class="highlight">"Caryll"</span>.',
+                'Find the <strong>TEXT</strong> block in the <span class="category-name">BASIC</span> category and enter <span class="highlight">"Caryll"</span>.',
                 'Find the <strong>echo</strong> block in the <span class="category-name">BASIC</span> category.',
-                'Inside echo, add a <strong>GET VARIABLE</strong> block and select <span class="highlight">"name"</span>.',
+                'Inside echo, add a <strong>GET VARIABLE</strong> block from <span class="category-name">VARIABLES</span> and select <span class="highlight">"name"</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: 'Caryll',
@@ -1191,38 +1191,38 @@
             title: 'Subtract Two Numbers', step: 'Activity 3', difficulty: 'Medium', time: '1 hour', points: '10 pts',
             steps: [
                 'Find the <strong>echo</strong> block in the <span class="category-name">BASIC</span> category.',
-                'Inside echo, add a <strong>SUBTRACT</strong> block from the <span class="category-name">MATH</span> category.',
-                'Add two <strong>NUMBER</strong> blocks: <span class="highlight">80</span> and <span class="highlight">50</span>.',
+                'Inside echo, add a <strong>math operation</strong> block from the <span class="category-name">MATH</span> category and choose <strong>−</strong>.',
+                'Add two <strong>number</strong> blocks: <span class="highlight">80</span> and <span class="highlight">50</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: '30',
             hint: 'Use <code>echo 80 - 50;</code>',
-            blocks: ['echo', 'SUBTRACT', 'NUMBER']
+            blocks: ['echo', 'math operation (−)', 'number']
         },
         'greater-than-php': {
             title: 'Greater Than', step: 'Activity 4', difficulty: 'Medium', time: '1 hour', points: '10 pts',
             steps: [
                 'Find the <strong>if</strong> block in the <span class="category-name">LOGIC</span> category.',
-                'Add a <strong>></strong> block from the <span class="category-name">LOGIC</span> category as the condition.',
-                'Set the values: <span class="highlight">25</span> and <span class="highlight">18</span>.',
-                'Inside the if block, add a <strong>echo</strong> block with the text <span class="highlight">"25 is greater than 18"</span>.',
+                'Add a <strong>compare</strong> block from <span class="category-name">LOGIC</span> and choose <strong>&gt;</strong>.',
+                'Add number blocks from <span class="category-name">MATH</span> and set them to <span class="highlight">25</span> and <span class="highlight">18</span>.',
+                'Inside the if block, add an <strong>echo</strong> block with a BASIC TEXT block containing <span class="highlight">"25 is greater than 18"</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: '25 is greater than 18',
             hint: 'Use <code>if (25 > 18) { echo "25 is greater than 18"; }</code>',
-            blocks: ['if', '>', 'echo', 'NUMBER', 'TEXT']
+            blocks: ['if', 'compare (>)', 'echo', 'number', 'TEXT']
         },
         'repeat-php': {
             title: 'Repeat a Message Three Times', step: 'Activity 5', difficulty: 'Hard', time: '1 hour', points: '10 pts',
             steps: [
                 'Find the <strong>FOR LOOP</strong> block in the <span class="category-name">LOOPS</span> category.',
-                'Set the loop to run <span class="highlight">3</span> times.',
-                'Inside the loop, add a <strong>echo</strong> block with the text <span class="highlight">"Learning PHP!"</span>.',
+                'Use the number blocks from <span class="category-name">MATH</span> to set the loop range for <span class="highlight">3</span> repetitions.',
+                'Inside the loop, add an <strong>echo</strong> block with a BASIC TEXT block containing <span class="highlight">"Learning PHP!"</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: 'Learning PHP!\nLearning PHP!\nLearning PHP!',
             hint: 'Use <code>for ($i = 0; $i < 3; $i++) { echo "Learning PHP!"; }</code>',
-            blocks: ['FOR LOOP', 'echo', 'NUMBER', 'TEXT']
+            blocks: ['FOR LOOP', 'echo', 'number', 'TEXT']
         }
     };
 
@@ -1245,9 +1245,8 @@
         db.className = 'difficulty-badge ' + d.difficulty.toLowerCase();
         document.getElementById('panelTime').textContent = d.time;
         document.getElementById('panelPoints').textContent = d.points;
-        document.getElementById('panelInstructions').innerHTML = d.steps.map((s, i) =>
-            `<div class="step-item"><span class="step-num">${i + 1}.</span><span class="step-desc">${s}</span></div>`
-        ).join('');
+        document.getElementById('panelInstructions').innerHTML =
+            `<strong><i class="fas fa-lightbulb me-1"></i>Clue:</strong> ${d.hint}`;
         document.getElementById('outputText').textContent = d.output;
         document.getElementById('panelBlocks').innerHTML = d.blocks.map(b => `<span class="block-pill">${b}</span>`).join('');
         document.getElementById('panelStartBtn').onclick = function() { window.location.href = `/playground_php?activity=${key}`; };
@@ -1265,7 +1264,7 @@
     });
 
     function loadActivityStatuses() {
-        fetch('/get_activities').then(r => r.json()).then(data => {
+        return fetch('/get_activities').then(r => r.json()).then(data => {
             if (data.success && data.activities) {
                 if (window.updateActivityScoreSummary) window.updateActivityScoreSummary(data.activities);
                 const m = {
@@ -1322,7 +1321,17 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.activity-card[data-activity]').forEach(card => card.classList.add('activity-locked'));
-        checkSidebarState(); loadActivityStatuses(); loadNotifications(); loadUserInfo();
+        checkSidebarState();
+        loadActivityStatuses().then(function() {
+            const requestedActivity = new URLSearchParams(window.location.search).get('activity');
+            const card = requestedActivity && Array.from(
+                document.querySelectorAll('.activity-card[data-activity]')
+            ).find(function(activityCard) {
+                return activityCard.dataset.activity === requestedActivity;
+            });
+            if (card && !card.classList.contains('activity-locked')) openPanel(requestedActivity);
+        });
+        loadNotifications(); loadUserInfo();
         window.activityStatusTimer = window.setInterval(loadActivityStatuses, 10000);
     });
     window.addEventListener('resize', checkSidebarState);

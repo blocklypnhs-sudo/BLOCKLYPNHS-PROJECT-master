@@ -644,7 +644,7 @@ function registerJavaBlocks() {
   if (!Blockly.Blocks['java_variable_get']) {
     Blockly.Blocks['java_variable_get'] = {
       init: function() {
-        this.appendDummyInput().appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
+        this.appendDummyInput().appendField('get variable').appendField(new Blockly.FieldTextInput('myVar'), 'NAME');
         this.setOutput(true, ['String','Number','Boolean']);
         this.setColour('#8b5cf6');
       }

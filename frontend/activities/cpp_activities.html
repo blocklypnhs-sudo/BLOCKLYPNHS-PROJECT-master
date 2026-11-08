@@ -1212,7 +1212,7 @@
             steps: [
                 'Find the <strong>cout</strong> block in the <span class="category-name">BASIC</span> category.',
                 'Drag the <strong>cout</strong> block to the workspace.',
-                'Find the <strong>TEXT</strong> block in the <span class="category-name">VARIABLES</span> category.',
+                'Find the <strong>TEXT</strong> block in the <span class="category-name">BASIC</span> category.',
                 'Drag the <strong>TEXT</strong> block and attach it <span class="highlight">inside</span> the cout block.',
                 'Click on the <strong>TEXT</strong> block and type: <span class="highlight">"Hello, C++!"</span>',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
@@ -1226,9 +1226,9 @@
             steps: [
                 'Find the <strong>int variable</strong> block in the <span class="category-name">VARIABLES</span> category.',
                 'Set the variable name to <span class="highlight">"age"</span>.',
-                'Set the value to <span class="highlight">17</span> using a NUMBER block.',
+                'Set the value to <span class="highlight">17</span> using a NUMBER block from <span class="category-name">MATH</span>.',
                 'Find the <strong>cout</strong> block in the <span class="category-name">BASIC</span> category.',
-                'Inside the cout block, add a <strong>GET VARIABLE</strong> block and select <span class="highlight">"age"</span>.',
+                'Inside the cout block, add a <strong>GET VARIABLE</strong> block from <span class="category-name">VARIABLES</span> and select <span class="highlight">"age"</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: '17',
@@ -1239,26 +1239,26 @@
             title: 'Multiply Two Numbers', step: 'Activity 3', difficulty: 'Medium', time: '1 hour', points: '10 pts',
             steps: [
                 'Find the <strong>cout</strong> block in the <span class="category-name">BASIC</span> category.',
-                'Inside the cout block, add a <strong>MULTIPLY</strong> block from the <span class="category-name">MATH</span> category.',
-                'Add two <strong>NUMBER</strong> blocks: <span class="highlight">6</span> and <span class="highlight">5</span>.',
+                'Inside the cout block, add the <strong>math</strong> block from the <span class="category-name">MATH</span> category and choose <strong>×</strong>.',
+                'Add two <strong>number</strong> blocks: <span class="highlight">6</span> and <span class="highlight">5</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: '30',
             hint: 'Use <code>cout << 6 * 5;</code>',
-            blocks: ['cout', 'MULTIPLY', 'NUMBER']
+            blocks: ['cout', 'math (×)', 'number']
         },
         'less-than': {
             title: 'Less Than', step: 'Activity 4', difficulty: 'Medium', time: '1 hour', points: '10 pts',
             steps: [
                 'Find the <strong>if</strong> block in the <span class="category-name">LOGIC</span> category.',
-                'Add a <strong>LESS THAN</strong> block from the <span class="category-name">LOGIC</span> category as the condition.',
-                'Set the values: <span class="highlight">15</span> and <span class="highlight">20</span>.',
-                'Inside the if block, add a <strong>cout</strong> block with the text <span class="highlight">"15 is less than 20"</span>.',
+                'Add the <strong>compare</strong> block from <span class="category-name">LOGIC</span> and choose <strong>&lt;</strong>.',
+                'Add number blocks from <span class="category-name">MATH</span> and set them to <span class="highlight">15</span> and <span class="highlight">20</span>.',
+                'Inside the if block, add a <strong>cout</strong> block with a BASIC TEXT block containing <span class="highlight">"15 is less than 20"</span>.',
                 'Click <span class="highlight">Start Activity</span> to continue to the playground.'
             ],
             output: '15 is less than 20',
             hint: 'Use <code>if (15 < 20) { cout << "15 is less than 20"; }</code>',
-            blocks: ['if', 'LESS THAN', 'cout', 'NUMBER', 'TEXT']
+            blocks: ['if', 'compare (<)', 'cout', 'number', 'TEXT']
         },
         'display-numbers': {
             title: 'Display Numbers 1 to 5', step: 'Activity 5', difficulty: 'Hard', time: '1 hour', points: '10 pts',
@@ -1294,9 +1294,8 @@
         db.className = 'difficulty-badge ' + d.difficulty.toLowerCase();
         document.getElementById('panelTime').textContent = d.time;
         document.getElementById('panelPoints').textContent = d.points;
-        document.getElementById('panelInstructions').innerHTML = d.steps.map((s, i) =>
-            `<div class="step-item"><span class="step-num">${i + 1}.</span><span class="step-desc">${s}</span></div>`
-        ).join('');
+        document.getElementById('panelInstructions').innerHTML =
+            `<strong><i class="fas fa-lightbulb me-1"></i>Clue:</strong> ${d.hint}`;
         document.getElementById('outputText').textContent = d.output;
         document.getElementById('panelBlocks').innerHTML = d.blocks.map(b => `<span class="block-pill">${b}</span>`).join('');
         document.getElementById('panelStartBtn').onclick = function() { window.location.href = `/playground_cpp?activity=${key}`; };
@@ -1314,7 +1313,7 @@
     });
 
     function loadActivityStatuses() {
-        fetch('/get_activities').then(r => r.json()).then(data => {
+        return fetch('/get_activities').then(r => r.json()).then(data => {
             if (data.success && data.activities) {
                 if (window.updateActivityScoreSummary) window.updateActivityScoreSummary(data.activities);
                 const m = { 'Hello, C++!': 'status-hellocpp', 'Store an Age': 'status-storeage', 'Multiply Two Numbers': 'status-multiply', 'Less Than': 'status-lessthan', 'Display Numbers 1 to 5': 'status-displaynumbers' };
@@ -1359,7 +1358,17 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.activity-card[data-activity]').forEach(card => card.classList.add('activity-locked'));
-        checkSidebarState(); loadActivityStatuses(); loadNotifications(); loadUserInfo();
+        checkSidebarState();
+        loadActivityStatuses().then(function() {
+            const requestedActivity = new URLSearchParams(window.location.search).get('activity');
+            const card = requestedActivity && Array.from(
+                document.querySelectorAll('.activity-card[data-activity]')
+            ).find(function(activityCard) {
+                return activityCard.dataset.activity === requestedActivity;
+            });
+            if (card && !card.classList.contains('activity-locked')) openPanel(requestedActivity);
+        });
+        loadNotifications(); loadUserInfo();
         window.activityStatusTimer = window.setInterval(loadActivityStatuses, 10000);
     });
     window.addEventListener('resize', checkSidebarState);

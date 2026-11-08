@@ -673,7 +673,7 @@ function registerCppBlocks() {
   }
   if (!Blockly.Blocks['cpp_variable_get']) {
     Blockly.Blocks['cpp_variable_get'] = { init: function() {
-      this.appendDummyInput().appendField(new Blockly.FieldTextInput('myVar'),'NAME');
+      this.appendDummyInput().appendField('get variable').appendField(new Blockly.FieldTextInput('myVar'),'NAME');
       this.setOutput(true, ['String','Number']); this.setColour('#8b5cf6');
     }};
   }

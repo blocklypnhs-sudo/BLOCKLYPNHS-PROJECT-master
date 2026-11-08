@@ -760,6 +760,9 @@
                 <button class="hero-btn" onclick="exportCSV()">
                     <i class="fas fa-download"></i> Export CSV
                 </button>
+                <button class="hero-btn" onclick="exportExcel()">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
                 <button class="hero-btn" onclick="printLeaderboard()">
                     <i class="fas fa-print"></i> Print
                 </button>
@@ -1054,19 +1057,63 @@
             showToast('No data to export.');
             return;
         }
-        var rows = [['Rank', 'Name', 'Grade', 'Activity Points /150', 'Activity Attempts Coverage %', 'Activities Attempted /15', 'Submission Attempts', 'Activity Score %', 'Learning Time']];
-        LB.filtered.forEach(function(s) {
-            rows.push([s.rank, s.name, s.grade, s.points, s.progress, s.completed, s.attempts || 0, s.activity_percentage, formatLearningTime(s.learning_time_seconds)]);
-        });
-        var csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
-        var blob = new Blob([csv], { type: 'text/csv' });
+        var rows = getLeaderboardExportRows();
+        var csvCell = function(value) {
+            var text = String(value == null ? '' : value);
+            if (/^[\u0000-\u0020]*[=+\-@]/.test(text)) text = "'" + text;
+            return '"' + text.replace(/"/g, '""') + '"';
+        };
+        var csv = '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
         a.download = 'leaderboard_' + new Date().toISOString().slice(0,10) + '.csv';
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        a.remove();
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
         showToast('CSV downloaded!');
+    }
+
+    function getLeaderboardExportRows() {
+        var rows = [['Rank', 'Name', 'Grade', 'Activity Points /150', 'Activity Attempts Coverage %', 'Activities Attempted /15', 'Submission Attempts', 'Activity Score %', 'Learning Time']];
+        LB.filtered.forEach(function(s) {
+            rows.push([s.rank, s.name, s.grade, s.points, s.progress, s.completed, s.attempts || 0, s.activity_percentage, formatLearningTime(s.learning_time_seconds)]);
+        });
+        return rows;
+    }
+
+    async function exportExcel() {
+        if (!LB.filtered.length) {
+            showToast('No data to export.');
+            return;
+        }
+
+        try {
+            var response = await fetch('/teacher/export_xlsx', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'leaderboard', rows: getLeaderboardExportRows() })
+            });
+            if (!response.ok) {
+                var result = await response.json();
+                throw new Error(result.message || 'Unable to generate Excel export.');
+            }
+
+            var url = URL.createObjectURL(await response.blob());
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = 'blocklearn-leaderboard.xlsx';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+            showToast('Excel workbook downloaded!');
+        } catch (error) {
+            console.error('Leaderboard Excel export failed:', error);
+            showToast(error.message || 'Excel export failed.', 'error');
+        }
     }
 
     function printLeaderboard() {

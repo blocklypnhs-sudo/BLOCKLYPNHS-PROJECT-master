@@ -379,6 +379,44 @@ def test_simple_activity_has_distinct_code_and_output_criteria():
     )
 
 
+def test_python_functions_assessment_recognizes_custom_definition_and_call_blocks():
+    workspace = (
+        '<xml>'
+        '<block type="python_function_def">'
+        '<field name="NAME">greet</field>'
+        '<statement name="STACK">'
+        '<block type="text_print">'
+        '<value name="TEXT"><block type="text">'
+        '<field name="TEXT">Welcome to BlockLearn!</field>'
+        '</block></value></block>'
+        '</statement>'
+        '<next><block type="python_function_call">'
+        '<mutation name="greet"></mutation>'
+        '<field name="NAME">greet</field>'
+        '</block></next></block>'
+        '</xml>'
+    )
+    result = score_block_submission(
+        'python',
+        workspace,
+        'Welcome to BlockLearn!',
+        'Welcome to BlockLearn!',
+        required_blocks='DEFINE FUNCTION,PRINT,CALL FUNCTION,TEXT',
+        task_description='Create and use a Python function named greet.',
+        hint='Define def greet() then call greet().',
+    )
+
+    assert result['score'] == 100
+    assert all(item['correct'] for item in result['breakdown'])
+    assert [item['criterion'] for item in result['breakdown']] == [
+        'Define the required function',
+        'Use the required output block',
+        'Call the required function',
+        'Use the required text',
+        'Expected program output',
+    ]
+
+
 @pytest.mark.parametrize(
     ('module_id', 'output'),
     [

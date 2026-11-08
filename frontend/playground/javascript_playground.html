@@ -221,6 +221,28 @@
             font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 11px;
         }
+        .activity-guide {
+            margin: 8px 0 10px;
+            padding: 8px 10px;
+            border-left: 3px solid #7a0523;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.45);
+        }
+        .activity-guide .label {
+            display: block;
+            margin-bottom: 2px;
+            color: #7a0523;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .activity-guide .text {
+            margin: 0;
+            color: #24352e;
+            font-size: 11px;
+            line-height: 1.45;
+        }
         .activity-banner-info .expected-output-box {
             background: rgba(255,255,255,0.4);
             border-radius: 10px;
@@ -475,6 +497,10 @@
                     <span class="difficulty-tag difficulty-easy" id="bannerDifficulty">Easy</span>
                 </h4>
                 <p class="instructions" id="bannerInstructions">Build a JavaScript program that prints "Hello, JavaScript!"</p>
+                <div class="activity-guide">
+                    <span class="label"><i class="fas fa-lightbulb me-1"></i>Clue</span>
+                    <p class="text" id="bannerGuide">Use console.log with a TEXT block connected inside it.</p>
+                </div>
                 <div class="expected-output-box">
                     <span class="label"><i class="fas fa-eye me-1"></i>Expected Output</span>
                     <span class="value" id="bannerExpectedOutput">"Hello, JavaScript!"</span>
@@ -543,7 +569,7 @@
 
         Blockly.Blocks['js_get'] = {
             init: function() {
-                this.appendDummyInput().appendField(new Blockly.FieldTextInput('name'), 'NAME');
+                this.appendDummyInput().appendField('get variable').appendField(new Blockly.FieldTextInput('name'), 'NAME');
                 this.setOutput(true, ['String', 'Number']);
                 this.setColour('#8b5cf6');
                 this.setTooltip('Get variable value');
@@ -704,15 +730,17 @@
                 toolboxCategories: ['JavaScript Basic'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
                 instructions: `TASK: Print "Hello, JavaScript!" to the console.\n\nBLOCKS NEEDED: console.log, TEXT\n\nSTEPS:\n1. Drag console.log from BASIC\n2. Drag TEXT from BASIC and attach INSIDE console.log\n3. Type "Hello, JavaScript!" in TEXT\n4. Click RUN CODE`,
+                guide: 'BASIC: connect a TEXT block inside console.log, then enter "Hello, JavaScript!".',
                 expected: '"Hello, JavaScript!"'
             },
             'store-score': {
                 name: 'Store Score',
                 difficulty: 'Easy',
                 step: 2,
-                toolboxCategories: ['JavaScript Basic', 'JavaScript Variables'],
+                toolboxCategories: ['JavaScript Basic', 'JavaScript Variables', 'JavaScript Math'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Create a variable called "score" with value 90 and print it.\n\nBLOCKS NEEDED: let, console.log, NUMBER, variable_get\n\nSTEPS:\n1. Drag "let" from VARIABLES\n2. Change "name" to "score"\n3. Attach a NUMBER block with value 90\n4. Drag console.log from BASIC\n5. Drag variable_get from VARIABLES and attach INSIDE console.log\n6. Change variable_get to "score"\n7. Click RUN CODE`,
+                instructions: `TASK: Create a variable called "score" with value 90 and print it.\n\nBLOCKS NEEDED: let, console.log, NUMBER, GET VARIABLE\n\nSTEPS:\n1. Drag "let" from VARIABLES\n2. Change "name" to "score"\n3. Attach a NUMBER block from MATH with value 90\n4. Drag console.log from BASIC\n5. Drag GET VARIABLE from VARIABLES and attach INSIDE console.log\n6. Change GET VARIABLE to "score"\n7. Click RUN CODE`,
+                guide: 'VARIABLES: set score to 90. BASIC: put get variable score inside console.log.',
                 expected: '90'
             },
             'add-numbers': {
@@ -721,16 +749,18 @@
                 step: 3,
                 toolboxCategories: ['JavaScript Basic', 'JavaScript Math'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Add 25 and 15 and print the result.\n\nBLOCKS NEEDED: console.log, math_operation, number\n\nSTEPS:\n1. Drag console.log\n2. Inside console.log, add math_operation (+)\n3. Add two number blocks: 25 and 15\n4. Click RUN CODE`,
+                instructions: `TASK: Add 25 and 15 and print the result.\n\nBLOCKS NEEDED: console.log, math operation, number\n\nSTEPS:\n1. Drag console.log from BASIC\n2. Inside console.log, add the math block from MATH and choose +\n3. Add two number blocks from MATH: 25 and 15\n4. Click RUN CODE`,
+                guide: 'MATH: choose addition and connect 25 and 15. Put the math result inside BASIC console.log.',
                 expected: '40'
             },
             'greater-than': {
                 name: 'Greater Than',
                 difficulty: 'Medium',
                 step: 4,
-                toolboxCategories: ['JavaScript Basic', 'JavaScript Logic'],
+                toolboxCategories: ['JavaScript Basic', 'JavaScript Math', 'JavaScript Logic'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Check if 20 is greater than 10. If true, print "20 is greater than 10".\n\nBLOCKS NEEDED: if, compare, console.log, number, text\n\nSTEPS:\n1. Drag if block\n2. Add compare (>) block as condition\n3. Set values: 20 and 10\n4. Inside if, add console.log with text "20 is greater than 10"\n5. Click RUN CODE`,
+                instructions: `TASK: Check if 20 is greater than 10. If true, print "20 is greater than 10".\n\nBLOCKS NEEDED: if, compare, console.log, number, text\n\nSTEPS:\n1. Drag if and compare from LOGIC; choose >\n2. Add number blocks from MATH: 20 and 10\n3. Inside if, add console.log from BASIC with a BASIC TEXT block containing "20 is greater than 10"\n4. Click RUN CODE`,
+                guide: 'LOGIC: compare 20 > 10. Inside IF, place BASIC console.log with the message in a TEXT block.',
                 expected: '20 is greater than 10'
             },
             'repeat-message': {
@@ -739,7 +769,8 @@
                 step: 5,
                 toolboxCategories: ['JavaScript Basic', 'JavaScript Loops'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Print "I love programming!" five times using a for loop.\n\nBLOCKS NEEDED: for loop, console.log, number, text\n\nSTEPS:\n1. Drag the for loop block\n2. Set counter to "i", from 0, and to 4\n3. Drag console.log into the loop's body\n4. Drag the text block into the console.log input (not directly into the loop body)\n5. Set the text to "I love programming!"\n6. Click RUN CODE`,
+                instructions: `TASK: Print "I love programming!" five times using a for loop.\n\nBLOCKS NEEDED: for loop, console.log, number, text (LOOPS category)\n\nSTEPS:\n1. Drag the for loop from LOOPS\n2. Set counter to "i", from 0, and to 4\n3. Drag console.log from LOOPS into the loop's body\n4. Drag TEXT from LOOPS into the console.log input (not directly into the loop body)\n5. Set the text to "I love programming!"\n6. Click RUN CODE`,
+                guide: 'LOOPS: repeat with counter i from 0 to 4. Inside the loop, place console.log with TEXT "I love programming!".',
                 expected: 'I love programming!\nI love programming!\nI love programming!\nI love programming!\nI love programming!'
             },
             'free-play': {
@@ -748,7 +779,8 @@
                 step: 0,
                 toolboxCategories: ['All'],
                 blocksXml: `<xml xmlns="https://developers.google.com/blockly/xml"></xml>`,
-                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: console.log, TEXT\nMATH: math_operation, number\nVARIABLES: let, variable_get\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                instructions: `TASK: Build anything you want!\n\nAvailable blocks:\nBASIC: console.log, TEXT\nMATH: math, number\nVARIABLES: let, get variable\nLOGIC: if, compare\nLOOPS: for loop\n\nTry creating:\n- Calculator with +, -, ×, ÷\n- Any math expression\n- Variables with different values\n- If-else conditions`,
+                guide: 'Start with BASIC console.log and TEXT. Add MATH, VARIABLES, LOGIC, or LOOPS to build a larger program.',
                 expected: 'Your Code'
             }
         };
@@ -859,7 +891,9 @@
             else if (activity.difficulty === 'Hard') diffTag.classList.add('difficulty-hard');
             else diffTag.classList.add('difficulty-easy');
             
-            document.getElementById('bannerInstructions').textContent = activity.instructions;
+            const taskPrompt = activity.instructions.split(/\n\s*\n/)[0].replace(/^TASK:\s*/, '');
+            document.getElementById('bannerInstructions').textContent = taskPrompt;
+            document.getElementById('bannerGuide').textContent = activity.guide;
             document.getElementById('bannerExpectedOutput').textContent = activity.expected || '—';
 
             const toolboxXml = getJSToolbox(activity.toolboxCategories);

@@ -914,6 +914,12 @@
                     <button class="btn-pill" type="button" onclick="exportGradingCsv('assessments')">
                         <i class="fas fa-file-csv"></i> Assessment Results CSV
                     </button>
+                    <button class="btn-pill" type="button" onclick="exportGradingExcel('scores')">
+                        <i class="fas fa-file-excel"></i> Student Scores Excel
+                    </button>
+                    <button class="btn-pill" type="button" onclick="exportGradingExcel('assessments')">
+                        <i class="fas fa-file-excel"></i> Assessment Results Excel
+                    </button>
                 </div>
             </div>
 
@@ -1398,7 +1404,18 @@ function loadDemoData() {
 // ============================================================
 function exportPDF() {
     if (!reportsData.reports.length) { showToast('No reports to export', 'error'); return; }
+    if (typeof html2canvas !== 'function' || !window.jspdf || !window.jspdf.jsPDF) {
+        showToast('PDF export is unavailable. Check your internet connection and try again.', 'error');
+        return;
+    }
+
     var btn = document.querySelector('.btn-pill--pdf');
+    var container = document.getElementById('pdfExportContainer');
+    if (!btn || !container) {
+        showToast('PDF export is unavailable on this page.', 'error');
+        return;
+    }
+
     btn.disabled = true;
     var rows = reportsData.reports.map(function(r, i) {
         var score = getScore(r);
@@ -1418,27 +1435,43 @@ function exportPDF() {
             '</tr></thead>' +
             '<tbody>' + rows + '</tbody>' +
         '</table>';
-    var container = document.getElementById('pdfExportContainer');
     container.style.display = 'block';
-    html2canvas(container, { scale: 2 }).then(function(canvas) {
-        var jsPDF = window.jspdf.jsPDF;
-        var pdf = new jsPDF('p', 'mm', 'a4');
-        var imgW = 190;
-        var imgH = canvas.height * imgW / canvas.width;
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, imgW, Math.min(imgH, 277));
+    Promise.resolve().then(function() {
+        return html2canvas(container, { scale: 2 });
+    }).then(function(canvas) {
+        var pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+        var pageWidth = pdf.internal.pageSize.getWidth();
+        var pageHeight = pdf.internal.pageSize.getHeight();
+        var margin = 10;
+        var imageWidth = pageWidth - margin * 2;
+        var imageHeight = canvas.height * imageWidth / canvas.width;
+        var pageContentHeight = pageHeight - margin * 2;
+        var image = canvas.toDataURL('image/png');
+        var offset = 0;
+        var remainingHeight = imageHeight;
+
+        pdf.addImage(image, 'PNG', margin, margin, imageWidth, imageHeight);
+        remainingHeight -= pageContentHeight;
+        while (remainingHeight > 0) {
+            pdf.addPage();
+            offset -= pageContentHeight;
+            pdf.addImage(image, 'PNG', margin, margin + offset, imageWidth, imageHeight);
+            remainingHeight -= pageContentHeight;
+        }
+
         pdf.save('blocklearn-performance-report.pdf');
-        container.style.display = 'none';
-        btn.disabled = false;
         showToast('PDF exported successfully');
-    }).catch(function() {
+    }).catch(function(error) {
+        console.error('Performance report PDF export failed:', error);
+        showToast('PDF export failed', 'error');
+    }).finally(function() {
         container.style.display = 'none';
         btn.disabled = false;
-        showToast('PDF export failed', 'error');
     });
 }
 
-async function exportGradingCsv(type) {
-    const config = type === 'assessments'
+function getGradingExportConfig(type) {
+    return type === 'assessments'
         ? {
             endpoint: '/get_assessment_results?export=1',
             rowKey: 'results',
@@ -1453,34 +1486,74 @@ async function exportGradingCsv(type) {
             headers: ['LRN', 'Student Name', 'Activity / Assessment', 'Language', 'Score', 'Submitted At'],
             fields: ['lrn', 'student_name', 'activity_name', 'language', 'score', 'completed_at']
         };
+}
+
+async function fetchGradingExportRows(config) {
+    const response = await fetch(config.endpoint, { cache: 'no-store' });
+    const result = await response.json();
+    if (!response.ok || !result.success || !Array.isArray(result[config.rowKey])) {
+        throw new Error(result.message || 'Unable to retrieve grading data.');
+    }
+    if (!result[config.rowKey].length) {
+        throw new Error('No grading data is available to export.');
+    }
+    return result[config.rowKey];
+}
+
+function downloadExportBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function exportGradingCsv(type) {
+    const config = getGradingExportConfig(type);
     try {
-        const response = await fetch(config.endpoint, { cache: 'no-store' });
-        const result = await response.json();
-        if (!response.ok || !result.success || !Array.isArray(result[config.rowKey])) {
-            throw new Error(result.message || 'Unable to retrieve grading data.');
-        }
-        const rows = result[config.rowKey];
-        if (!rows.length) {
-            showToast('No grading data is available to export.', 'error');
-            return;
-        }
-        const csvEscape = value => `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+        const rows = await fetchGradingExportRows(config);
+        const csvEscape = value => {
+            let text = String(value == null ? '' : value);
+            if (/^[\u0000-\u0020]*[=+\-@]/.test(text)) text = "'" + text;
+            return `"${text.replace(/"/g, '""')}"`;
+        };
         const csv = [config.headers, ...rows.map(row => config.fields.map(field => row[field]))]
             .map(row => row.map(csvEscape).join(','))
             .join('\r\n');
         const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = config.filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(url);
+        downloadExportBlob(blob, config.filename);
         showToast('CSV grading sheet exported.');
     } catch (error) {
         console.error('Grading CSV export failed:', error);
         showToast(error.message || 'CSV export failed.', 'error');
+    }
+}
+
+async function exportGradingExcel(type) {
+    const config = getGradingExportConfig(type);
+    try {
+        const records = await fetchGradingExportRows(config);
+        const rows = [config.headers, ...records.map(record => config.fields.map(field => record[field] ?? ''))];
+        const response = await fetch('/teacher/export_xlsx', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, rows })
+        });
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.message || 'Unable to generate Excel export.');
+        }
+        const filename = type === 'assessments'
+            ? 'blocklearn-assessment-results.xlsx'
+            : 'blocklearn-student-scores.xlsx';
+        downloadExportBlob(await response.blob(), filename);
+        showToast('Excel grading workbook exported.');
+    } catch (error) {
+        console.error('Grading Excel export failed:', error);
+        showToast(error.message || 'Excel export failed.', 'error');
     }
 }
 

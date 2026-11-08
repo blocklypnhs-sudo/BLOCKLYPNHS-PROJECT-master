@@ -687,7 +687,7 @@ function registerJsBlocks() {
   }
   if (!Blockly.Blocks['js_get']) {
     Blockly.Blocks['js_get'] = { init: function() {
-      this.appendDummyInput().appendField(new Blockly.FieldTextInput('name'),'NAME');
+      this.appendDummyInput().appendField('get variable').appendField(new Blockly.FieldTextInput('name'),'NAME');
       this.setOutput(true, ['String','Number']); this.setColour('#8b5cf6');
     }};
   }

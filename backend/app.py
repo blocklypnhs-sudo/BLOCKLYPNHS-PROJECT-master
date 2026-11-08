@@ -1,5 +1,5 @@
 # app.py - Main Flask Application for Blockly Learning Platform
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file, send_from_directory
 from flask_cors import CORS
 import mysql.connector
 from html import escape as html_escape
@@ -79,6 +79,7 @@ from backend.scores import (
     get_student_activity_scores,
     get_student_total_scores,
 )
+from backend.xlsx_export import create_xlsx_workbook
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'frontend')
@@ -5387,6 +5388,37 @@ def get_assessment_results():
         if conn:
             conn.close()
 
+@app.route('/teacher/export_xlsx', methods=['POST'])
+def export_teacher_xlsx():
+    if session.get('role') != 'teacher':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    exports = {
+        'leaderboard': ('Leaderboard', 'blocklearn-leaderboard.xlsx'),
+        'scores': ('Student Scores', 'blocklearn-student-scores.xlsx'),
+        'assessments': ('Assessment Results', 'blocklearn-assessment-results.xlsx'),
+        'submissions': ('Student Submissions', 'blocklearn-submissions.xlsx'),
+    }
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or data.get('type') not in exports:
+        return jsonify({'success': False, 'message': 'Invalid Excel export type'}), 400
+
+    sheet_name, filename = exports[data['type']]
+    try:
+        workbook = create_xlsx_workbook(sheet_name, data.get('rows'))
+    except ValueError as error:
+        return jsonify({'success': False, 'message': str(error)}), 400
+    except Exception:
+        app.logger.exception('Unable to generate teacher Excel export')
+        return jsonify({'success': False, 'message': 'Unable to generate Excel export'}), 500
+
+    return send_file(
+        workbook,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=filename,
+    )
+
 @app.route('/teacher/get_submissions')
 def get_teacher_score_submissions():
     if session.get('role') != 'teacher':
@@ -5472,7 +5504,7 @@ def teacher_score_attempt_history():
             SELECT attempt_id, attempt_type, item_type, student_id, student_name,
                    student_lrn, title, language, score, points_earned, max_points,
                    result_status,
-                   DATE_FORMAT(submitted_at, '%Y-%m-%d %H:%i:%s') AS submitted_at
+                   CAST(submitted_at AS CHAR) AS submitted_at
             FROM (
                 SELECT h.id AS attempt_id,
                        'item' AS attempt_type,

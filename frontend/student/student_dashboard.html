@@ -910,6 +910,73 @@
         .dashboard-module-count.is-passed { color: var(--green-main); font-weight: 750; }
         .dashboard-module-count.is-failed { color: var(--coral); font-weight: 750; }
         .dashboard-module-arrow { color: var(--stone-light); font-size: 0.7rem; }
+        .dashboard-module-progress { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+        .dashboard-module-track { height: 6px; flex: 1; background: var(--chart-grid); border-radius: 99px; overflow: hidden; }
+        .dashboard-module-fill { display: block; height: 100%; width: 0; background: var(--green-light); border-radius: inherit; transition: width 0.6s ease; }
+        .module-status { padding: 0.8rem 0.45rem 0.35rem; border-top: 1px solid var(--border-fresh); }
+        .module-status[hidden] { display: none !important; }
+        .module-language-links { display: grid; gap: 0.4rem; }
+        .module-language-link {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+            padding: 0.5rem 0.65rem; border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none;
+            font-size: 0.7rem; transition: border-color 0.2s, background 0.2s;
+        }
+        .module-language-link:hover { border-color: var(--green-main); background: var(--green-soft); color: var(--text-primary); }
+        .module-language-status { color: var(--stone); font-size: 0.64rem; white-space: nowrap; }
+        .module-language-status.is-passed { color: var(--green-main); font-weight: 750; }
+        .module-language-status.is-failed { color: var(--coral); font-weight: 750; }
+        .module-assessments { margin-top: 0.75rem; }
+        .module-assessment-list { display: grid; gap: 0.35rem; }
+        .module-assessment-link {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+            padding: 0.45rem 0.6rem; border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none;
+            font-size: 0.7rem; transition: border-color 0.2s, background 0.2s;
+        }
+        .module-assessment-link:hover { border-color: var(--green-main); background: var(--green-soft); color: var(--text-primary); }
+        .module-assessment-status { color: var(--stone); font-size: 0.64rem; white-space: nowrap; }
+        .module-assessment-link.is-passed .module-assessment-status { color: var(--green-main); font-weight: 750; }
+        .module-assessment-link.is-failed .module-assessment-status { color: var(--coral); font-weight: 750; }
+        .module-assessment-link.is-locked { color: var(--stone); cursor: not-allowed; }
+        .module-assessment-link.is-locked .module-assessment-status { color: var(--stone-light); }
+        .module-awards-content { margin-top: 0.75rem; }
+        .module-activities { margin-top: 0.75rem; }
+        .module-activity-list { display: grid; gap: 0.35rem; }
+        .module-activity-link {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+            padding: 0.45rem 0.6rem; border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none;
+            font-size: 0.7rem; transition: border-color 0.2s, background 0.2s;
+        }
+        .module-activity-link:hover { border-color: var(--green-main); background: var(--green-soft); color: var(--text-primary); }
+        .module-activity-status { color: var(--stone); font-size: 0.64rem; white-space: nowrap; }
+        .module-activity-link.is-available .module-activity-status,
+        .module-activity-link.is-completed .module-activity-status { color: var(--green-main); font-weight: 750; }
+        .module-activity-link.is-locked { color: var(--stone); cursor: not-allowed; }
+        .module-activity-link.is-locked .module-activity-status { color: var(--stone-light); }
+        .module-detail-heading { display: flex; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .module-detail-heading strong { color: var(--text-primary); font-size: 0.72rem; }
+        .module-detail-heading span { color: var(--stone); font-size: 0.68rem; }
+        .module-awards-group { margin-top: 0.75rem; }
+        .module-detail-items { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .module-item-badge {
+            display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.3rem 0.5rem;
+            border-radius: 999px; background: #eef0f2; color: #8a929b;
+            font-size: 0.63rem; font-weight: 700; text-decoration: none;
+        }
+        .module-item-badge.earned { background: #e3f5e9; color: #24864a; }
+        .module-certificate { padding-top: 0.6rem; border-top: 1px solid var(--border-fresh); }
+        .module-certificate-state { margin-top: 0.65rem; color: var(--stone); font-size: 0.68rem; }
+        .module-certificate-state.ready { color: #24864a; font-weight: 700; }
+        .module-progress-error { color: #a33; font-size: 0.68rem; }
+        .btn-certificate {
+            display: inline-flex; align-items: center; margin-top: 8px; padding: 6px 14px;
+            background: #2980b9; color: white; text-decoration: none; border-radius: 5px; font-size: 13px;
+        }
+        .btn-certificate:hover { background: #1f6391; color: white; }
+        .progress-text { color: #666; font-size: 13px; }
+        .locked-text { color: #999; font-size: 12px; margin-top: 4px; }
 
         /* ===== BOTTOM ===== */
         .bottom-section {
@@ -1085,6 +1152,8 @@
             .dashboard-left, .dashboard-right { gap: 1rem; }
             .dashboard-modules { padding: 0.85rem; }
             .dashboard-module-summary { grid-template-columns: 32px minmax(0, 1fr) 12px; }
+            .dashboard-module-row[data-language] .dashboard-module-summary { grid-template-columns: 32px minmax(0, 1fr) 12px; }
+            .dashboard-module-row[data-language] .dashboard-module-progress { grid-column: 2 / 4; }
         }
         @media (max-width: 768px) {
             .dashboard-grid { grid-template-columns: 1fr; }
@@ -1336,72 +1405,107 @@
             </div>
 
             <div class="dashboard-right">
-                <section class="dashboard-modules fu e6" aria-label="Assessment modules">
+                <section class="dashboard-modules fu e6" aria-label="Learning modules">
                     <div class="dashboard-modules-head">
                         <h3><i class="fas fa-layer-group"></i>Modules</h3>
                         <a href="/student_modules">View all</a>
                     </div>
                     <div class="dashboard-module-list">
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="python-01-basics" href="/student_modules/python/1">
-                            <span class="dashboard-module-icon"><i class="fab fa-python"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">Python Module 1: Basics</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="python-02-loops" href="/student_modules/python/2">
-                            <span class="dashboard-module-icon"><i class="fab fa-python"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">Python Module 2: Loops</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="java-01-basics" href="/student_modules/java/1">
-                            <span class="dashboard-module-icon"><i class="fab fa-java"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">Java Module 1: Basics</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="java-02-loops" href="/student_modules/java/2">
-                            <span class="dashboard-module-icon"><i class="fab fa-java"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">Java Module 2: Loops</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="php-01-variables" href="/student_modules/php/1">
-                            <span class="dashboard-module-icon"><i class="fab fa-php"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">PHP Module 1: Variables</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="php-02-conditionals" href="/student_modules/php/2">
-                            <span class="dashboard-module-icon"><i class="fab fa-php"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">PHP Module 2: Conditionals</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="js-01-variables" href="/student_modules/javascript/1">
-                            <span class="dashboard-module-icon"><i class="fab fa-js"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">JavaScript Module 1: Variables</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="js-02-functions" href="/student_modules/javascript/2">
-                            <span class="dashboard-module-icon"><i class="fab fa-js"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">JavaScript Module 2: Functions</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="cpp-01-basics" href="/student_modules/cpp/1">
-                            <span class="dashboard-module-icon"><i class="fas fa-code"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">C++ Module 1: Basics</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
-                        <a class="dashboard-module-row dashboard-module-summary" data-module-id="cpp-02-loops" href="/student_modules/cpp/2">
-                            <span class="dashboard-module-icon"><i class="fas fa-code"></i></span>
-                            <span class="dashboard-module-copy"><span class="dashboard-module-name">C++ Module 2: Loops</span><span class="dashboard-module-meta">Assessment score loading...</span></span>
-                            <span class="dashboard-module-count" data-module-status>Loading...</span>
-                            <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
-                        </a>
+                        <div class="dashboard-module-row" data-language="python" data-suffix="Python" data-type="assessment">
+                            <button class="dashboard-module-summary" type="button" aria-expanded="false" aria-controls="moduleDetailsPython">
+                                <span class="dashboard-module-icon"><i class="fab fa-python"></i></span>
+                                <span class="dashboard-module-copy"><span class="dashboard-module-name">Python Basics</span><span class="dashboard-module-meta">Variables and fundamentals</span></span>
+                                <span class="dashboard-module-progress">
+                                    <span class="dashboard-module-track" role="progressbar" aria-label="Python Basics assessment completion" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span class="dashboard-module-fill" id="moduleProgressPython"></span></span>
+                                    <span class="dashboard-module-count" id="moduleCountPython">Loading...</span>
+                                </span>
+                                <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
+                            </button>
+                            <div class="module-status" id="moduleDetailsPython" hidden>
+                                <div class="module-language-links">
+                                    <a class="module-language-link" data-module-id="python-01-basics" href="/student_modules/python/1"><span>Python Module 1: Basics</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                    <a class="module-language-link" data-module-id="python-02-loops" href="/student_modules/python/2"><span>Python Module 2: Loops</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                </div>
+                                <div class="module-assessments" data-assessment-language="python"><div class="progress-text">Loading assessments...</div></div>
+                                <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-module-row" data-language="java" data-suffix="Java" data-type="assessment">
+                            <button class="dashboard-module-summary" type="button" aria-expanded="false" aria-controls="moduleDetailsJava">
+                                <span class="dashboard-module-icon"><i class="fab fa-java"></i></span>
+                                <span class="dashboard-module-copy"><span class="dashboard-module-name">Java Basics</span><span class="dashboard-module-meta">Start the first lesson</span></span>
+                                <span class="dashboard-module-progress">
+                                    <span class="dashboard-module-track" role="progressbar" aria-label="Java Basics assessment completion" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span class="dashboard-module-fill" id="moduleProgressJava"></span></span>
+                                    <span class="dashboard-module-count" id="moduleCountJava">Loading...</span>
+                                </span>
+                                <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
+                            </button>
+                            <div class="module-status" id="moduleDetailsJava" hidden>
+                                <div class="module-language-links">
+                                    <a class="module-language-link" data-module-id="java-01-basics" href="/student_modules/java/1"><span>Java Module 1: Basics</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                    <a class="module-language-link" data-module-id="java-02-loops" href="/student_modules/java/2"><span>Java Module 2: Loops</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                </div>
+                                <div class="module-assessments" data-assessment-language="java"><div class="progress-text">Loading assessments...</div></div>
+                                <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-module-row" data-language="php" data-suffix="Php" data-type="activity">
+                            <button class="dashboard-module-summary" type="button" aria-expanded="false" aria-controls="moduleDetailsPhp">
+                                <span class="dashboard-module-icon"><i class="fab fa-php"></i></span>
+                                <span class="dashboard-module-copy"><span class="dashboard-module-name">PHP Variables</span><span class="dashboard-module-meta">Build your first scripts</span></span>
+                                <span class="dashboard-module-progress">
+                                    <span class="dashboard-module-track" role="progressbar" aria-label="PHP Variables activity completion" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span class="dashboard-module-fill" id="moduleProgressPhp"></span></span>
+                                    <span class="dashboard-module-count" id="moduleCountPhp">Loading...</span>
+                                </span>
+                                <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
+                            </button>
+                            <div class="module-status" id="moduleDetailsPhp" hidden>
+                                <div class="module-language-links">
+                                    <a class="module-language-link" data-module-id="php-01-variables" href="/student_modules/php/1"><span>PHP Module 1: Variables</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                    <a class="module-language-link" data-module-id="php-02-conditionals" href="/student_modules/php/2"><span>PHP Module 2: Conditionals</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                </div>
+                                <div class="module-activities"><div class="progress-text">Loading activities...</div></div>
+                                <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-module-row" data-language="javascript" data-suffix="Javascript" data-type="activity">
+                            <button class="dashboard-module-summary" type="button" aria-expanded="false" aria-controls="moduleDetailsJavascript">
+                                <span class="dashboard-module-icon"><i class="fab fa-js"></i></span>
+                                <span class="dashboard-module-copy"><span class="dashboard-module-name">JavaScript Variables</span><span class="dashboard-module-meta">Learn values and expressions</span></span>
+                                <span class="dashboard-module-progress">
+                                    <span class="dashboard-module-track" role="progressbar" aria-label="JavaScript Variables activity completion" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span class="dashboard-module-fill" id="moduleProgressJavascript"></span></span>
+                                    <span class="dashboard-module-count" id="moduleCountJavascript">Loading...</span>
+                                </span>
+                                <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
+                            </button>
+                            <div class="module-status" id="moduleDetailsJavascript" hidden>
+                                <div class="module-language-links">
+                                    <a class="module-language-link" data-module-id="js-01-variables" href="/student_modules/javascript/1"><span>JavaScript Module 1: Variables</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                    <a class="module-language-link" data-module-id="js-02-functions" href="/student_modules/javascript/2"><span>JavaScript Module 2: Functions</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                </div>
+                                <div class="module-activities"><div class="progress-text">Loading activities...</div></div>
+                                <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-module-row" data-language="cpp" data-suffix="Cpp" data-type="activity">
+                            <button class="dashboard-module-summary" type="button" aria-expanded="false" aria-controls="moduleDetailsCpp">
+                                <span class="dashboard-module-icon"><i class="fas fa-code"></i></span>
+                                <span class="dashboard-module-copy"><span class="dashboard-module-name">C++ Basics</span><span class="dashboard-module-meta">Explore your first program</span></span>
+                                <span class="dashboard-module-progress">
+                                    <span class="dashboard-module-track" role="progressbar" aria-label="C++ Basics activity completion" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span class="dashboard-module-fill" id="moduleProgressCpp"></span></span>
+                                    <span class="dashboard-module-count" id="moduleCountCpp">Loading...</span>
+                                </span>
+                                <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
+                            </button>
+                            <div class="module-status" id="moduleDetailsCpp" hidden>
+                                <div class="module-language-links">
+                                    <a class="module-language-link" data-module-id="cpp-01-basics" href="/student_modules/cpp/1"><span>C++ Module 1: Basics</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                    <a class="module-language-link" data-module-id="cpp-02-loops" href="/student_modules/cpp/2"><span>C++ Module 2: Loops</span><span class="module-language-status" data-module-status>Loading...</span></a>
+                                </div>
+                                <div class="module-activities"><div class="progress-text">Loading activities...</div></div>
+                                <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -1777,10 +1881,13 @@
 
         loadDashboardLeaderboard();
         loadModuleProgress();
+        loadAwardsModuleProgress();
+        loadDashboardActivities();
+        loadDashboardAssessmentStatuses();
     }
 
     function loadModuleProgress() {
-        fetch('/api/student/module-assessment-progress')
+        return fetch('/api/student/module-assessment-progress')
             .then(function(response) {
                 if (!response.ok) throw new Error('Module progress request failed');
                 return response.json();
@@ -1791,23 +1898,15 @@
                 }
 
                 data.modules.forEach(function(module) {
-                    var row = document.querySelector(
-                        '.dashboard-module-row[data-module-id="' + module.module_id + '"]'
+                    var link = document.querySelector(
+                        '.module-language-link[data-module-id="' + module.module_id + '"]'
                     );
-                    if (!row) return;
-                    var meta = row.querySelector('.dashboard-module-meta');
-                    var status = row.querySelector('[data-module-status]');
+                    if (!link) return;
+                    var status = link.querySelector('[data-module-status]');
                     var attempted = module.status === 'passed' || module.status === 'failed';
                     var resultLabel = module.status === 'passed'
                         ? 'Passed'
                         : module.status === 'failed' ? 'Failed' : 'Submitted';
-                    if (meta) {
-                        meta.textContent = attempted
-                            ? resultLabel +
-                                ' · Score ' + module.score + '/100 · ' + module.attempts +
-                                (module.attempts === 1 ? ' attempt' : ' attempts')
-                            : 'Assessment not started';
-                    }
                     if (status) {
                         status.classList.toggle('is-passed', module.status === 'passed');
                         status.classList.toggle('is-failed', module.status === 'failed');
@@ -1823,6 +1922,262 @@
                     status.textContent = 'Score unavailable';
                 });
             });
+    }
+
+    function loadAwardsModuleProgress() {
+        return fetch('/api/module_awards')
+            .then(function(response) {
+                if (!response.ok) throw new Error('Module awards request failed');
+                return response.json();
+            })
+            .then(function(data) {
+                if (!data.success || !Array.isArray(data.modules)) {
+                    throw new Error(data.message || 'Module awards were not returned');
+                }
+
+                data.modules.forEach(function(module) {
+                    var card = document.querySelector(
+                        '.dashboard-module-row[data-language="' + module.language + '"]'
+                    );
+                    if (!card) return;
+
+                    var isAssessment = module.language === 'python' || module.language === 'java';
+                    var suffix = card.dataset.suffix;
+                    var completed = Number(module.items && module.items.passed) || 0;
+                    var total = Number(module.items && module.items.total) || 0;
+                    var percentage = total ? Math.min(100, Math.round(completed / total * 100)) : 0;
+                    var fill = document.getElementById('moduleProgress' + suffix);
+                    var count = document.getElementById('moduleCount' + suffix);
+                    var track = fill && fill.parentElement;
+
+                    if (fill && track && count) {
+                        fill.style.width = percentage + '%';
+                        track.setAttribute('aria-valuemax', String(total));
+                        track.setAttribute('aria-valuenow', String(Math.min(completed, total)));
+                        count.textContent = completed + ' / ' + total +
+                            (isAssessment ? ' assessments' : ' activities');
+                    }
+
+                    renderModuleAwards(card, module, isAssessment);
+                });
+            })
+            .catch(function(error) {
+                console.error('Error loading module awards:', error);
+                document.querySelectorAll('.dashboard-module-row[data-language] .module-awards-content').forEach(function(details) {
+                    details.innerHTML = '<div class="module-progress-error">Module progress could not be loaded. Please refresh the page.</div>';
+                });
+                document.querySelectorAll('.dashboard-module-row[data-language] .dashboard-module-count').forEach(function(count) {
+                    count.textContent = 'Progress unavailable';
+                });
+            });
+    }
+
+    function loadDashboardActivities() {
+        var activityKeys = {
+            php: ['hello-php', 'store-name', 'subtract-numbers', 'greater-than-php', 'repeat-php'],
+            javascript: ['hello-js', 'store-score', 'add-numbers', 'greater-than', 'repeat-message'],
+            cpp: ['hello-cpp', 'store-age', 'multiply-numbers', 'less-than', 'display-numbers']
+        };
+        var activityRoutes = {
+            php: '/student_activities_php',
+            javascript: '/student_activities_javascript',
+            cpp: '/student_activities_cpp'
+        };
+
+        return fetch('/get_activities')
+            .then(function(response) {
+                if (!response.ok) throw new Error('Activity status request failed');
+                return response.json();
+            })
+            .then(function(data) {
+                if (!data.success || !Array.isArray(data.activities)) {
+                    throw new Error(data.message || 'Activity statuses were not returned');
+                }
+
+                document.querySelectorAll('.dashboard-module-row[data-type="activity"]').forEach(function(card) {
+                    var language = card.dataset.language;
+                    var container = card.querySelector('.module-activities');
+                    var keys = activityKeys[language];
+                    if (!container || !keys) return;
+
+                    var activities = data.activities.filter(function(activity) {
+                        return activity.language === language;
+                    });
+                    if (!activities.length) {
+                        container.innerHTML = '<div class="progress-text">No activities are available.</div>';
+                        return;
+                    }
+
+                    var list = activities.map(function(activity) {
+                        var index = Number(activity.activity_number) - 1;
+                        var key = keys[index];
+                        if (!key) return '';
+
+                        var completed = activity.passed === true || activity.status === 'COMPLETED';
+                        var available = activity.status === 'AVAILABLE';
+                        var state = completed ? 'Completed' : available ? 'Start activity' : 'Locked';
+                        var className = completed ? 'is-completed' : available ? 'is-available' : 'is-locked';
+                        var title = esc(activity.name || 'Activity');
+                        var status = '<span class="module-activity-status">' + state + '</span>';
+
+                        return completed || available
+                            ? '<a class="module-activity-link ' + className + '" href="' +
+                                activityRoutes[language] + '?activity=' + encodeURIComponent(key) + '">' +
+                                '<span>' + title + '</span>' + status + '</a>'
+                            : '<span class="module-activity-link is-locked" aria-disabled="true">' +
+                                '<span>' + title + '</span>' + status + '</span>';
+                    }).join('');
+
+                    container.innerHTML =
+                        '<div class="module-detail-heading"><strong>Activities</strong><span>' +
+                        activities.filter(function(activity) {
+                            return activity.passed === true || activity.status === 'COMPLETED';
+                        }).length + '/' + activities.length + ' passed</span></div>' +
+                        '<div class="module-activity-list">' + list + '</div>';
+                });
+            })
+            .catch(function(error) {
+                console.error('Error loading dashboard activities:', error);
+                document.querySelectorAll('.module-activities').forEach(function(container) {
+                    container.innerHTML = '<div class="module-progress-error">Activity status could not be loaded. Please refresh the page.</div>';
+                });
+            });
+    }
+
+    function loadDashboardAssessmentStatuses() {
+        var assessments = {
+            python: {
+                route: '/assessment_python_activity?id=',
+                titles: [
+                    'Python Fundamentals',
+                    'Variables & Data Types',
+                    'Conditional Statements',
+                    'Loops & Iterations',
+                    'Functions & Modules'
+                ]
+            },
+            java: {
+                route: '/assessment_java_activity?id=',
+                titles: [
+                    'Hello, Java!',
+                    'Variables & Output',
+                    'Add Two Numbers',
+                    'If-Else Statement',
+                    'For Loop'
+                ]
+            }
+        };
+        var statusLabels = {
+            passed: 'Passed',
+            failed: 'Not passed',
+            in_progress: 'In progress',
+            not_started: 'Ready to start'
+        };
+
+        Object.keys(assessments).forEach(function(language) {
+            var container = document.querySelector(
+                '.module-assessments[data-assessment-language="' + language + '"]'
+            );
+            if (!container) return;
+
+            fetch('/get_assessment_statuses?language=' + encodeURIComponent(language), {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(function(response) {
+                    if (!response.ok) throw new Error(language + ' assessment status request failed');
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (!data.success || !Array.isArray(data.statuses)) {
+                        throw new Error(data.message || language + ' assessment statuses were not returned');
+                    }
+
+                    var config = assessments[language];
+                    var rows = data.statuses.map(function(item) {
+                        var number = Number(item.assessment_number);
+                        var title = config.titles[number - 1];
+                        if (!title) return '';
+
+                        var locked = Boolean(item.locked);
+                        var status = statusLabels[item.status] || 'Ready to start';
+                        var score = item.score === null || item.score === undefined
+                            ? ''
+                            : ' · ' + Number(item.score) + '%';
+                        var className = locked ? 'is-locked' : 'is-' + item.status;
+                        var statusMarkup = '<span class="module-assessment-status">' +
+                            (locked ? 'Locked' : esc(status + score)) + '</span>';
+
+                        return locked
+                            ? '<span class="module-assessment-link is-locked" aria-disabled="true">' +
+                                '<span>' + esc(title) + '</span>' + statusMarkup + '</span>'
+                            : '<a class="module-assessment-link ' + className + '" href="' +
+                                config.route + encodeURIComponent(String(number)) + '">' +
+                                '<span>' + esc(title) + '</span>' + statusMarkup + '</a>';
+                    }).join('');
+                    var passed = Number(data.passed) || 0;
+                    var total = Number(data.total) || data.statuses.length;
+
+                    container.innerHTML =
+                        '<div class="module-detail-heading"><strong>Assessments</strong><span>' +
+                        passed + '/' + total + ' passed</span></div>' +
+                        '<div class="module-assessment-list">' + rows + '</div>';
+                })
+                .catch(function(error) {
+                    console.error('Error loading ' + language + ' assessment statuses:', error);
+                    container.innerHTML =
+                        '<div class="module-progress-error">Assessment status could not be loaded. Please refresh the page.</div>';
+                });
+        });
+    }
+
+    function renderModuleAwards(card, module, isAssessment) {
+        var details = card.querySelector('.module-awards-content');
+        if (!details) return;
+
+        var itemLabel = isAssessment ? 'assessments' : 'activities';
+        var lessonsDone = Number(module.lessons && module.lessons.done) || 0;
+        var lessonsTotal = Number(module.lessons && module.lessons.total) || 0;
+        var items = module.items && Array.isArray(module.items.list) ? module.items.list : [];
+        var badges = module.badges || {};
+        var earnedBadgeCount = 0;
+        var itemBadges = items.map(function(item) {
+            var code = item.badge_code || '';
+            var earned = Boolean(item.passed) || Boolean(badges[code]);
+            if (earned) earnedBadgeCount += 1;
+            var label = (isAssessment ? 'Assessment ' : 'Activity ') + item.number;
+            var title = (item.title || label) + (earned ? ' — badge earned' : ' — locked');
+            var content = '<i class="fas ' + (earned ? 'fa-circle-check' : 'fa-lock') + '" aria-hidden="true"></i>' +
+                esc(label);
+            return earned
+                ? '<a class="module-item-badge earned" href="/item_badge/' + encodeURIComponent(code) + '" title="' + esc(title) + '">' + content + '</a>'
+                : '<span class="module-item-badge" aria-label="' + esc(title) + '">' + content + '</span>';
+        }).join('');
+
+        var certificate = module.certificate && module.certificate.available
+            ? '<div class="module-certificate-state ready"><i class="fas fa-certificate" aria-hidden="true"></i> Certificate earned</div>' +
+              '<a class="btn-certificate" href="/module_certificate/' + encodeURIComponent(module.language) + '">View Certificate</a>'
+            : '<div class="module-certificate-state"><i class="fas fa-lock" aria-hidden="true"></i> Certificate locked — complete 2 lessons and pass all ' +
+              esc(String(module.items && module.items.total || 0)) + ' ' + itemLabel + '.</div>';
+
+        var finals = module.module_assessments || {};
+        var finalsSummary = Number(finals.total) > 0
+            ? '<div class="module-detail-heading"><strong>Module finals</strong><span>' +
+              esc(String(finals.passed || 0)) + '/' + esc(String(finals.total)) + ' passed</span></div>'
+            : '';
+
+        details.innerHTML =
+            '<div class="module-detail-heading"><strong>Lessons</strong><span>' +
+            esc(String(lessonsDone)) + '/' + esc(String(lessonsTotal)) + ' completed</span></div>' +
+            finalsSummary +
+            '<div class="module-detail-heading"><strong>' + (isAssessment ? 'Assessments' : 'Activities') +
+            '</strong><span>' + esc(String(module.items && module.items.passed || 0)) + '/' +
+            esc(String(module.items && module.items.total || 0)) + ' passed</span></div>' +
+            '<div class="module-awards-group"><div class="module-detail-heading"><strong>Badges</strong><span>' +
+            earnedBadgeCount + '/' + items.length + ' earned</span></div>' +
+            '<div class="module-detail-items" aria-label="' + (isAssessment ? 'Assessment' : 'Activity') + ' badges">' +
+            itemBadges + '</div></div>' +
+            '<div class="module-awards-group module-certificate"><div class="module-detail-heading"><strong>Certificate</strong></div>' +
+            certificate + '</div>';
     }
 
     function esc(s) {
@@ -1870,6 +2225,20 @@
         setTimeout(function() { t.classList.add('out'); setTimeout(function() { t.remove(); }, 300); }, 2500);
     }
 
+    document.querySelectorAll('.dashboard-module-row[data-language] .dashboard-module-summary').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var expanded = button.getAttribute('aria-expanded') === 'true';
+            var details = document.getElementById(button.getAttribute('aria-controls'));
+            button.setAttribute('aria-expanded', String(!expanded));
+            if (details) details.hidden = expanded;
+            var arrow = button.querySelector('.dashboard-module-arrow');
+            if (arrow) {
+                arrow.classList.toggle('fa-chevron-right', expanded);
+                arrow.classList.toggle('fa-chevron-down', !expanded);
+            }
+        });
+    });
+
     /* ===== REAL-TIME NOTIFICATION UPDATES ===== */
     // Check for new notifications every 10 seconds
     function checkForNewNotifications() {
@@ -1903,7 +2272,7 @@
             .catch(err => console.error('Error checking notifications:', err));
     }
 
-    document.addEventListener('DOMContentLoaded', function() { 
+    function initializeDashboard() {
         loadStats(); 
         loadUnreadCount();
         
@@ -1912,7 +2281,12 @@
         setInterval(loadUnreadCount, 10000);
         setInterval(checkForNewNotifications, 5000); // Check every 5 seconds
         setInterval(loadDashboardLeaderboard, 30000);
-    });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeDashboard, { once: true });
+    } else {
+        initializeDashboard();
+    }
 
     window.addEventListener('storage', function(event) {
         if (event.key === 'student_dashboard_refresh') {

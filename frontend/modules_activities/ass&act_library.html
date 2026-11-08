@@ -359,7 +359,7 @@
             color: var(--tile-color);
             font-size: 0.88rem;
         }
-        .topbar-actions { display: flex; align-items: center; gap: 8px; }
+        .topbar-actions { display: flex; align-items: center; gap: 8px; position: relative; z-index: 200; }
         .library-switch {
             display: inline-flex;
             align-items: center;
@@ -413,7 +413,8 @@
             color: var(--text-primary);
             background: var(--card-white);
             box-shadow: var(--shadow-xs);
-            text-decoration: none;
+            cursor: pointer;
+            font: inherit;
             transition: all 0.25s ease;
         }
         .module-profile:hover {
@@ -454,12 +455,75 @@
             margin-left: 2px;
             color: var(--stone-light);
             font-size: 0.6rem;
+            transition: transform 0.25s ease;
         }
+        .module-profile.open .module-profile-chevron { transform: rotate(180deg); }
         [data-theme="dark"] .module-profile-name { color: var(--text-primary); }
+        .module-profile-wrap { position: relative; }
+        .module-profile-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 220px;
+            background: var(--dropdown-bg);
+            border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-md);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            z-index: var(--dropdown-z-index);
+            overflow: hidden;
+        }
+        .module-profile-dropdown.open { display: block; animation: dropIn 0.25s ease; }
+        .module-profile-dropdown .pd-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--pd-sep);
+        }
+        .module-profile-dropdown .pd-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+        }
+        .module-profile-dropdown .pd-name { color: var(--text-primary); font-size: 0.82rem; font-weight: 700; }
+        .module-profile-dropdown .pd-grade { color: var(--stone-light); font-size: 0.68rem; }
+        .module-profile-dropdown .pd-links { padding: 0.3rem 0; }
+        .module-profile-dropdown .pd-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 0.55rem 1rem;
+            border: 0;
+            background: transparent;
+            color: var(--text-secondary);
+            text-decoration: none;
+            text-align: left;
+            font: inherit;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+        .module-profile-dropdown .pd-link:hover { background: var(--dropdown-link-hover); color: var(--dropdown-link-hover-text); }
+        .module-profile-dropdown .pd-link i { width: 18px; color: var(--stone); text-align: center; }
+        .module-profile-dropdown .pd-link.logout { color: var(--coral); }
+        .module-profile-dropdown .pd-link.logout:hover { background: var(--coral-soft); color: #b33a2a; }
+        .module-profile-dropdown .pd-sep { height: 1px; margin: 0.3rem 0; background: var(--pd-sep); }
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
         @media (max-width: 768px) {
             .module-profile-info { display: none; }
             .module-profile { padding: 4px; }
+            .module-profile-dropdown { min-width: 200px; }
         }
         .theme-btn .icon-sun { display: none; }
         [data-theme="dark"] .theme-btn .icon-moon { display: none; }
@@ -829,14 +893,36 @@
                 <a class="notification-btn" href="/notifications" aria-label="Notifications" title="Notifications">
                     <i class="fas fa-bell"></i>
                 </a>
-                <a class="module-profile" href="/student_profile" aria-label="Open student profile">
-                    <span class="module-profile-avatar"><i class="fas fa-user"></i></span>
-                    <span class="module-profile-info">
-                        <span class="module-profile-name">{{ full_name or username or 'Student' }}</span>
-                        <span class="module-profile-grade">{{ grade_level or 'Grade 11 - ICT' }}</span>
-                    </span>
-                    <i class="fas fa-chevron-down module-profile-chevron" aria-hidden="true"></i>
-                </a>
+                <div class="module-profile-wrap">
+                    <button class="module-profile" id="moduleProfileTrigger" type="button"
+                            aria-label="Open account menu" aria-controls="moduleProfileDropdown"
+                            aria-expanded="false" onclick="toggleModuleProfile(event)">
+                        <span class="module-profile-avatar"><i class="fas fa-user"></i></span>
+                        <span class="module-profile-info">
+                            <span class="module-profile-name">{{ full_name or username or 'Student' }}</span>
+                            <span class="module-profile-grade">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                        </span>
+                        <i class="fas fa-chevron-down module-profile-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="module-profile-dropdown" id="moduleProfileDropdown">
+                        <div class="pd-header">
+                            <span class="pd-avatar"><i class="fas fa-user"></i></span>
+                            <div>
+                                <div class="pd-name">{{ full_name or username or 'Student' }}</div>
+                                <div class="pd-grade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                            </div>
+                        </div>
+                        <div class="pd-links">
+                            <button class="pd-link" type="button" onclick="toggleLibraryNav(); closeModuleProfile()">
+                                <i class="fas fa-compass"></i> Navigation
+                            </button>
+                            <a href="/student_profile" class="pd-link"><i class="fas fa-circle-user"></i> My Profile</a>
+                            <a href="/student_settings" class="pd-link"><i class="fas fa-sliders"></i> Settings</a>
+                            <div class="pd-sep"></div>
+                            <a href="/logout" class="pd-link logout"><i class="fas fa-arrow-right-from-bracket"></i> Sign Out</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -987,6 +1073,26 @@
         }
         function collapseLibrarySidebar() { setLibrarySidebarCollapsed(true); }
         function expandLibrarySidebar() { setLibrarySidebarCollapsed(false); }
+        function toggleLibraryNav() {
+            var sidebar = document.querySelector('.student-sidebar');
+            setLibrarySidebarCollapsed(!sidebar.classList.contains('collapsed'));
+        }
+        function toggleModuleProfile(event) {
+            event.stopPropagation();
+            var trigger = document.getElementById('moduleProfileTrigger');
+            var dropdown = document.getElementById('moduleProfileDropdown');
+            var isOpen = trigger.getAttribute('aria-expanded') === 'true';
+            trigger.setAttribute('aria-expanded', String(!isOpen));
+            trigger.classList.toggle('open', !isOpen);
+            dropdown.classList.toggle('open', !isOpen);
+        }
+        function closeModuleProfile() {
+            var trigger = document.getElementById('moduleProfileTrigger');
+            var dropdown = document.getElementById('moduleProfileDropdown');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.classList.remove('open');
+            dropdown.classList.remove('open');
+        }
         function toggleActivitiesNav() {
             var toggle = document.getElementById('activitiesToggle');
             var submenu = document.getElementById('activitiesSubmenu');
@@ -994,6 +1100,16 @@
             toggle.classList.toggle('open', isOpen);
             toggle.setAttribute('aria-expanded', String(isOpen));
         }
+        document.addEventListener('click', function (event) {
+            var trigger = document.getElementById('moduleProfileTrigger');
+            var dropdown = document.getElementById('moduleProfileDropdown');
+            if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+                closeModuleProfile();
+            }
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') closeModuleProfile();
+        });
         document.addEventListener('DOMContentLoaded', async function () {
             var moduleLinks = Array.from(document.querySelectorAll('.module-link'));
             function setLocked(link, locked, number) {

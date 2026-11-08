@@ -1202,12 +1202,13 @@
             steps: [
                 'Find the <strong>console.log</strong> block in the BASIC category.',
                 'Drag the <strong>console.log</strong> block to the workspace.',
-                'Find the <strong>TEXT</strong> block in the VARIABLES category.',
+                'Find the <strong>TEXT</strong> block in the BASIC category.',
                 'Drag the <strong>TEXT</strong> block and attach it inside the console.log block.',
-                'Click on the TEXT block and type: <code>"Hello, World!"</code>',
+                'Click on the TEXT block and type: <code>"Hello, JavaScript!"</code>',
                 'Click the <strong>RUN CODE</strong> button to see the output!'
             ],
             output: 'Hello, JavaScript!',
+            hint: 'Use the BASIC print block with a text value.',
             blocks: ['console.log', 'TEXT']
         },
         'store-score': {
@@ -1217,16 +1218,16 @@
             time: '1 hour',
             points: '10 pts',
             steps: [
-                'Drag <strong>var myVar =</strong> from VARIABLES category.',
-                'Rename <strong>myVar</strong> to <strong>name</strong>.',
-                'Drag a <strong>TEXT</strong> block from BASIC and type your name.',
+                'Drag the <strong>let</strong> block from VARIABLES and name it <strong>score</strong>.',
+                'Connect a <strong>NUMBER</strong> block from MATH and set it to <strong>90</strong>.',
                 'Drag <strong>console.log</strong> from BASIC.',
-                'Drag the <strong>myVar</strong> block into console.log.',
-                'Change <strong>myVar</strong> to <strong>name</strong>.',
-                'Click <strong>RUN CODE</strong> to see your name printed!'
+                'Drag the <strong>GET VARIABLE</strong> block from VARIABLES into console.log.',
+                'Set the variable name to <strong>score</strong>.',
+                'Click <strong>RUN CODE</strong> to see the score printed!'
             ],
             output: '90',
-            blocks: ['var', 'console.log', 'NUMBER', 'variable_get']
+            hint: 'Store the number in a variable, then print that variable.',
+            blocks: ['let', 'NUMBER', 'console.log', 'GET VARIABLE']
         },
         'add-numbers': {
             title: 'Add Numbers',
@@ -1237,16 +1238,16 @@
             steps: [
                 'Find the <strong>console.log</strong> block in the BASIC category.',
                 'Drag it to the workspace.',
-                'Find the <strong>math_operation</strong> block in the MATH category.',
+                'Find the <strong>math</strong> block in the MATH category.',
                 'Drag it INSIDE the console.log block.',
                 'Change the dropdown to <strong>+</strong> (ADD).',
-                'Find the <strong>math_number</strong> block in the MATH category.',
-                'Drag two math_number blocks into the math_operation block.',
-                'Set the numbers to <strong>5</strong> and <strong>10</strong>.',
+                'Drag two <strong>NUMBER</strong> blocks from MATH into the math block.',
+                'Set the numbers to <strong>25</strong> and <strong>15</strong>.',
                 'Click <strong>RUN CODE</strong> to see the result!'
             ],
             output: '40',
-            blocks: ['console.log', 'math_operation', 'math_number']
+            hint: 'Use a math block with addition, then print its result.',
+            blocks: ['console.log', 'math (+)', 'NUMBER']
         },
         'greater-than': {
             title: 'Greater Than',
@@ -1255,16 +1256,14 @@
             time: '1 hour',
             points: '10 pts',
             steps: [
-                'Find the <strong>console.log</strong> block in the BASIC category.',
-                'Drag it to the workspace.',
-                'Build the formula: <strong>(32 × 9) + 160</strong>',
-                'Use <strong>math_operation</strong> (MULTIPLY) for 32 × 9',
-                'Use <strong>math_operation</strong> (ADD) for + 160',
-                'Add <strong>math_number</strong> blocks for 32, 9, and 160.',
-                'Click <strong>RUN CODE</strong> to see the result!'
+                'Find the <strong>if</strong> block and <strong>compare</strong> block in LOGIC.',
+                'Set the comparison to <strong>20 &gt; 10</strong> using NUMBER blocks from MATH.',
+                'Inside if, add <strong>console.log</strong> from BASIC with a BASIC TEXT block containing <strong>"20 is greater than 10"</strong>.',
+                'Click <strong>RUN CODE</strong> to check the result!'
             ],
             output: '20 is greater than 10',
-            blocks: ['if', '&gt;', 'console.log', 'NUMBER', 'TEXT']
+            hint: 'Compare the two numbers in an if block and print the message when true.',
+            blocks: ['if', 'compare (>)', 'console.log', 'NUMBER', 'TEXT']
         },
         'repeat-message': {
             title: 'Repeat a Message Five Times',
@@ -1273,12 +1272,13 @@
             time: '1 hour',
             points: '10 pts',
             steps: [
-                'Find the <strong>for loop</strong> block in the LOOPS category.',
+                'Find the <strong>for loop</strong> block in the LOOPS category. The NUMBER, console.log, and TEXT blocks are also available there.',
                 'Set the loop to run <strong>5</strong> times.',
                 'Inside the loop, add a <strong>console.log</strong> block with <code>"I love programming!"</code>.',
                 'Click <strong>RUN CODE</strong> to see the message five times!'
             ],
             output: 'I love programming!\nI love programming!\nI love programming!\nI love programming!\nI love programming!',
+            hint: 'Set a loop to repeat five times and put the print block inside it.',
             blocks: ['for loop', 'console.log', 'NUMBER', 'TEXT']
         }
     };
@@ -1301,9 +1301,8 @@
         document.getElementById('panelTime').textContent = data.time;
         document.getElementById('panelPoints').textContent = data.points;
         const instContainer = document.getElementById('panelInstructions');
-        instContainer.innerHTML = data.steps.map((step, i) =>
-            `<div class="step-item"><span class="step-num">${i + 1}.</span><span class="step-desc">${step}</span></div>`
-        ).join('');
+        instContainer.innerHTML =
+            `<strong><i class="fas fa-lightbulb me-1"></i>Clue:</strong> ${data.hint}`;
         document.getElementById('outputText').textContent = data.output;
         document.getElementById('panelBlocks').innerHTML = data.blocks.map(b => `<span class="block-pill">${b}</span>`).join('');
         document.getElementById('panelStartBtn').onclick = function() {
@@ -1331,7 +1330,7 @@
 
     // ----- LOAD STATUSES -----
     function loadActivityStatuses() {
-        fetch('/get_activities')
+        return fetch('/get_activities')
             .then(r => r.json())
             .then(data => {
                 if (data.success && data.activities) {
@@ -1394,7 +1393,15 @@
             card.dataset.status = 'LOCKED';
         });
         checkSidebarState();
-        loadActivityStatuses();
+        loadActivityStatuses().then(function() {
+            const requestedActivity = new URLSearchParams(window.location.search).get('activity');
+            const card = requestedActivity && Array.from(
+                document.querySelectorAll('.activity-card[data-activity]')
+            ).find(function(activityCard) {
+                return activityCard.dataset.activity === requestedActivity;
+            });
+            if (card && card.dataset.status !== 'LOCKED') openPanel(requestedActivity);
+        });
         loadNotifications();
         loadUserInfo();
         window.activityStatusTimer = window.setInterval(loadActivityStatuses, 10000);

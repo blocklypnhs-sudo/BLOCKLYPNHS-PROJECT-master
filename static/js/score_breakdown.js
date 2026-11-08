@@ -26,8 +26,8 @@
         .score-correct { color: #15803d; font-weight: 800; }
         .score-incorrect { color: #b91c1c; font-weight: 800; }
         .score-attempt-feedback {
-            position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center;
-            padding: 16px; background: rgba(8, 24, 18, .56);
+            position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center;
+            padding: 16px; background: rgba(8, 24, 18, .88);
         }
         .score-attempt-feedback-card {
             position: relative; width: min(680px, 100%); max-height: min(88vh, 760px);
@@ -97,6 +97,10 @@
     window.showScoreAttemptFeedback = function (result, activityTitle, options) {
         const previous = document.getElementById('scoreAttemptFeedback');
         if (previous) previous.remove();
+
+        if (window.Blockly && typeof window.Blockly.hideChaff === 'function') {
+            window.Blockly.hideChaff();
+        }
 
         options = options || {};
         const passed = result.status === 'completed' || result.passed === true;

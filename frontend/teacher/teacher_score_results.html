@@ -648,6 +648,10 @@
                     title="Download the filtered grades as an Excel-compatible CSV file">
                 <i class="fas fa-file-csv"></i> Export CSV (Excel-compatible)
             </button>
+            <button class="btn btn-primary" type="button" onclick="exportScoresExcel()"
+                    title="Download the filtered grades as an Excel workbook">
+                <i class="fas fa-file-excel"></i> Export Excel
+            </button>
         </div>
 
         <!-- Dashboard -->
@@ -1059,13 +1063,8 @@
             return '"' + text.replace(/"/g, '""') + '"';
         }
 
-        function exportScoresCsv() {
-            if (!filteredSubmissions.length) {
-                showToast('There are no submissions to export for these filters.', 'info');
-                return;
-            }
-
-            const rows = [
+        function getScoreExportRows() {
+            return [
                 ['Student', 'LRN', 'Submission ID', 'Type', 'Activity or Assessment', 'Language', 'Score', 'Maximum Score', 'Status', 'Submitted At', 'Teacher Feedback'],
                 ...filteredSubmissions.map(sub => [
                     sub.student_name || 'Student',
@@ -1081,6 +1080,15 @@
                     sub.teacher_feedback || ''
                 ])
             ];
+        }
+
+        function exportScoresCsv() {
+            if (!filteredSubmissions.length) {
+                showToast('There are no submissions to export for these filters.', 'info');
+                return;
+            }
+
+            const rows = getScoreExportRows();
             const csv = '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n');
             const fileUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
             const downloadLink = document.createElement('a');
@@ -1090,6 +1098,38 @@
             downloadLink.click();
             downloadLink.remove();
             setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+        }
+
+        async function exportScoresExcel() {
+            if (!filteredSubmissions.length) {
+                showToast('There are no submissions to export for these filters.', 'info');
+                return;
+            }
+
+            try {
+                const response = await fetch('/teacher/export_xlsx', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'submissions', rows: getScoreExportRows() })
+                });
+                if (!response.ok) {
+                    const result = await response.json();
+                    throw new Error(result.message || 'Unable to generate Excel export.');
+                }
+
+                const fileUrl = URL.createObjectURL(await response.blob());
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileUrl;
+                downloadLink.download = 'blocklearn-submissions.xlsx';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                downloadLink.remove();
+                setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+                showToast('Excel workbook exported.');
+            } catch (error) {
+                console.error('Submission Excel export failed:', error);
+                showToast(error.message || 'Excel export failed.', 'error');
+            }
         }
 
         // ============================================================

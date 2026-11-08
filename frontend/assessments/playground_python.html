@@ -181,6 +181,28 @@
             font-weight: 600;
             word-break: break-all;
         }
+        .quick-guide {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-fresh);
+            background: #f0f7f3;
+            color: #244b3b;
+        }
+        .quick-guide .label {
+            flex: 0 0 auto;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #287653;
+        }
+        .quick-guide .text {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.45;
+        }
 
         .workspace-toolbar {
             padding: 8px 16px;
@@ -416,6 +438,10 @@
                 <span class="label"><i class="fas fa-bullseye me-1"></i> Expected Output</span>
                 <span class="value" id="expectedOutputText">Hello, World!</span>
             </div>
+            <div class="quick-guide">
+                <span class="label"><i class="fas fa-lightbulb me-1"></i> Quick guide</span>
+                <p class="text" id="quickGuideText">BASIC: connect a TEXT block inside print.</p>
+            </div>
 
             <div class="workspace-toolbar">
                 <span class="lang-badge"><i class="fab fa-python me-1"></i> Python</span>
@@ -451,6 +477,7 @@
                 output: 'Hello, World!',
                 blocks: ['print', 'TEXT'],
                 blocksXml: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+                guide: 'BASIC: connect a TEXT block inside print, then enter "Hello, World!".',
                 expectedOutput: 'Hello, World!'
             },
             2: {
@@ -470,6 +497,7 @@
                         </value>
                     </block>
                 </xml>`,
+                guide: 'VARIABLES: set name to "Juan". BASIC: print the get variable name block.',
                 expectedOutput: 'Juan'
             },
             3: {
@@ -495,6 +523,7 @@
                         </value>
                     </block>
                 </xml>`,
+                guide: 'LOGIC: compare 10 > 5. Put BASIC print with TEXT "Positive" inside the IF branch.',
                 expectedOutput: 'Positive'
             },
             4: {
@@ -518,6 +547,7 @@
                         </value>
                     </block>
                 </xml>`,
+                guide: 'LOOPS: count i from 1 to 5. Inside the loop, print the get variable i block.',
                 expectedOutput: '1\n2\n3\n4\n5'
             },
             5: {
@@ -541,6 +571,7 @@
                         </next>
                     </block>
                 </xml>`,
+                guide: 'FUNCTIONS: put print with TEXT "Welcome to BlockLearn!" inside greet, then call greet below it.',
                 expectedOutput: 'Welcome to BlockLearn!'
             }
         };
@@ -560,6 +591,7 @@
             document.getElementById('activityPoints').textContent = data.points;
             document.getElementById('activityDifficulty').textContent = data.difficulty;
             document.getElementById('expectedOutputText').textContent = data.expectedOutput || data.output || '—';
+            document.getElementById('quickGuideText').textContent = data.guide;
             window.currentActivityData = data;
         }
 
@@ -701,6 +733,7 @@
                 Blockly.Blocks['variables_get'] = {
                     init: function() {
                         this.appendDummyInput()
+                            .appendField('get variable')
                             .appendField(new Blockly.FieldTextInput('item'), 'VAR');
                         this.setOutput(true, ['String', 'Number']);
                         this.setColour('#8b5cf6');
@@ -1127,6 +1160,7 @@
                 }
 
                 if (statement.startsWith('print(') && statement.endsWith(')')) {
+                    closeOpenBlocks(indent);
                     const inner = statement.slice(6, -1).trim();
                     output.push(`console.log(${normalizeExpression(inner)});`);
                     return;
@@ -1139,6 +1173,7 @@
                     return;
                 }
 
+                closeOpenBlocks(indent);
                 const finalStatement = normalizeExpression(statement);
                 output.push(finalStatement.endsWith(';') ? finalStatement : `${finalStatement};`);
             });

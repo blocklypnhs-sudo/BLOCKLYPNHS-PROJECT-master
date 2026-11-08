@@ -110,6 +110,7 @@ def test_teacher_can_list_saved_score_attempts(monkeypatch):
     assert connection.cursor_instance.params == (40, 0)
     assert 'learning_item_submission_history' in connection.cursor_instance.query
     assert 'module_assessment_submission_history' in connection.cursor_instance.query
+    assert 'CAST(submitted_at AS CHAR) AS submitted_at' in connection.cursor_instance.query
 
 
 def test_module_score_endpoint_returns_saved_line_breakdown(monkeypatch):
