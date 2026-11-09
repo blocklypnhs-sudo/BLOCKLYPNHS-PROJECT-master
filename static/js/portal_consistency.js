@@ -12,8 +12,139 @@
             </svg>
         </div>`;
 
+    function initializeMobileDropdownPositioning() {
+        const dropdownSelector = '.notif-dropdown, .profile-dropdown, .module-profile-dropdown';
+        const positionedStyles = new WeakMap();
+        const styleProperties = [
+            'position',
+            'top',
+            'left',
+            'right',
+            'transform',
+            'max-width',
+            'max-height',
+            'overflow-y'
+        ];
+
+        const restoreDropdownPosition = (dropdown) => {
+            const originalStyles = positionedStyles.get(dropdown);
+            if (!originalStyles) return;
+            originalStyles.forEach(([property, value, priority]) => {
+                if (value) {
+                    dropdown.style.setProperty(property, value, priority);
+                } else {
+                    dropdown.style.removeProperty(property);
+                }
+            });
+            positionedStyles.delete(dropdown);
+        };
+
+        const positionDropdown = (dropdown) => {
+            if (!dropdown.classList.contains('open')) {
+                restoreDropdownPosition(dropdown);
+                return;
+            }
+            if (!window.matchMedia('(max-width: 768px)').matches) {
+                restoreDropdownPosition(dropdown);
+                return;
+            }
+
+            let trigger;
+            if (dropdown.classList.contains('notif-dropdown')) {
+                trigger = dropdown.closest('.notification-wrap')
+                    ?.querySelector('#notifBtn, .notification-btn, .notif-btn');
+            } else if (dropdown.classList.contains('module-profile-dropdown')) {
+                trigger = dropdown.closest('.module-profile-wrap')
+                    ?.querySelector('#moduleProfileTrigger, .module-profile');
+            } else {
+                trigger = dropdown.closest('.profile-trigger')
+                    || document.querySelector('#profileTrigger');
+            }
+            if (!trigger) return;
+
+            if (!positionedStyles.has(dropdown)) {
+                positionedStyles.set(dropdown, styleProperties.map((property) => [
+                    property,
+                    dropdown.style.getPropertyValue(property),
+                    dropdown.style.getPropertyPriority(property)
+                ]));
+            }
+
+            const setImportant = (property, value) => {
+                dropdown.style.setProperty(property, value, 'important');
+            };
+            setImportant('position', 'fixed');
+            setImportant('top', '12px');
+            setImportant('left', '12px');
+            setImportant('right', 'auto');
+            setImportant('transform', 'none');
+            setImportant('max-width', 'calc(100vw - 24px)');
+            setImportant('max-height', 'calc(100dvh - 24px)');
+            setImportant('overflow-y', 'auto');
+
+            const triggerRect = trigger.getBoundingClientRect();
+            const dropdownRect = dropdown.getBoundingClientRect();
+            const viewportWidth = document.documentElement.clientWidth;
+            const viewportHeight = window.innerHeight;
+            const margin = 12;
+            const left = Math.max(
+                margin,
+                Math.min(triggerRect.right - dropdownRect.width, viewportWidth - dropdownRect.width - margin)
+            );
+            const belowTop = triggerRect.bottom + 8;
+            const availableBelow = viewportHeight - belowTop - margin;
+            const availableAbove = triggerRect.top - margin;
+            const openAbove = dropdownRect.height > availableBelow && availableAbove > availableBelow;
+            const top = openAbove
+                ? Math.max(margin, triggerRect.top - Math.min(dropdownRect.height, availableAbove) - 8)
+                : belowTop;
+            const availableHeight = Math.max(
+                80,
+                viewportHeight - top - margin
+            );
+
+            setImportant('left', left + 'px');
+            setImportant('top', top + 'px');
+            setImportant('max-height', availableHeight + 'px');
+        };
+
+        const repositionOpenDropdowns = () => {
+            document.querySelectorAll(dropdownSelector).forEach(positionDropdown);
+        };
+        const scheduleReposition = (dropdown) => {
+            window.requestAnimationFrame(() => positionDropdown(dropdown));
+        };
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.matches(dropdownSelector)) {
+                    scheduleReposition(mutation.target);
+                }
+            });
+        });
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+            subtree: true
+        });
+        window.addEventListener('resize', repositionOpenDropdowns);
+        repositionOpenDropdowns();
+    }
+
     function initializePortalSidebar() {
-        const sidebar = document.querySelector('.sidebar');
+        initializeMobileDropdownPositioning();
+
+        try {
+            if (localStorage.getItem('blocklearn-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        } catch (error) {
+            console.warn('Unable to load saved theme preference.', error);
+        }
+
+        const sidebar = document.querySelector('.sidebar, .student-sidebar');
         if (!sidebar) return;
 
         if (sidebar.classList.contains('teacher-sidebar') &&
@@ -84,7 +215,7 @@
     }
 
     window.portalSetSidebarCollapsed = function (collapsed) {
-        const sidebar = document.querySelector('.sidebar');
+        const sidebar = document.querySelector('.sidebar, .student-sidebar');
         const mainContent = document.querySelector('.main-content');
         if (!sidebar) return;
 

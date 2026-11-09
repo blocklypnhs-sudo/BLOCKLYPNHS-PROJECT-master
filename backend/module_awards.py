@@ -287,7 +287,7 @@ def get_item_progress(cursor, student_id, language):
     A graded item counts as passed when its submitted or legacy-completed attempt
     meets the pass mark. A pending review counts only after a teacher score exists.
     """
-    catalog = 'assessments' if language in ASSESSMENT_LANGUAGES else 'activities'
+    catalog = 'assessments' if language in ASSESSMENT_LANGUAGES else 'activity_catalog'
     cursor.execute(
         f"""
         SELECT id, assessment_number, title

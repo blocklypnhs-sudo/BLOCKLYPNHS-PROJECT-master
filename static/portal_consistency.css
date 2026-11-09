@@ -355,7 +355,9 @@ body {
   }
 
   .sidebar,
-  .sidebar.collapsed {
+  .sidebar.collapsed,
+  .student-sidebar,
+  .student-sidebar.collapsed {
     width: min(280px, calc(100vw - 48px)) !important;
     max-width: 88vw;
     transform: translateX(-105%);
@@ -364,10 +366,64 @@ body {
     transition: transform 0.3s ease, visibility 0s linear 0.3s;
   }
 
-  .sidebar.mobile-open {
+  .sidebar.mobile-open,
+  .student-sidebar.mobile-open {
     transform: translateX(0);
     visibility: visible;
     transition-delay: 0s;
+  }
+
+  .student-sidebar.mobile-open {
+    z-index: 1001 !important;
+    overflow: hidden auto;
+  }
+
+  .student-sidebar.mobile-open .student-sidebar-brand {
+    justify-content: center;
+    min-height: 88px;
+    padding: 0.4rem 0.15rem;
+  }
+
+  .student-sidebar.mobile-open .student-sidebar-logo-image {
+    display: block !important;
+  }
+
+  .student-sidebar.mobile-open .student-sidebar-wordmark {
+    display: flex !important;
+  }
+
+  .student-sidebar.mobile-open .student-sidebar-brand-mono,
+  .student-sidebar.mobile-open .student-sidebar-expand-wrap,
+  .student-sidebar.mobile-open .student-sidebar-collapse {
+    display: none !important;
+  }
+
+  .student-sidebar.mobile-open .nav-link-custom {
+    justify-content: flex-start;
+    width: calc(100% - 1rem);
+    margin: 0 0.5rem;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .student-sidebar.mobile-open .nav-text {
+    display: inline !important;
+  }
+
+  .student-sidebar.mobile-open .nav-section-label {
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.9rem 1.15rem 0.3rem;
+    opacity: 1;
+    overflow: visible;
+  }
+
+  .student-sidebar.mobile-open .activities-submenu.open {
+    display: block !important;
+  }
+
+  .student-sidebar.mobile-open .activities-submenu:not(.open) {
+    display: none !important;
   }
 
   .sidebar.mobile-open .sidebar-logo {
@@ -435,6 +491,14 @@ body {
     padding-top: 60px;
   }
 
+  .student-sidebar ~ main,
+  .student-sidebar ~ .page-shell {
+    width: 100% !important;
+    max-width: none;
+    margin-left: 0 !important;
+    padding-top: 60px;
+  }
+
   .portal-shell {
     width: 100%;
     padding: 60px 14px 20px;
@@ -457,6 +521,16 @@ body {
     box-shadow: 0 4px 14px rgba(8, 40, 30, 0.2);
     color: #fff;
     font: 700 0.78rem/1 Inter, sans-serif;
+  }
+
+  body.portal-menu-open .portal-mobile-menu {
+    left: min(292px, calc(100vw - 48px));
+    width: 42px;
+    padding: 0;
+  }
+
+  body.portal-menu-open .portal-mobile-menu span {
+    display: none;
   }
 
   .portal-mobile-overlay {

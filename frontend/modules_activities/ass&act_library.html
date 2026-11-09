@@ -41,6 +41,9 @@
             --radius-md: 14px;
             --radius-lg: 18px;
             --radius-xl: 22px;
+            --dropdown-bg: #ffffff;
+            --dropdown-z-index: 99999;
+            --pd-sep: var(--border-fresh);
             --grid-line: rgba(150,195,175,0.26);
             --gold-text: #9a7020;
             --green-accent: #147a54;
@@ -56,6 +59,8 @@
             --border-fresh: #20402f;
             --card-white: #14291f;
             --card-tint: #11231a;
+            --dropdown-bg: #1a3329;
+            --pd-sep: #20402f;
             --tile-bg: #1c3a2c;
             --tile-color: #4ade80;
             --green-soft: #163328;
@@ -359,7 +364,8 @@
             color: var(--tile-color);
             font-size: 0.88rem;
         }
-        .topbar-actions { display: flex; align-items: center; gap: 8px; position: relative; z-index: 200; }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; position: relative; z-index: 200; }
+        .library-switches, .topbar-controls { display: flex; align-items: center; gap: 8px; }
         .library-switch {
             display: inline-flex;
             align-items: center;
@@ -402,6 +408,79 @@
             color: var(--green-accent);
             border-color: var(--green-accent);
         }
+        .notification-wrap { position: relative; }
+        .notification-btn { position: relative; }
+        .notification-btn .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            border: 2px solid var(--card-white);
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--coral);
+            color: #fff;
+            font-size: 0.55rem;
+            font-weight: 800;
+        }
+        .notification-btn .notif-badge.hidden { display: none; }
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: min(360px, calc(100vw - 32px));
+            max-height: 420px;
+            overflow: hidden;
+            border: 1px solid var(--border-fresh);
+            border-radius: var(--radius-md);
+            background: var(--dropdown-bg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            z-index: var(--dropdown-z-index);
+        }
+        .notif-dropdown.open { display: block; animation: dropIn 0.25s ease; }
+        .notif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--pd-sep);
+        }
+        .notif-header h6 { margin: 0; color: var(--text-primary); font-size: 0.82rem; font-weight: 700; }
+        .notif-header h6 i { margin-right: 6px; color: var(--gold-warm); }
+        .notif-header .mark-read-btn {
+            border: 0;
+            background: transparent;
+            color: var(--green-accent);
+            font-size: 0.63rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .notif-list { max-height: 340px; overflow-y: auto; }
+        .module-notif-item { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border-fresh); }
+        .module-notif-item.unread { border-left: 3px solid var(--blue); background: var(--blue-soft); }
+        .module-notif-title { color: var(--text-primary); font-size: 0.76rem; font-weight: 700; }
+        .module-notif-message { margin-top: 3px; color: var(--text-secondary); font-size: 0.7rem; line-height: 1.4; overflow-wrap: anywhere; }
+        .module-notif-time { display: block; margin-top: 4px; color: var(--stone-light); font-size: 0.58rem; }
+        .module-notif-read {
+            margin-top: 4px;
+            padding: 2px 8px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--green-accent);
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+        .module-notif-read:hover { background: var(--green-soft); }
+        .notif-empty { padding: 1.7rem 1rem; color: var(--stone-light); text-align: center; }
+        .notif-empty i { display: block; margin-bottom: 0.5rem; color: var(--stone-light); font-size: 1.4rem; }
+        .notif-empty p { margin: 0; font-size: 0.72rem; }
         .module-profile {
             display: inline-flex;
             align-items: center;
@@ -534,6 +613,8 @@
             .title-wrap h1 i { width: 32px; height: 32px; font-size: 0.8rem; }
             .topbar-actions { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
             .theme-btn, .notification-btn { width: 34px; height: 34px; }
+            .topbar-actions { width: 100%; justify-content: space-between; }
+            .library-switches, .topbar-controls { gap: 5px; }
         }
 
         /* ----- SECTION HEADERS (matches dashboard) ----- */
@@ -809,6 +890,7 @@
         } catch (e) {}
     </script>
     <link href="/static/mobile_responsive.css" rel="stylesheet">
+    <script defer src="/static/js/portal_consistency.js"></script>
 </head>
 <body>
 
@@ -885,41 +967,57 @@
                 <h1><i class="fas fa-layer-group"></i>Modules</h1>
             </div>
             <div class="topbar-actions">
-                <a class="library-switch" href="/assessments"><i class="fas fa-clipboard-check"></i>Assessments</a>
-                <a class="library-switch active" href="/student_modules" aria-current="page"><i class="fas fa-layer-group"></i>Modules</a>
-                <button class="theme-btn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle light/dark mode">
-                    <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
-                </button>
-                <a class="notification-btn" href="/notifications" aria-label="Notifications" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                </a>
-                <div class="module-profile-wrap">
-                    <button class="module-profile" id="moduleProfileTrigger" type="button"
-                            aria-label="Open account menu" aria-controls="moduleProfileDropdown"
-                            aria-expanded="false" onclick="toggleModuleProfile(event)">
-                        <span class="module-profile-avatar"><i class="fas fa-user"></i></span>
-                        <span class="module-profile-info">
-                            <span class="module-profile-name">{{ full_name or username or 'Student' }}</span>
-                            <span class="module-profile-grade">{{ grade_level or 'Grade 11 - ICT' }}</span>
-                        </span>
-                        <i class="fas fa-chevron-down module-profile-chevron" aria-hidden="true"></i>
+                <nav class="library-switches" aria-label="Learning pages">
+                    <a class="library-switch" href="/assessments"><i class="fas fa-clipboard-check"></i>Assessments</a>
+                    <a class="library-switch active" href="/student_modules" aria-current="page"><i class="fas fa-layer-group"></i>Modules</a>
+                </nav>
+                <div class="topbar-controls">
+                    <button class="theme-btn" type="button" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle light/dark mode">
+                        <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
                     </button>
-                    <div class="module-profile-dropdown" id="moduleProfileDropdown">
-                        <div class="pd-header">
-                            <span class="pd-avatar"><i class="fas fa-user"></i></span>
-                            <div>
-                                <div class="pd-name">{{ full_name or username or 'Student' }}</div>
-                                <div class="pd-grade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                    <div class="notification-wrap">
+                        <button class="notification-btn" id="notifBtn" type="button" aria-label="Notifications" title="Notifications" aria-expanded="false" aria-haspopup="true" aria-controls="notifDropdown" onclick="toggleNotifications(event)">
+                            <i class="fas fa-bell"></i>
+                            <span class="notif-badge hidden" id="notifBadge">0</span>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <h6><i class="fas fa-bell"></i>Notifications</h6>
+                                <button class="mark-read-btn" type="button" onclick="markAllRead()">Mark all as read</button>
+                            </div>
+                            <div class="notif-list" id="notifList">
+                                <div class="notif-empty"><i class="fas fa-spinner fa-spin"></i><p>Loading notifications...</p></div>
                             </div>
                         </div>
-                        <div class="pd-links">
-                            <button class="pd-link" type="button" onclick="toggleLibraryNav(); closeModuleProfile()">
-                                <i class="fas fa-compass"></i> Navigation
-                            </button>
-                            <a href="/student_profile" class="pd-link"><i class="fas fa-circle-user"></i> My Profile</a>
-                            <a href="/student_settings" class="pd-link"><i class="fas fa-sliders"></i> Settings</a>
-                            <div class="pd-sep"></div>
-                            <a href="/logout" class="pd-link logout"><i class="fas fa-arrow-right-from-bracket"></i> Sign Out</a>
+                    </div>
+                    <div class="module-profile-wrap">
+                        <button class="module-profile" id="moduleProfileTrigger" type="button"
+                                aria-label="Open account menu" aria-controls="moduleProfileDropdown"
+                                aria-expanded="false" onclick="toggleModuleProfile(event)">
+                            <span class="module-profile-avatar"><i class="fas fa-user"></i></span>
+                            <span class="module-profile-info">
+                                <span class="module-profile-name">{{ full_name or username or 'Student' }}</span>
+                                <span class="module-profile-grade">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                            </span>
+                            <i class="fas fa-chevron-down module-profile-chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="module-profile-dropdown" id="moduleProfileDropdown">
+                            <div class="pd-header">
+                                <span class="pd-avatar"><i class="fas fa-user"></i></span>
+                                <div>
+                                    <div class="pd-name">{{ full_name or username or 'Student' }}</div>
+                                    <div class="pd-grade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                                </div>
+                            </div>
+                            <div class="pd-links">
+                                <button class="pd-link" type="button" onclick="toggleLibraryNav(); closeModuleProfile()">
+                                    <i class="fas fa-compass"></i> Navigation
+                                </button>
+                                <a href="/student_profile" class="pd-link"><i class="fas fa-circle-user"></i> My Profile</a>
+                                <a href="/student_settings" class="pd-link"><i class="fas fa-sliders"></i> Settings</a>
+                                <div class="pd-sep"></div>
+                                <a href="/logout" class="pd-link logout"><i class="fas fa-arrow-right-from-bracket"></i> Sign Out</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1077,6 +1175,141 @@
             var sidebar = document.querySelector('.student-sidebar');
             setLibrarySidebarCollapsed(!sidebar.classList.contains('collapsed'));
         }
+        var notificationsOpen = false;
+        function toggleNotifications(event) {
+            event.stopPropagation();
+            notificationsOpen = !notificationsOpen;
+            var trigger = document.getElementById('notifBtn');
+            var dropdown = document.getElementById('notifDropdown');
+            trigger.setAttribute('aria-expanded', String(notificationsOpen));
+            dropdown.classList.toggle('open', notificationsOpen);
+            if (notificationsOpen) loadNotifications();
+        }
+        function setNotificationMessage(icon, message) {
+            var empty = document.createElement('div');
+            empty.className = 'notif-empty';
+            var iconElement = document.createElement('i');
+            iconElement.className = 'fas ' + icon;
+            iconElement.setAttribute('aria-hidden', 'true');
+            var text = document.createElement('p');
+            text.textContent = message;
+            empty.append(iconElement, text);
+            var list = document.getElementById('notifList');
+            list.replaceChildren(empty);
+        }
+        function loadNotifications() {
+            setNotificationMessage('fa-spinner fa-spin', 'Loading notifications...');
+            fetch('/get_notifications')
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Unable to load notifications');
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (!data.success) throw new Error(data.message || 'Unable to load notifications');
+                    renderNotifications(data.notifications);
+                    updateNotificationBadge(data.unread_count);
+                })
+                .catch(function (error) {
+                    console.error('Unable to load notifications:', error);
+                    setNotificationMessage('fa-circle-exclamation', 'Unable to load notifications');
+                });
+        }
+        function renderNotifications(notifications) {
+            var list = document.getElementById('notifList');
+            if (!Array.isArray(notifications) || notifications.length === 0) {
+                setNotificationMessage('fa-bell-slash', 'No notifications yet');
+                return;
+            }
+            var fragment = document.createDocumentFragment();
+            notifications.forEach(function (notification) {
+                var item = document.createElement('article');
+                item.className = 'module-notif-item' + (notification.is_read ? '' : ' unread');
+                var title = document.createElement('div');
+                title.className = 'module-notif-title';
+                title.textContent = notification.title || 'Notification';
+                var message = document.createElement('div');
+                message.className = 'module-notif-message';
+                message.textContent = notification.message || '';
+                var time = document.createElement('time');
+                time.className = 'module-notif-time';
+                time.textContent = getNotificationTimeAgo(notification.created_at);
+                item.append(title, message, time);
+                if (!notification.is_read) {
+                    var readButton = document.createElement('button');
+                    readButton.className = 'module-notif-read';
+                    readButton.type = 'button';
+                    readButton.dataset.notificationId = notification.id;
+                    readButton.textContent = 'Mark as read';
+                    item.append(readButton);
+                }
+                fragment.append(item);
+            });
+            list.replaceChildren(fragment);
+        }
+        function getNotificationTimeAgo(dateString) {
+            if (!dateString) return 'Just now';
+            var date = new Date(dateString);
+            if (Number.isNaN(date.getTime())) return 'Just now';
+            var seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+            if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+            return date.toLocaleDateString();
+        }
+        function updateNotificationBadge(count) {
+            var badge = document.getElementById('notifBadge');
+            var unreadCount = Number(count) || 0;
+            badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+            badge.classList.toggle('hidden', unreadCount === 0);
+        }
+        function markRead(notificationId) {
+            fetch('/mark_notification_read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notification_id: notificationId })
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Unable to mark notification as read');
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (!data.success) throw new Error(data.message || 'Unable to mark notification as read');
+                    loadNotifications();
+                })
+                .catch(function (error) { console.error(error); });
+        }
+        function markAllRead() {
+            fetch('/mark_all_notifications_read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Unable to mark notifications as read');
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (!data.success) throw new Error(data.message || 'Unable to mark notifications as read');
+                    loadNotifications();
+                })
+                .catch(function (error) { console.error(error); });
+        }
+        document.getElementById('notifList').addEventListener('click', function (event) {
+            var button = event.target.closest('[data-notification-id]');
+            if (button) markRead(button.dataset.notificationId);
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/get_unread_count')
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Unable to load unread notification count');
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (!data.success) throw new Error(data.message || 'Unable to load unread notification count');
+                    updateNotificationBadge(data.count);
+                })
+                .catch(function (error) { console.error(error); });
+        });
         function toggleModuleProfile(event) {
             event.stopPropagation();
             var trigger = document.getElementById('moduleProfileTrigger');
@@ -1106,9 +1339,21 @@
             if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
                 closeModuleProfile();
             }
+            var notificationTrigger = document.getElementById('notifBtn');
+            var notificationDropdown = document.getElementById('notifDropdown');
+            if (notificationsOpen && !notificationTrigger.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                notificationsOpen = false;
+                notificationTrigger.setAttribute('aria-expanded', 'false');
+                notificationDropdown.classList.remove('open');
+            }
         });
         document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') closeModuleProfile();
+            if (event.key === 'Escape') {
+                closeModuleProfile();
+                notificationsOpen = false;
+                document.getElementById('notifBtn').setAttribute('aria-expanded', 'false');
+                document.getElementById('notifDropdown').classList.remove('open');
+            }
         });
         document.addEventListener('DOMContentLoaded', async function () {
             var moduleLinks = Array.from(document.querySelectorAll('.module-link'));

@@ -878,7 +878,7 @@
 
 <div class="app">
     <!-- ===== SIDEBAR (all existing items/routes preserved; Progress is active) ===== -->
-    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <aside class="sidebar student-portal-sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-logo">
             <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="logo-image">
             <div class="logo-full">
@@ -977,7 +977,7 @@
                 <!-- Profile -->
                 <div style="position: relative;">
                     <div class="profile-trigger" id="profileTrigger" onclick="toggleProfile(event)">
-                        <div class="profile-trigger-avatar" id="profileAvatar">S</div>
+                        <div class="profile-trigger-avatar" id="profileAvatar"><i class="fas fa-user" aria-hidden="true"></i></div>
                         <div class="profile-trigger-info">
                             <span class="profile-trigger-name" id="profileName">{{ full_name or username or 'Student' }}</span>
                             <span class="profile-trigger-role" id="profileRole">{{ grade_level or 'Grade 11 - ICT' }}</span>
@@ -986,7 +986,7 @@
                     </div>
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="pd-header">
-                            <div class="pd-avatar" id="pdAvatar">S</div>
+                            <div class="pd-avatar" id="pdAvatar"><i class="fas fa-user" aria-hidden="true"></i></div>
                             <div>
                                 <div class="pd-name" id="pdName">{{ full_name or username or 'Student' }}</div>
                                 <div class="pd-grade" id="pdGrade">{{ grade_level or 'Grade 11 - ICT' }}</div>
@@ -1222,7 +1222,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    var NOTIF_API = '/student/api/notifications';   /* ENDPOINT: notifications list */
+    var NOTIF_API = '/get_notifications';
+    var NOTIF_READ_API = '/mark_notification_read';
+    var NOTIF_READ_ALL_API = '/mark_all_notifications_read';
     var JSON_HEADERS = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
 
     /* ===== THEME ===== */
@@ -1384,8 +1386,15 @@
 
     async function markAllRead() {
         try {
-            await fetch(NOTIF_API + '/read-all', { method: 'POST', headers: JSON_HEADERS });
-        } catch (e) {}
+            var res = await fetch(NOTIF_READ_ALL_API, { method: 'POST', headers: JSON_HEADERS });
+            var data = await res.json();
+            if (!res.ok || data.success === false) {
+                throw new Error(data.message || 'Unable to mark notifications as read');
+            }
+        } catch (err) {
+            showToast(err.message || 'Unable to mark notifications as read', 'error');
+            return;
+        }
         document.querySelectorAll('#notifList .notif-item.unread').forEach(function (item) {
             item.classList.remove('unread');
             var btn = item.querySelector('.notif-read-btn');
@@ -1402,9 +1411,19 @@
             var id = btn.getAttribute('data-id') || '';
             if (id) {
                 try {
-                    await fetch(NOTIF_API + '/' + encodeURIComponent(id) + '/read',
-                        { method: 'POST', headers: JSON_HEADERS });
-                } catch (err) {}
+                    var res = await fetch(NOTIF_READ_API, {
+                        method: 'POST',
+                        headers: JSON_HEADERS,
+                        body: JSON.stringify({ notification_id: id })
+                    });
+                    var data = await res.json();
+                    if (!res.ok || data.success === false) {
+                        throw new Error(data.message || 'Unable to mark notification as read');
+                    }
+                } catch (err) {
+                    showToast(err.message || 'Unable to mark notification as read', 'error');
+                    return;
+                }
             }
             var item = btn.closest('.notif-item');
             if (item) item.classList.remove('unread');

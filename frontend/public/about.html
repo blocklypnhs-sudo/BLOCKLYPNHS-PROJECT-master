@@ -16,11 +16,44 @@
     }
 
     .header {
+      position: relative;
       background: #2e6f40;
       color: white;
       padding: 22px 24px;
       border-bottom: 4px solid #1f4f2e;
       text-align: center;
+    }
+    .header-back-row {
+      width: min(1120px, 100%);
+      margin: 0 auto 12px;
+      text-align: left;
+    }
+    .about-back-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 7px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      color: #1f4f2e;
+      box-shadow: 0 6px 16px rgba(9, 42, 32, 0.16);
+      font-size: 0.84rem;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .about-back-button:hover {
+      background: #eaf5ef;
+      box-shadow: 0 8px 20px rgba(9, 42, 32, 0.22);
+      transform: translateX(-2px);
+    }
+    .about-back-button:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.75);
+      outline-offset: 3px;
     }
     .header h1 {
       font-size: 1.85rem;
@@ -212,6 +245,12 @@
 <body>
   <div class="page-shell">
     <header class="header">
+      <div class="header-back-row">
+        <a class="about-back-button" href="/login" aria-label="Back to login">
+          <span aria-hidden="true">←</span>
+          <span>Back to Login</span>
+        </a>
+      </div>
       <div class="header-logos">
         <img class="pup-logo" src="/static/pup_logo.png" alt="PUP logo">
         <img class="pnhs-logo" src="/static/pnhs-logo.png" alt="PNHS logo">

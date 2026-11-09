@@ -175,6 +175,7 @@
         padding:0; margin-bottom:1rem; box-shadow:none;
     }
     .top-bar-right { display:flex; align-items:center; gap:8px; }
+    .ticket-topbar-actions { display:flex; align-items:center; gap:8px; }
     .back-pill {
         display:inline-flex; align-items:center; gap:8px; text-decoration:none;
         color:var(--text-primary); font-size:.74rem; font-weight:700;
@@ -615,9 +616,10 @@
 
 <main>
     <nav class="top-bar fu e1">
-        <a class="back-pill" href="/student_dashboard"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
-        <div style="display:flex;align-items:center;gap:8px;">
-            <a class="back-pill" href="/student_help"><i class="fas fa-circle-question"></i>Help &amp; FAQ</a>
+        <a class="back-pill ticket-topbar-link ticket-topbar-back" href="/student_dashboard" aria-label="Back to Dashboard"><i class="fas fa-arrow-left" aria-hidden="true"></i><span class="ticket-topbar-label">Back to Dashboard</span></a>
+        <div class="ticket-topbar-actions">
+            <a class="back-pill ticket-topbar-link" href="/student_profile" aria-label="My Profile"><i class="fas fa-user" aria-hidden="true"></i><span class="ticket-topbar-label">My Profile</span></a>
+            <a class="back-pill ticket-topbar-link" href="/student_help" aria-label="Help and FAQ"><i class="fas fa-circle-question" aria-hidden="true"></i><span class="ticket-topbar-label">Help &amp; FAQ</span></a>
             <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
                 <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
             </button>

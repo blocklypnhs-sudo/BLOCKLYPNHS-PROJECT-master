@@ -172,13 +172,14 @@ def test_module_progress_keeps_passed_attempt_for_activity_badge():
     assert progress['passed'] == 1
     assert progress['items'][0]['passed'] is True
     assert progress['items'][0]['badge_code'] == 'php_act2'
-    assert 'FROM activities' in FakeCursor.queries[0]
+    assert 'FROM activity_catalog' in FakeCursor.queries[0]
 
 
 @pytest.mark.parametrize(
     ('language', 'catalog'),
     [('python', 'assessments'), ('java', 'assessments'),
-     ('php', 'activities'), ('javascript', 'activities'), ('cpp', 'activities')],
+     ('php', 'activity_catalog'), ('javascript', 'activity_catalog'),
+     ('cpp', 'activity_catalog')],
 )
 def test_item_progress_reads_the_language_catalog(language, catalog):
     from backend.module_awards import get_item_progress
