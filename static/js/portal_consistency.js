@@ -21,6 +21,7 @@
             'left',
             'right',
             'transform',
+            'width',
             'max-width',
             'max-height',
             'overflow-y'
@@ -52,7 +53,9 @@
             let trigger;
             if (dropdown.classList.contains('notif-dropdown')) {
                 trigger = dropdown.closest('.notification-wrap')
-                    ?.querySelector('#notifBtn, .notification-btn, .notif-btn');
+                    ?.querySelector('#notifBtn, .notification-btn, .notif-btn')
+                    || dropdown.closest('header')?.querySelector('#notifBtn, .notification-btn, .notif-btn')
+                    || document.querySelector('#notifBtn, .notification-btn, .notif-btn');
             } else if (dropdown.classList.contains('module-profile-dropdown')) {
                 trigger = dropdown.closest('.module-profile-wrap')
                     ?.querySelector('#moduleProfileTrigger, .module-profile');
@@ -73,6 +76,27 @@
             const setImportant = (property, value) => {
                 dropdown.style.setProperty(property, value, 'important');
             };
+
+            if (dropdown.classList.contains('notif-dropdown') &&
+                document.querySelector('.teacher-sidebar, .student-sidebar, .student-portal-sidebar')) {
+                const header = dropdown.closest('header') || trigger.closest('header');
+                const headerBottom = header
+                    ? header.getBoundingClientRect().bottom
+                    : trigger.getBoundingClientRect().bottom;
+                const top = Math.min(headerBottom + 6, Math.max(12, window.innerHeight - 120));
+
+                setImportant('position', 'fixed');
+                setImportant('top', top + 'px');
+                setImportant('left', '50%');
+                setImportant('right', 'auto');
+                setImportant('transform', 'translateX(-50%)');
+                setImportant('width', 'min(360px, calc(100vw - 24px))');
+                setImportant('max-width', 'calc(100vw - 24px)');
+                setImportant('max-height', Math.max(100, window.innerHeight - top - 12) + 'px');
+                setImportant('overflow-y', 'auto');
+                return;
+            }
+
             setImportant('position', 'fixed');
             setImportant('top', '12px');
             setImportant('left', '12px');

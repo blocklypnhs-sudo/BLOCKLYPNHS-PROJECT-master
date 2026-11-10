@@ -36,7 +36,9 @@
         .main-content.shifted { margin-left: var(--sidebar-collapsed-w); }
         main { max-width: 760px; margin: 0 auto; padding: 0; }
         .header, .notification { background: #fff; border: 1px solid #dde9e3; border-radius: 16px; box-shadow: 0 4px 16px rgba(20,90,66,.06); }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; }
+        .header { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 18px 22px; }
+        .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+        .header-actions #read { white-space: nowrap; }
         h1 { margin: 0; font-size: 20px; } button { border: 0; border-radius: 999px; padding: 9px 14px; cursor: pointer; background: #145a42; color: #fff; }
         #badge { background: #e06050; padding: 2px 7px; border-radius: 999px; font-size: 11px; }
         .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
@@ -58,6 +60,7 @@
         .sidebar.collapsed .nav-text, .sidebar.collapsed .nav-section-label { display: none; }
         .sidebar.collapsed .sidebar-user { justify-content: center; padding: .7rem .5rem; }
         @media (max-width: 768px) { .sidebar { width: var(--sidebar-collapsed-w); } .sidebar .sidebar-logo { justify-content: center; padding: .75rem .4rem; min-height: 62px; } .sidebar .logo-image, .sidebar .logo-full, .sidebar .toggle-btn { display: none; } .sidebar .logo-mono, .sidebar .hamburger-wrap { display: flex; } .sidebar .logo-mono { width: 100%; justify-content: center; } .sidebar .logo-mono img { width: 40px; height: 40px; } .sidebar .nav-link-custom { justify-content: center; padding: .55rem 0; margin: 0 .3rem; } .sidebar .nav-text, .sidebar .nav-section-label { display: none; } .sidebar .sidebar-user { justify-content: center; padding: .7rem .5rem; } .sidebar .sidebar-user-info { display: none; } .main-content { margin-left: var(--sidebar-collapsed-w); padding: 20px 12px; } }
+        @media (max-width: 560px) { .header { align-items: flex-start; padding: 14px; } .header-actions { flex-wrap: wrap; } .header-actions #read { padding: 8px 10px; font-size: 12px; } }
     </style>
     <link href="/static/mobile_responsive.css" rel="stylesheet">
     <script defer src="/static/js/portal_consistency.js"></script>
@@ -89,10 +92,22 @@
         <a href="/student_help" class="nav-link-custom"><iconify-icon icon="lucide:circle-help"></iconify-icon><span class="nav-text">Help &amp; FAQ</span></a>
         <a href="/student_tickets" class="nav-link-custom"><iconify-icon icon="lucide:ticket"></iconify-icon><span class="nav-text">Support Tickets</span></a>
     </nav>
-    <div class="sidebar-user"><div class="sidebar-avatar">{{ (full_name or username or 'S')[0] | upper }}</div><div class="sidebar-user-info"><h4>{{ full_name or username or 'Student' }}</h4><p>{{ grade_level or 'Grade 11 - ICT' }}</p></div></div>
+    <div class="sidebar-user"><div class="sidebar-avatar">{{ (full_name or username or 'S')[0] | upper }}</div><div class="sidebar-user-info"><h4>{{ full_name or username or 'Student' }}</h4><p>{{ grade_label or 'Grade 11 - ICT' }}</p></div></div>
 </aside>
 <div class="main-content" id="mainContent"><main>
-    <section class="header"><h1>Student Notifications <span id="badge">0</span></h1><button id="read">Mark all as read</button></section>
+    <section class="header">
+        <h1>Student Notifications <span id="badge">0</span></h1>
+        <div class="header-actions">
+            <a class="student-account-chip" href="/student_profile" aria-label="Open student profile">
+                <span class="student-account-avatar"><iconify-icon icon="lucide:user-round" aria-hidden="true"></iconify-icon></span>
+                <span class="student-account-info">
+                    <span class="student-account-name">{{ full_name or username or 'Student' }}</span>
+                    <span class="student-account-grade">{{ grade_label or 'Grade 11 - ICT' }}</span>
+                </span>
+            </a>
+            <button id="read">Mark all as read</button>
+        </div>
+    </section>
     <nav class="filters" aria-label="Filter notifications">
         <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
         <button class="filter" type="button" data-filter="assessments" aria-pressed="false">Assessments &amp; Feedback</button>

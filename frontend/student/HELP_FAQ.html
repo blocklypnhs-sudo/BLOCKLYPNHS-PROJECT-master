@@ -847,7 +847,7 @@
             <div class="nav-section-label">Activities</div>
             <div class="nav-item">
                 <button class="nav-link-custom activities-toggle" id="activitiesToggle" aria-expanded="false">
-                    <iconify-icon icon="lucide:code"></iconify-icon>
+                    <iconify-icon icon="lucide:layout-grid"></iconify-icon>
                     <span class="nav-text">Activities</span>
                     <i class="fas fa-chevron-down activities-chevron"></i>
                 </button>
@@ -921,7 +921,7 @@
                         <div class="profile-trigger-avatar" id="profileAvatar"><i class="fas fa-user" aria-hidden="true"></i></div>
                         <div class="profile-trigger-info">
                             <span class="profile-trigger-name" id="profileName">{{ full_name or username or 'Student' }}</span>
-                            <span class="profile-trigger-role" id="profileRole">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                            <span class="profile-trigger-role" id="profileRole">{{ grade_label or 'Grade 11 - ICT' }}</span>
                         </div>
                         <i class="fas fa-chevron-down profile-trigger-chevron"></i>
                     </div>
@@ -930,7 +930,7 @@
                             <div class="pd-avatar" id="pdAvatar"><i class="fas fa-user" aria-hidden="true"></i></div>
                             <div>
                                 <div class="pd-name" id="pdName">{{ full_name or username or 'Student' }}</div>
-                                <div class="pd-grade" id="pdGrade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                                <div class="pd-grade" id="pdGrade">{{ grade_label or 'Grade 11 - ICT' }}</div>
                             </div>
                         </div>
                         <div class="pd-links">

@@ -76,13 +76,48 @@
         .empty { color: var(--text-secondary); padding: 28px 10px; text-align: center; font-size: .85rem; }
         .error { color: #991b1b; }
         .header-actions { display: flex; align-items: center; gap: 8px; }
+        .header-actions .back-link {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            padding: 7px 14px;
+            font-size: .82rem;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
         .theme-btn { width: 38px; height: 38px; border: 0; border-radius: 11px; background: transparent; color: var(--text-secondary); cursor: pointer; }
         .theme-btn:hover { background: var(--card-white); color: var(--gold-warm); box-shadow: var(--shadow-sm); }
         .theme-btn .icon-sun { display: none; }
         [data-theme="dark"] .theme-btn .icon-sun { display: inline; }
         [data-theme="dark"] .theme-btn .icon-moon { display: none; }
-        @media (max-width: 850px) { main.main-content { padding: 72px 14px 20px; } .layout { grid-template-columns: 1fr; } .table-wrap { max-height: 45vh; } }
-        @media (max-width: 520px) { .page-header { align-items: flex-start; flex-direction: column; } .panel { padding: 12px; } }
+        @media (max-width: 850px) {
+            main.main-content { padding: 60px 14px 20px; }
+            .page-header { position: sticky; top: calc(max(12px, env(safe-area-inset-top)) + 48px); z-index: 900; }
+            .layout { grid-template-columns: 1fr; }
+            .table-wrap { max-height: 45vh; }
+        }
+        @media (max-width: 520px) {
+            .page-header {
+                align-items: center;
+                flex-direction: row;
+                gap: 6px;
+                padding: 8px 10px;
+                margin-bottom: 10px;
+                border-radius: 13px;
+                background: var(--card-white);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+            }
+            .page-header > div:first-child { flex: 1 1 auto; min-width: 0; }
+            .page-header h1 { font-size: clamp(.76rem, 3.8vw, .9rem); line-height: 1.2; }
+            .page-header p { display: none; }
+            .header-actions { width: auto; flex: 0 0 auto; justify-content: flex-end; gap: 4px; }
+            .theme-btn { flex: 0 0 38px; }
+            .back-link { min-height: 36px; display: inline-flex; align-items: center; padding: 6px 9px; font-size: .68rem; white-space: nowrap; }
+            .panel { padding: 12px; }
+        }
     </style>
     <link href="/static/mobile_responsive.css" rel="stylesheet">
     <script defer src="/static/js/portal_consistency.js"></script>

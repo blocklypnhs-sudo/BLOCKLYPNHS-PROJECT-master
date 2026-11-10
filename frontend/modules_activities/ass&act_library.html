@@ -172,7 +172,7 @@
         .student-sidebar.collapsed .nav-link-custom i { font-size: 1.15rem; }
         .student-sidebar.collapsed .nav-link-custom iconify-icon { font-size: 1.05rem; }
         .student-sidebar.collapsed ~ .page-shell {
-            margin-left: calc(70px + max(0px, (100vw - 70px - 1180px) / 2));
+            margin-left: 70px;
         }
         .sidebar-nav {
             flex: 1;
@@ -315,13 +315,33 @@
             background-size: 44px 44px;
             transition: background-image 0.4s ease;
         }
+        .bg-blob {
+            position: absolute; border-radius: 50%; filter: blur(90px);
+            opacity: 0.12; animation: blobDrift 22s ease-in-out infinite alternate;
+            transition: opacity 0.4s ease;
+        }
+        [data-theme="dark"] .bg-blob { opacity: 0.1; }
+        .bg-blob--1 {
+            width: 420px; height: 420px; top: -12%; right: -6%;
+            background: radial-gradient(circle, rgba(119,123,180,0.25), transparent 70%);
+        }
+        .bg-blob--2 {
+            width: 340px; height: 340px; bottom: -10%; left: 8%;
+            background: radial-gradient(circle, rgba(40,168,122,0.25), transparent 70%);
+            animation-duration: 28s; animation-delay: -6s;
+        }
+        @keyframes blobDrift {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(25px, -30px) scale(1.04); }
+            100% { transform: translate(-15px, 15px) scale(0.97); }
+        }
 
         .page-shell {
             position: relative;
             z-index: 1;
-            max-width: 1180px;
-            margin: 0 auto 0 calc(232px + max(0px, (100vw - 232px - 1180px) / 2));
-            padding: 24px clamp(14px, 3vw, 36px) 56px;
+            max-width: none;
+            margin: 0 0 0 232px;
+            padding: 20px 28px 28px;
             transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -661,28 +681,27 @@
             border-radius: 2px;
         }
         .language-section {
-            margin-top: 22px;
-            padding: 8px 18px 18px;
-            border: 1px solid var(--border-fresh);
-            border-radius: var(--radius-xl);
-            background: var(--card-tint);
-            scroll-margin-top: 22px;
+            margin: 0 0 1.6rem;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            scroll-margin-top: 20px;
         }
-        .language-section:first-of-type { margin-top: 0; }
-        .language-section .section-header { margin-top: 4px; }
-        .language-section .section-header h2 { font-size: 1rem; }
+        .language-section .section-header { margin: 0 0 0.8rem; }
+        .language-section .section-header h2 { font-size: 0.92rem; }
         .language-section .section-header h2 i {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            font-size: 1rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            font-size: 0.9rem;
             color: #fff;
         }
         .language-section .section-header h2 iconify-icon {
-            width: 38px;
-            height: 38px;
-            padding: 9px;
-            border-radius: 12px;
+            width: 34px;
+            height: 34px;
+            padding: 8px;
+            border-radius: 10px;
             color: #fff;
         }
         .language-section .section-header h2 i.python { background: linear-gradient(135deg, #4a90d9, #1e5dbb); }
@@ -719,7 +738,7 @@
             border-radius: 3px 3px 0 0; opacity: 0; transition: opacity 0.3s;
         }
         .card--assessment::before { background: linear-gradient(90deg, var(--green-bright), var(--green-main)); }
-        .card--activity::before { background: linear-gradient(90deg, var(--gold-warm), #f0c060); }
+        .card--activity::before { background: linear-gradient(90deg, var(--green-bright), var(--green-main)); }
         .card:hover {
             transform: translateY(-3px);
             box-shadow: var(--shadow-md);
@@ -806,15 +825,16 @@
             transform: translateY(-1px);
         }
         .card--activity .card-link {
-            background: var(--gold-light);
-            color: var(--gold-text);
+            justify-content: flex-start;
+            padding: 0.4rem 0;
+            background: transparent;
+            color: var(--green-accent);
         }
-        [data-theme="dark"] .card--activity .card-link { color: var(--gold-text); }
         .card--activity .card-link:hover {
-            background: var(--gold-warm);
-            color: white;
-            transform: translateY(-1px);
+            background: transparent;
+            color: var(--green-main);
         }
+        [data-theme="dark"] .card--activity .card-link:hover { color: #8ce3b0; }
         .card-link i { transition: transform 0.25s ease; }
         .card-link:hover i { transform: translateX(3px); }
         .card-link.locked {
@@ -837,7 +857,7 @@
 
         /* ----- RESPONSIVE ----- */
         @media (max-width: 900px) {
-            .page-shell { padding: 18px 18px 40px; }
+            .page-shell { padding: 18px 18px 28px; }
         }
         @media (max-width: 768px) {
             .student-sidebar { width: 70px; }
@@ -853,7 +873,7 @@
             }
             .student-sidebar .nav-link-custom i { font-size: 1.15rem; }
             .student-sidebar .nav-link-custom iconify-icon { font-size: 1.05rem; }
-            .page-shell { margin-left: 70px; }
+            .page-shell { margin-left: 70px; padding: 14px; }
             .student-sidebar:not(.collapsed) { width: min(232px, 85vw); }
             .student-sidebar:not(.collapsed) .student-sidebar-brand { justify-content: center; padding: 0.4rem 0.15rem; }
             .student-sidebar:not(.collapsed) .student-sidebar-logo-image { display: block; }
@@ -868,11 +888,13 @@
             .student-sidebar.collapsed { width: 70px; }
         }
         @media (max-width: 640px) {
-            .page-shell { padding: 14px 12px 36px; }
+            .page-shell { padding: 12px 12px 28px; }
             .grid { grid-template-columns: 1fr; }
-            .section-header h2 { font-size: 0.85rem; }
+            .section-header { gap: 8px; margin-bottom: 0.7rem; }
+            .section-header h2 { font-size: 0.85rem; gap: 8px; }
             .topbar-actions { justify-content: flex-end; }
-            .language-section { padding: 7px 10px 12px; margin-top: 14px; }
+            .language-section { margin-bottom: 1.2rem; }
+            .language-section .section-header .divider-line { display: none; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -894,7 +916,10 @@
 </head>
 <body>
 
-    <div class="bg-layer" aria-hidden="true"></div>
+    <div class="bg-layer" aria-hidden="true">
+        <div class="bg-blob bg-blob--1"></div>
+        <div class="bg-blob bg-blob--2"></div>
+    </div>
 
     <aside class="student-sidebar" aria-label="Student navigation">
         <div class="student-sidebar-brand">
@@ -928,7 +953,7 @@
             <div class="nav-section-label">Activities</div>
             <div class="nav-item">
                 <button type="button" class="nav-link-custom activities-toggle" id="activitiesToggle" onclick="toggleActivitiesNav()" aria-expanded="false" aria-controls="activitiesSubmenu">
-                    <iconify-icon icon="lucide:code"></iconify-icon><span class="nav-text">Activities</span><i class="fas fa-chevron-down activities-chevron"></i>
+                    <iconify-icon icon="lucide:layout-grid"></iconify-icon><span class="nav-text">Activities</span><i class="fas fa-chevron-down activities-chevron"></i>
                 </button>
                 <div class="activities-submenu" id="activitiesSubmenu">
                     <a href="/student_activities">All Activities</a>
@@ -997,7 +1022,7 @@
                             <span class="module-profile-avatar"><i class="fas fa-user"></i></span>
                             <span class="module-profile-info">
                                 <span class="module-profile-name">{{ full_name or username or 'Student' }}</span>
-                                <span class="module-profile-grade">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                                <span class="module-profile-grade">{{ grade_label or 'Grade 11 - ICT' }}</span>
                             </span>
                             <i class="fas fa-chevron-down module-profile-chevron" aria-hidden="true"></i>
                         </button>
@@ -1006,7 +1031,7 @@
                                 <span class="pd-avatar"><i class="fas fa-user"></i></span>
                                 <div>
                                     <div class="pd-name">{{ full_name or username or 'Student' }}</div>
-                                    <div class="pd-grade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                                    <div class="pd-grade">{{ grade_label or 'Grade 11 - ICT' }}</div>
                                 </div>
                             </div>
                             <div class="pd-links">

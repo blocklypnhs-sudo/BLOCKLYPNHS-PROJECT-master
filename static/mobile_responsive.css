@@ -37,6 +37,56 @@ pre {
     overflow-x: clip;
   }
 
+  :is(.page-title, .lang-tab, .lang-pill, .lang-badge, .lang-tag) :is(
+    iconify-icon[icon^="logos:"],
+    iconify-icon[icon^="simple-icons:"],
+    i.fab.fa-python,
+    i.fab.fa-java,
+    i.fab.fa-php,
+    i.fab.fa-js
+  ),
+  :is(.lang-pill, .lang-badge, .lang-tag) > :is(
+    iconify-icon[icon^="logos:"],
+    iconify-icon[icon^="simple-icons:"],
+    i.fab.fa-python,
+    i.fab.fa-java,
+    i.fab.fa-php,
+    i.fab.fa-js
+  ) {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    max-width: none;
+    object-fit: contain;
+    vertical-align: middle;
+  }
+
+  :is(.lang-tab, .lang-pill, .lang-badge, .lang-tag) iconify-icon[icon^="logos:"],
+  :is(.lang-tab, .lang-pill, .lang-badge, .lang-tag) iconify-icon[icon^="simple-icons:"] {
+    width: 1.15em;
+    height: 1.15em;
+  }
+
+  :is(.lang-tab, .lang-pill, .lang-badge, .lang-tag) i.fab.fa-python,
+  :is(.lang-tab, .lang-pill, .lang-badge, .lang-tag) i.fab.fa-java,
+  :is(.lang-tab, .lang-pill, .lang-badge, .lang-tag) i.fab.fa-php,
+  :is(.lang-tab, .lang-pill, .lang-badge, .lang-tag) i.fab.fa-js {
+    width: 1.15em;
+    min-width: 1.15em;
+    height: 1.15em;
+    line-height: 1.15em;
+  }
+
+  :is(.page-title) iconify-icon[icon^="logos:"],
+  :is(.page-title) iconify-icon[icon^="simple-icons:"] {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+  }
+
   .main-content,
   .content,
   .page-content,
@@ -144,9 +194,9 @@ pre {
     -webkit-overflow-scrolling: touch;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .page-header,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .page-header,
   .student-portal-sidebar ~ .main-content .header,
   .student-sidebar ~ .page-shell .topbar,
   .container-custom > .top-bar {
@@ -170,11 +220,95 @@ pre {
     -webkit-backdrop-filter: blur(14px);
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar > div:first-child,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar > div:first-child,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .page-header > div:first-child {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar > div:first-child,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar > div:first-child,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .page-header > div:first-child {
     flex: 1 1 auto;
     min-width: 0;
+  }
+
+  .teacher-sidebar ~ main :is(.top-bar, .topbar, .page-header) h1 {
+    min-width: 0;
+    overflow: hidden;
+    font-size: clamp(0.74rem, 3.2vw, 0.9rem);
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .teacher-sidebar ~ main :is(.top-bar, .topbar, .page-header) h1 > i {
+    flex: 0 0 27px;
+    width: 27px;
+    height: 27px;
+    margin-right: 0;
+    border-radius: 8px;
+    font-size: 0.75rem;
+  }
+
+  .teacher-sidebar ~ main .top-bar .page-subtitle {
+    display: none;
+  }
+
+  .teacher-sidebar ~ main .top-bar-right {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .teacher-sidebar ~ main .top-bar-right .top-search {
+    flex: 0 1 112px;
+    width: min(112px, 28vw);
+    min-width: 0;
+  }
+
+  .teacher-sidebar ~ main .top-bar-right .top-search input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .teacher-sidebar ~ main .topbar > h1 {
+    flex: 1 1 auto;
+  }
+
+  .teacher-sidebar ~ main .topbar-actions {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  .teacher-sidebar ~ main .topbar {
+    flex-wrap: wrap !important;
+  }
+
+  .teacher-sidebar ~ main .topbar > h1,
+  .teacher-sidebar ~ main .topbar-actions {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+
+  .teacher-sidebar ~ main .topbar-actions {
+    justify-content: flex-end;
+  }
+
+  .teacher-sidebar ~ main .assessment-results-header {
+    flex-wrap: wrap !important;
+  }
+
+  .teacher-sidebar ~ main .assessment-results-header > div:first-child,
+  .teacher-sidebar ~ main .assessment-results-header > .top-bar-right {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+
+  .teacher-sidebar ~ main .assessment-results-header > .top-bar-right {
+    margin-left: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .teacher-sidebar ~ main .assessment-results-header .top-search {
+    order: 0;
+    flex: 1 1 112px;
+    width: auto;
+    max-width: 160px;
   }
 
   .student-portal-sidebar ~ .main-content .header h1 {
@@ -340,9 +474,9 @@ pre {
     white-space: nowrap;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .page-title,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .page-title,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .page-header .page-title {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .page-title,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .page-title,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .page-header .page-title {
     min-width: 0;
     flex: 1 1 auto;
     overflow: hidden;
@@ -353,26 +487,41 @@ pre {
     gap: 5px !important;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .page-title > i,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .page-title > i,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .page-header .page-title > i {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .page-title > i,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .page-title > i,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .page-header .page-title > i {
     width: 27px !important;
     height: 27px !important;
     border-radius: 8px !important;
     font-size: 0.75rem !important;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar-right,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar-actions {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar-right,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar-actions,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .header-actions {
     flex: 0 0 auto;
+    align-items: center;
     min-width: 0;
     max-width: none !important;
+    flex-direction: row;
     flex-wrap: nowrap !important;
     gap: 4px !important;
     margin-left: 0 !important;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .ticket-topbar-actions {
+  .teacher-sidebar ~ main .header-actions > .action-btn,
+  .teacher-sidebar ~ main .header-actions > .back-link,
+  .teacher-sidebar ~ main .topbar-actions > .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 31px;
+    padding: 5px 8px;
+    font-size: 0.66rem;
+    white-space: nowrap;
+  }
+
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .ticket-topbar-actions {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
@@ -380,7 +529,7 @@ pre {
     gap: 4px !important;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .ticket-topbar-link {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .ticket-topbar-link {
     flex: 0 0 31px;
     width: 31px;
     height: 31px;
@@ -391,16 +540,17 @@ pre {
     border-radius: 9px;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .ticket-topbar-label {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .ticket-topbar-label {
     display: none;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .theme-btn,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .notif-btn,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .profile-trigger,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .theme-btn,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .notif-btn,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .profile-trigger {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .theme-btn,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .notif-btn,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .profile-trigger,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .theme-btn,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .notif-btn,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .profile-trigger,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .page-header .theme-btn {
     min-width: 31px;
     width: 31px;
     height: 31px;
@@ -409,15 +559,15 @@ pre {
     justify-content: center;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .profile-trigger-avatar,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .profile-trigger-avatar {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .profile-trigger-avatar,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .profile-trigger-avatar {
     width: 25px !important;
     height: 25px !important;
     font-size: 0.68rem !important;
   }
 
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .top-bar .profile-trigger-chevron,
-  :is(.student-sidebar, .student-portal-sidebar) ~ main .topbar .profile-trigger-chevron {
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .top-bar .profile-trigger-chevron,
+  :is(.student-sidebar, .student-portal-sidebar, .teacher-sidebar) ~ main .topbar .profile-trigger-chevron {
     display: none;
   }
 }

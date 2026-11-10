@@ -252,6 +252,28 @@
         .nav-link-custom.active i,
         .nav-link-custom.active iconify-icon { color: #128057; }
 
+        .activities-toggle { justify-content: flex-start; }
+        .activities-toggle .activities-chevron {
+            width: auto !important; flex: 0 0 auto; margin-left: auto;
+            font-size: 0.62rem !important; transition: transform 0.25s ease;
+        }
+        .activities-toggle.open .activities-chevron { transform: rotate(180deg); }
+        .activities-submenu { display: none; padding: 0.1rem 0 0.25rem 2.35rem; }
+        .activities-submenu.open { display: block; }
+        .activities-submenu-label {
+            padding: 0.4rem 0.6rem 0.15rem; color: rgba(190,225,208,0.45);
+            font-size: 0.5rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+        }
+        .activities-submenu a {
+            display: flex; align-items: center; gap: 9px; padding: 0.36rem 0.6rem;
+            border-radius: 9px; color: #a9d3c0; text-decoration: none;
+            font-size: 0.74rem; font-weight: 500; transition: all 0.2s ease;
+        }
+        .activities-submenu a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .activities-submenu iconify-icon { font-size: 0.95rem; }
+        .sidebar.collapsed .activities-submenu,
+        .sidebar.collapsed .activities-chevron { display: none; }
+
         .nav-badge {
             position: absolute; top: 50%; left: 22px; transform: translateY(-50%);
             width: 7px; height: 7px; background: var(--coral);
@@ -898,6 +920,10 @@
                 justify-content: flex-start; width: calc(100% - 0.8rem);
                 padding: 0.55rem 0.7rem; margin: 0 0.4rem;
             }
+            .sidebar:not(.collapsed) .activities-toggle { justify-content: flex-start; }
+            .sidebar.mobile-open .activities-submenu.open { display: block; }
+            .sidebar.mobile-open .activities-submenu:not(.open) { display: none; }
+            .sidebar.mobile-open .activities-chevron { display: inline-block; }
             .sidebar:not(.collapsed) .nav-text { display: inline !important; }
             .sidebar:not(.collapsed) .nav-section-label {
                 height: auto; padding: 0.6rem 1rem 0.25rem; margin: 0.45rem 0.7rem 0.2rem;
@@ -947,10 +973,18 @@
             <div class="nav-item"><a href="/student_modules" class="nav-link-custom"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a></div>
             <div class="nav-item"><a href="/student_progress" class="nav-link-custom"><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon><span class="nav-text">Progress</span></a></div>
             <div class="nav-section-label">Activities</div>
-            <div class="nav-item"><a href="/student_activities" class="nav-link-custom"><iconify-icon icon="lucide:code"></iconify-icon><span class="nav-text">All Activities</span></a></div>
-            <div class="nav-item"><a href="/student_activities_php" class="nav-link-custom"><iconify-icon icon="logos:php"></iconify-icon><span class="nav-text">PHP</span></a></div>
-            <div class="nav-item"><a href="/student_activities_javascript" class="nav-link-custom"><iconify-icon icon="logos:javascript"></iconify-icon><span class="nav-text">JavaScript</span></a></div>
-            <div class="nav-item"><a href="/student_activities_cpp" class="nav-link-custom"><iconify-icon icon="logos:cplusplus"></iconify-icon><span class="nav-text">C++</span></a></div>
+            <div class="nav-item">
+                <button type="button" class="nav-link-custom activities-toggle" id="activitiesToggle" onclick="toggleActivitiesNav()" aria-expanded="false" aria-controls="activitiesSubmenu">
+                    <iconify-icon icon="lucide:layout-grid"></iconify-icon><span class="nav-text">Activities</span><i class="fas fa-chevron-down activities-chevron"></i>
+                </button>
+                <div class="activities-submenu" id="activitiesSubmenu">
+                    <a href="/student_activities"><iconify-icon icon="lucide:layers"></iconify-icon>All Activities</a>
+                    <div class="activities-submenu-label">Languages</div>
+                    <a href="/student_activities_php"><iconify-icon icon="logos:php"></iconify-icon>PHP</a>
+                    <a href="/student_activities_javascript"><iconify-icon icon="logos:javascript"></iconify-icon>JavaScript</a>
+                    <a href="/student_activities_cpp"><iconify-icon icon="simple-icons:cplusplus"></iconify-icon>C++</a>
+                </div>
+            </div>
             <div class="nav-section-label">Account</div>
             <div class="nav-item"><a href="/student_profile" class="nav-link-custom"><iconify-icon icon="lucide:circle-user-round"></iconify-icon><span class="nav-text">Profile</span></a></div>
             <div class="nav-item"><a href="/student_settings" class="nav-link-custom"><iconify-icon icon="lucide:sliders-horizontal"></iconify-icon><span class="nav-text">Settings</span></a></div>
@@ -1008,7 +1042,7 @@
                     <div class="profile-trigger-avatar"><i class="fas fa-user"></i></div>
                     <div class="profile-trigger-info">
                         <span class="profile-trigger-name" id="profileName">{{ full_name or username or 'Student' }}</span>
-                        <span class="profile-trigger-role" id="profileRole">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                        <span class="profile-trigger-role" id="profileRole">{{ grade_label or 'Grade 11 - ICT' }}</span>
                     </div>
                     <i class="fas fa-chevron-down profile-trigger-chevron"></i>
                 </div>
@@ -1017,7 +1051,7 @@
                         <div class="pd-avatar"><i class="fas fa-user"></i></div>
                         <div>
                             <div class="pd-name" id="pdName">{{ full_name or username or 'Student' }}</div>
-                            <div class="pd-grade" id="pdGrade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                            <div class="pd-grade" id="pdGrade">{{ grade_label or 'Grade 11 - ICT' }}</div>
                         </div>
                     </div>
                     <div class="pd-links">
@@ -1213,6 +1247,13 @@
         isExpanded = true;
         applyState();
         try { localStorage.setItem('blocklearn-sidebar', 'expanded'); } catch (e) {}
+    }
+    function toggleActivitiesNav() {
+        var toggle = document.getElementById('activitiesToggle');
+        var submenu = document.getElementById('activitiesSubmenu');
+        var isOpen = submenu.classList.toggle('open');
+        toggle.classList.toggle('open', isOpen);
+        toggle.setAttribute('aria-expanded', String(isOpen));
     }
 
     window.addEventListener('resize', function() {

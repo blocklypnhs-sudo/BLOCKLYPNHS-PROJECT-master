@@ -1002,6 +1002,11 @@ def _student_display_name(student):
     )
 
 
+def _student_grade_label(grade_level):
+    grade = str(grade_level or 'Grade 11').strip()
+    return grade if 'ict' in grade.lower() else f'{grade} - ICT'
+
+
 def _student_name_sql(cursor, alias='s'):
     """Build a name expression using only student columns present in this schema."""
     cursor.execute("SHOW COLUMNS FROM students")
@@ -1068,15 +1073,19 @@ def student_dashboard():
                           grade_level=grade_level,
                           username=student_username,
                           full_name=student_name,
+                          grade_label=_student_grade_label(grade_level),
                           display_name=student_name)
 
 @app.route('/student_leaderboard')
 def student_leaderboard():
     if session.get('role') != 'student':
         return redirect('/')
+    student = _get_student_identity()
+    student_name = _student_display_name(student)
     return render_template('student/student_leader_board.html',
                           username=session.get('username'),
-                          full_name=session.get('full_name'))
+                          full_name=student_name,
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')))
 
 @app.route('/student_modules')
 def student_modules():
@@ -1272,6 +1281,7 @@ def student_progress():
     if session.get('role') != 'student':
         return redirect('/')
 
+    student = _get_student_identity()
     language_details = {
         'php': ('PHP', 'php', 'logos:php'),
         'javascript': ('JavaScript', 'js', 'logos:javascript'),
@@ -1454,6 +1464,7 @@ def student_progress():
         username=session.get('username'),
         full_name=session.get('full_name'),
         grade_level=session.get('grade_level'),
+        grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')),
         progress={
             'overall': overall_summary,
             'activities': activity_summary,
@@ -1517,7 +1528,8 @@ def student_profile():
                                   student=student,
                                   lrn=(student or {}).get('lrn') or session.get('lrn'),
                                   username=session.get('username'),
-                                  full_name=student_name)
+                                  full_name=student_name,
+                                  grade_label=_student_grade_label((student or {}).get('grade_level') or session.get('grade_level')))
     finally:
         cursor.close()
         conn.close()
@@ -1539,7 +1551,8 @@ def student_settings():
                           full_name=student_name,
                           lrn=student.get('lrn') or session.get('lrn'),
                           email=student.get('email') or '',
-                          grade_level=student.get('grade_level') or session.get('grade_level'))
+                          grade_level=student.get('grade_level') or session.get('grade_level'),
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')))
 
 @app.route('/student_help')
 def student_help():
@@ -1556,7 +1569,8 @@ def student_help():
     return render_template('student/HELP_FAQ.html', 
                           username=student_username,
                           full_name=student_name,
-                          grade_level=student.get('grade_level') or session.get('grade_level'))
+                          grade_level=student.get('grade_level') or session.get('grade_level'),
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')))
 
 @app.route('/assessments')
 def assessments_overview():
@@ -1572,19 +1586,25 @@ def assessment_overview_alias():
 def module_assessments():
     if session.get('role') != 'student':
         return redirect('/')
+    student = _get_student_identity()
+    student_name = _student_display_name(student)
     return render_template('modules_activities/ass&act_library.html',
                           username=session.get('username'),
-                          full_name=session.get('full_name'),
-                          grade_level=session.get('grade_level'),
+                          full_name=student_name,
+                          grade_level=student.get('grade_level') or session.get('grade_level'),
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')),
                           library_mode='modules')
 
 @app.route('/assessments_python')
 def assessments_python():
     if session.get('role') != 'student':
         return redirect('/')
+    student = _get_student_identity()
     return render_template('assessments/python_assessments.html',
                           username=session.get('username'),
                           full_name=session.get('full_name'),
+                          grade_level=student.get('grade_level') or session.get('grade_level'),
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')),
                           score_language='python',
                           score_language_name='Python')
 
@@ -1592,9 +1612,12 @@ def assessments_python():
 def assessments_java():
     if session.get('role') != 'student':
         return redirect('/')
+    student = _get_student_identity()
     return render_template('assessments/java_assessments.html',
                           username=session.get('username'),
                           full_name=session.get('full_name'),
+                          grade_level=student.get('grade_level') or session.get('grade_level'),
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')),
                           score_language='java',
                           score_language_name='Java')
 
@@ -1982,6 +2005,14 @@ def notifications_page():
     }
     if role not in templates:
         return redirect('/')
+    if role == 'student':
+        student = _get_student_identity()
+        return render_template(
+            templates[role],
+            username=session.get('username'),
+            full_name=_student_display_name(student),
+            grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')),
+        )
     return render_template(templates[role])
 
 @app.route('/get_notifications')
@@ -3369,9 +3400,11 @@ def teacher_tickets():
 def student_tickets():
     if session.get('role') != 'student':
         return redirect('/')
+    student = _get_student_identity()
     return render_template('student/tickets.html',
                           username=session.get('username'),
-                          full_name=session.get('full_name'))
+                          full_name=_student_display_name(student),
+                          grade_label=_student_grade_label(student.get('grade_level') or session.get('grade_level')))
 
 # ==================== ICT SUPPORT ROUTES ====================
 
@@ -3563,6 +3596,7 @@ def student_profile_data():
                 'lrn': student.get('lrn'),
                 'full_name': _student_display_name(student),
                 'grade_level': student.get('grade_level'),
+                'grade_label': _student_grade_label(student.get('grade_level')),
                 'email': student.get('email'),
                 'created_at': (
                     student['created_at'].strftime('%B %d, %Y')

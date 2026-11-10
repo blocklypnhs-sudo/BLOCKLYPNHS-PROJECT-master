@@ -246,6 +246,28 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
 .loading{padding:1.5rem;text-align:center;color:var(--stone-light);font-size:.76rem}
 .loading i{animation:spin 1s linear infinite;margin-right:6px;color:var(--green-accent)}
 @keyframes spin{to{transform:rotate(360deg)}}
+.analytics-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 1.1rem;position:relative;z-index:100}
+.analytics-heading{min-width:0}
+.analytics-title{display:flex;align-items:center;gap:10px;font-size:1.18rem;
+  font-weight:800;letter-spacing:-.4px;line-height:1.25}
+.analytics-title i{width:36px;height:36px;flex-shrink:0;border-radius:11px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--tile-bg);color:var(--tile-color);font-size:.88rem}
+.analytics-title-copy{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.analytics-title em{font-style:normal;color:var(--green-accent)}
+.analytics-heading p{margin-top:.15rem;color:var(--stone-light);font-size:.74rem;line-height:1.5}
+.analytics-topbar .theme-btn{width:38px;height:38px;flex-shrink:0;border:0;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;background:transparent;
+  color:var(--text-secondary);font-size:.95rem;cursor:pointer}
+.analytics-topbar .theme-btn:hover{background:var(--card-white);color:var(--gold-warm);box-shadow:var(--shadow-xs)}
+.analytics-topbar .theme-btn .icon-sun{display:none}
+.analytics-topbar .theme-btn .icon-moon{display:inline}
+[data-theme="dark"] .analytics-topbar .theme-btn .icon-sun{display:inline}
+[data-theme="dark"] .analytics-topbar .theme-btn .icon-moon{display:none}
+.keyword-card{display:flex;flex-direction:column}
+.keyword-card .kw-cloud{flex:1;align-content:center;justify-content:center;min-height:180px}
+.keyword-card .kw-cloud > :is(.empty,.loading){width:100%;text-align:center}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:900px){
@@ -255,11 +277,13 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
 }
 @media(max-width:576px){
   main{padding:12px 12px 28px}
-  .hero{padding:1rem 1.15rem}
-  .hero h1{font-size:1.05rem}
-  .hero p{font-size:.68rem}
+  .analytics-topbar{gap:6px;margin-bottom:.75rem}
+  .analytics-title{font-size:clamp(.76rem,3.2vw,.9rem);gap:5px;white-space:nowrap}
+  .analytics-title i{width:27px;height:27px;border-radius:8px;font-size:.75rem}
+  .analytics-heading p{display:none}
   .filter-bar{padding:.75rem .9rem}
   .summary-value{font-size:1.5rem}
+  .keyword-card .kw-cloud{min-height:140px}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -279,16 +303,15 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
 <div class="app">
   {% include 'teacher/_sidebar.html' %}
 <main class="main-content" id="mainContent">
-  <nav class="top-bar">
+  <header class="top-bar analytics-topbar">
+    <div class="analytics-heading">
+      <h1 class="analytics-title"><i class="fas fa-chart-line" aria-hidden="true"></i><span class="analytics-title-copy">Learning <em>Feedback Analytics</em></span></h1>
+      <p>Insights from student feedback about assessments, activities, and modules.</p>
+    </div>
     <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme" title="Toggle theme">
       <i class="fas fa-moon icon-moon"></i><i class="fas fa-sun icon-sun"></i>
     </button>
-  </nav>
-
-  <header class="hero">
-    <h1>Learning <em>Feedback Analytics</em></h1>
-    <p>Insights from student feedback about assessments, activities, and modules.</p>
-    </header>
+  </header>
 
   <!-- Filters -->
   <div class="filter-bar">
@@ -352,7 +375,7 @@ main{max-width:1240px;margin:0 auto;padding:20px 24px 40px;position:relative;z-i
       <h3><i class="fas fa-code"></i> Feedback by Language</h3>
       <div class="chart-wrap"><canvas id="langChart"></canvas></div>
     </div>
-    <div class="chart-card">
+    <div class="chart-card keyword-card">
       <h3><i class="fas fa-tags"></i> Top Keywords</h3>
       <div class="kw-cloud" id="kwCloud">
         <div class="loading"><i class="fas fa-spinner"></i>Loading keywords…</div>

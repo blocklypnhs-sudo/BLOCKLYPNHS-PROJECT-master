@@ -277,8 +277,11 @@
             padding: 4px 12px 4px 5px;
             border-radius: 999px; border: 1px solid var(--border-fresh);
             background: var(--card-white); box-shadow: var(--shadow-xs);
-            flex-shrink: 0;
+            flex-shrink: 0; cursor: pointer; color: inherit; font: inherit;
         }
+        .profile-trigger:hover,
+        .profile-trigger.open { border-color: var(--green-accent); }
+        .profile-menu { position: relative; }
         .profile-trigger-avatar {
             width: 31px; height: 31px;
             background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
@@ -288,6 +291,31 @@
         .profile-trigger-info { display: flex; flex-direction: column; }
         .profile-trigger-name { font-size: 0.75rem; font-weight: 700; color: var(--text-primary); line-height: 1.25; white-space: nowrap; }
         .profile-trigger-role { font-size: 0.62rem; color: var(--text-secondary); line-height: 1.25; white-space: nowrap; }
+        .profile-trigger-chevron { color: var(--stone-light); font-size: 0.55rem; }
+        .profile-dropdown {
+            display: none; position: absolute; top: calc(100% + 8px); right: 0;
+            min-width: 210px; overflow: hidden; z-index: 1100;
+            border: 1px solid var(--border-fresh); border-radius: var(--radius-md);
+            background: var(--card-white); box-shadow: var(--shadow-md);
+        }
+        .profile-dropdown.open { display: block; }
+        .pd-header { display: flex; align-items: center; gap: 10px; padding: 0.8rem 0.95rem; border-bottom: 1px solid var(--border-fresh); }
+        .pd-avatar {
+            display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-bright), var(--green-deep));
+            color: #fff; font-size: 0.78rem; font-weight: 700;
+        }
+        .pd-name { color: var(--text-primary); font-size: 0.78rem; font-weight: 700; }
+        .pd-grade { color: var(--stone-light); font-size: 0.64rem; }
+        .pd-links { padding: 0.25rem 0; }
+        .pd-link {
+            display: flex; align-items: center; gap: 10px; padding: 0.5rem 0.95rem;
+            color: var(--text-secondary); font-size: 0.75rem; font-weight: 500;
+            text-decoration: none; transition: background 0.2s, color 0.2s;
+        }
+        .pd-link:hover { background: var(--green-soft); color: var(--green-accent); }
+        .pd-sep { height: 1px; margin: 0.25rem 0; background: var(--border-fresh); }
 
         .theme-btn {
             width: 38px; height: 38px; border-radius: 11px; border: none;
@@ -741,11 +769,29 @@
                     <i class="fas fa-moon icon-moon"></i>
                     <i class="fas fa-sun icon-sun"></i>
                 </button>
-                <div class="profile-trigger">
-                    <div class="profile-trigger-avatar"><i class="fas fa-chalkboard-user"></i></div>
-                    <div class="profile-trigger-info">
-                        <span class="profile-trigger-name">{{ full_name or username or 'Teacher' }}</span>
-                        <span class="profile-trigger-role">{{ subject or 'ICT Instructor' }}</span>
+                <div class="profile-menu">
+                    <button class="profile-trigger" id="profileTrigger" type="button" onclick="toggleProfile()" aria-expanded="false" aria-haspopup="true" aria-controls="profileDropdown">
+                        <span class="profile-trigger-avatar" id="profileAvatar">T</span>
+                        <span class="profile-trigger-info">
+                            <span class="profile-trigger-name">{{ full_name or username or 'Teacher' }}</span>
+                            <span class="profile-trigger-role">ICT Teacher</span>
+                        </span>
+                        <i class="fas fa-chevron-down profile-trigger-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="pd-header">
+                            <div class="pd-avatar" id="pdAvatar">T</div>
+                            <div>
+                                <div class="pd-name">{{ full_name or username or 'Teacher' }}</div>
+                                <div class="pd-grade">ICT Teacher</div>
+                            </div>
+                        </div>
+                        <div class="pd-links">
+                            <a href="/teacher_profile" class="pd-link"><i class="fas fa-circle-user"></i> My Profile</a>
+                            <a href="/teacher_settings" class="pd-link"><i class="fas fa-sliders"></i> Settings</a>
+                            <div class="pd-sep"></div>
+                            <a href="/logout" class="pd-link"><i class="fas fa-arrow-right-from-bracket"></i> Sign Out</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -870,6 +916,29 @@
         var saved = localStorage.getItem('blocklearn-theme');
         if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     })();
+
+    var profileOpen = false;
+    function toggleProfile(force) {
+        profileOpen = typeof force === 'boolean' ? force : !profileOpen;
+        document.getElementById('profileDropdown').classList.toggle('open', profileOpen);
+        document.getElementById('profileTrigger').classList.toggle('open', profileOpen);
+        document.getElementById('profileTrigger').setAttribute('aria-expanded', String(profileOpen));
+    }
+
+    document.addEventListener('click', function(event) {
+        var trigger = document.getElementById('profileTrigger');
+        var dropdown = document.getElementById('profileDropdown');
+        if (profileOpen && !trigger.contains(event.target) && !dropdown.contains(event.target)) {
+            toggleProfile(false);
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && profileOpen) {
+            toggleProfile(false);
+            document.getElementById('profileTrigger').focus();
+        }
+    });
 
     /* ===== TOAST ===== */
     function esc(s) {

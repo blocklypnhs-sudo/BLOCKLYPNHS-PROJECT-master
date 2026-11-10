@@ -105,6 +105,14 @@
 
         :focus-visible { outline: 2px solid var(--green-accent); outline-offset: 2px; }
 
+        .teacher-sidebar .toggle-btn,
+        .teacher-sidebar .toggle-btn:hover,
+        .teacher-sidebar .toggle-btn:active {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
         /* ===== BACKGROUND: light mint + subtle grid ===== */
         .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
         .bg-layer::before {
@@ -540,8 +548,22 @@
         }
         @media (max-width: 600px) {
             .main-content { padding: 12px; }
-            .topbar h1 { font-size: 1.02rem; }
-            .topbar h1 i { width: 32px; height: 32px; font-size: 0.8rem; }
+            .topbar h1 { font-size: 0.9rem; }
+            .topbar h1 i { width: 27px; height: 27px; font-size: 0.75rem; }
+            .topbar-actions {
+                width: 100%;
+                flex: 0 0 100%;
+                justify-content: flex-end;
+                flex-wrap: nowrap;
+                gap: 6px;
+            }
+            .topbar-actions .btn {
+                min-height: 38px;
+                padding: 6px 9px;
+                font-size: 0.68rem;
+                white-space: nowrap;
+            }
+            .topbar-actions .theme-toggle { flex: 0 0 38px; }
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
             .stat-card { padding: 0.85rem 0.95rem; }
             .stat-card .value { font-size: 1.35rem; }

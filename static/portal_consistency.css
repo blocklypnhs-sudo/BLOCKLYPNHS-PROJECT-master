@@ -28,6 +28,44 @@
   outline-offset: 2px;
 }
 
+button:not(:disabled):not([aria-disabled="true"]):active,
+[role="button"]:not([aria-disabled="true"]):active,
+input[type="button"]:not(:disabled):active,
+input[type="submit"]:not(:disabled):active,
+input[type="reset"]:not(:disabled):active {
+  animation: portal-control-press 180ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes portal-control-press {
+  0%, 100% { scale: 1; }
+  45% { scale: 0.96; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):not([aria-disabled="true"]):active,
+  [role="button"]:not([aria-disabled="true"]):active,
+  input[type="button"]:not(:disabled):active,
+  input[type="submit"]:not(:disabled):active,
+  input[type="reset"]:not(:disabled):active {
+    animation: portal-control-press-desktop 240ms cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+}
+
+@keyframes portal-control-press-desktop {
+  0%, 100% { scale: 1; }
+  45% { scale: 0.92; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):not([aria-disabled="true"]):active,
+  [role="button"]:not([aria-disabled="true"]):active,
+  input[type="button"]:not(:disabled):active,
+  input[type="submit"]:not(:disabled):active,
+  input[type="reset"]:not(:disabled):active {
+    animation: none;
+  }
+}
+
 html,
 body {
   max-width: 100%;
@@ -38,6 +76,98 @@ body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body:has(a[href="/student_dashboard"]) .profile-trigger,
+body:has(a[href="/student_dashboard"]) .module-profile,
+.student-account-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 4px 10px 4px 4px;
+  border: 1.5px solid var(--border-fresh, #e0ebe4);
+  border-radius: 12px;
+  background: var(--card-white, #fff);
+  color: var(--text-primary, #10382c);
+  text-decoration: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+body:has(a[href="/student_dashboard"]) .profile-trigger:hover,
+body:has(a[href="/student_dashboard"]) .module-profile:hover,
+.student-account-chip:hover {
+  border-color: var(--green-main, #12604a);
+  box-shadow: 0 2px 8px rgba(18, 96, 74, 0.12);
+  color: var(--text-primary, #10382c);
+}
+
+body:has(a[href="/student_dashboard"]) .profile-trigger-avatar,
+body:has(a[href="/student_dashboard"]) .module-profile-avatar,
+.student-account-avatar {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--green-main, #12604a), var(--green-deep, #0c3b2d));
+  color: #fff;
+  font-size: 0.78rem;
+}
+
+body:has(a[href="/student_dashboard"]) .profile-trigger-info,
+body:has(a[href="/student_dashboard"]) .module-profile-info,
+.student-account-info {
+  display: flex;
+  max-width: 190px;
+  min-width: 0;
+  flex-direction: column;
+  text-align: left;
+}
+
+body:has(a[href="/student_dashboard"]) .profile-trigger-name,
+body:has(a[href="/student_dashboard"]) .module-profile-name,
+.student-account-name {
+  overflow: hidden;
+  color: var(--text-primary, #10382c);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body:has(a[href="/student_dashboard"]) .profile-trigger-role,
+body:has(a[href="/student_dashboard"]) .module-profile-grade,
+.student-account-grade {
+  color: var(--text-secondary, #3f5f52);
+  font-size: 0.6rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.student-account-chip {
+  max-width: min(260px, 48vw);
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.student-account-chip:focus-visible {
+  outline: 2px solid var(--green-accent, #147a54);
+  outline-offset: 2px;
+}
+
+.top-bar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-account-avatar iconify-icon {
+  font-size: 0.9rem;
 }
 
 .sidebar {
@@ -143,6 +273,9 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
+  border: 0;
+  background: transparent;
+  color: #d8efe5;
   transform: translateY(-50%);
 }
 
@@ -350,6 +483,23 @@ body {
 }
 
 @media (max-width: 768px) {
+  body:has(a[href="/student_dashboard"]) .profile-trigger-info,
+  body:has(a[href="/student_dashboard"]) .module-profile-info {
+    display: none;
+  }
+
+  .student-account-chip {
+    min-height: 40px;
+    padding-right: 4px;
+  }
+
+  .student-account-info {
+    display: none;
+  }
+
+  .top-bar-actions {
+    flex-wrap: wrap;
+  }
   body.portal-menu-open {
     overflow: hidden;
   }

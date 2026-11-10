@@ -322,6 +322,7 @@
             box-shadow: 0 4px 14px rgba(0,0,0,0.20);
             border-radius: 999px;
         }
+        .nav-group-toggle.active { background: transparent; color: var(--sidebar-text); box-shadow: none; }
         .nav-link-custom.active i,
         .nav-link-custom.active iconify-icon { color: var(--cpp-color); }
 
@@ -898,7 +899,7 @@
             <div class="nav-item"><a href="/student_modules" class="nav-link-custom"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a></div>
             <div class="nav-item"><a href="/student_progress" class="nav-link-custom"><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon><span class="nav-text">Progress</span></a></div>
             <div class="nav-section-label">Activities</div>
-            <button type="button" class="nav-group-toggle" id="activitiesNavToggle" aria-expanded="true" aria-controls="activitiesSubnav" onclick="toggleActivitiesNav()">
+            <button type="button" class="nav-group-toggle active" id="activitiesNavToggle" aria-expanded="true" aria-controls="activitiesSubnav" onclick="toggleActivitiesNav()">
                 <iconify-icon icon="lucide:layout-grid"></iconify-icon>
                 <span class="nav-text">Activities</span>
                 <iconify-icon class="nav-group-chevron" icon="lucide:chevron-down"></iconify-icon>
@@ -1347,11 +1348,12 @@
     function loadUserInfo() {
         fetch('/student_profile_data').then(r => r.json()).then(d => {
             if (d.success) {
-                const n = d.full_name || 'Student', g = d.grade_level || 'Grade 11';
+                const n = d.full_name || 'Student';
+                const gradeLabel = d.grade_label || 'Grade 11 - ICT';
                 document.getElementById('triggerName').innerText = n;
-                document.getElementById('triggerRole').innerText = g;
+                document.getElementById('triggerRole').innerText = gradeLabel;
                 document.getElementById('pdName').innerText = n;
-                document.getElementById('pdGrade').innerText = g + ' - ICT';
+                document.getElementById('pdGrade').innerText = gradeLabel;
             }
         }).catch(err => console.error('Error loading user info:', err));
     }

@@ -531,10 +531,19 @@
     <main class="main-content" id="mainContent">
         <header class="top-bar">
             <h1 class="page-title"><i class="fas fa-trophy"></i>Leaderboard</h1>
-            <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light/dark mode">
-                <i class="fas fa-moon icon-moon"></i>
-                <i class="fas fa-sun icon-sun"></i>
-            </button>
+            <div class="top-bar-actions">
+                <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light/dark mode">
+                    <i class="fas fa-moon icon-moon"></i>
+                    <i class="fas fa-sun icon-sun"></i>
+                </button>
+                <a class="student-account-chip" href="/student_profile" aria-label="Open student profile">
+                    <span class="student-account-avatar"><i class="fas fa-user" aria-hidden="true"></i></span>
+                    <span class="student-account-info">
+                        <span class="student-account-name">{{ full_name or username or 'Student' }}</span>
+                        <span class="student-account-grade">{{ grade_label or 'Grade 11 - ICT' }}</span>
+                    </span>
+                </a>
+            </div>
         </header>
 
         <!-- ============================================================== -->

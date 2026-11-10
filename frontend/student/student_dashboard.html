@@ -909,12 +909,36 @@
         .dashboard-module-count { color: var(--stone); font-size: 0.62rem; white-space: nowrap; }
         .dashboard-module-count.is-passed { color: var(--green-main); font-weight: 750; }
         .dashboard-module-count.is-failed { color: var(--coral); font-weight: 750; }
-        .dashboard-module-arrow { color: var(--stone-light); font-size: 0.7rem; }
+        .dashboard-module-arrow {
+            color: var(--stone-light); font-size: 0.7rem;
+            transition: transform 0.25s ease, color 0.25s ease;
+        }
+        .dashboard-module-summary[aria-expanded="true"] .dashboard-module-arrow {
+            transform: rotate(90deg);
+        }
         .dashboard-module-progress { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
         .dashboard-module-track { height: 6px; flex: 1; background: var(--chart-grid); border-radius: 99px; overflow: hidden; }
         .dashboard-module-fill { display: block; height: 100%; width: 0; background: var(--green-light); border-radius: inherit; transition: width 0.6s ease; }
-        .module-status { padding: 0.8rem 0.45rem 0.35rem; border-top: 1px solid var(--border-fresh); }
-        .module-status[hidden] { display: none !important; }
+        .module-status {
+            display: grid;
+            grid-template-rows: 1fr;
+            opacity: 1;
+            transform: translateY(0);
+            padding: 0.8rem 0.45rem 0.35rem;
+            border-top: 1px solid var(--border-fresh);
+            transition: grid-template-rows 0.32s ease, opacity 0.22s ease, transform 0.32s ease, padding 0.32s ease;
+        }
+        .module-status[hidden] {
+            display: grid !important;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            transform: translateY(-6px);
+            padding-top: 0;
+            padding-bottom: 0;
+            border-top-color: transparent;
+            pointer-events: none;
+        }
+        .module-status-content { min-height: 0; overflow: hidden; }
         .module-language-links { display: grid; gap: 0.4rem; }
         .module-language-link {
             display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
@@ -1161,6 +1185,23 @@
             .stats-grid { grid-row: 1; }
             .dashboard-modules { grid-row: 2; }
             .dashboard-leaderboard { grid-row: 3; }
+            .dashboard-module-row[data-type="activity"] .module-activity-link {
+                min-width: 0;
+                gap: 0.75rem;
+                padding: 0.45rem 0.6rem;
+            }
+            .dashboard-module-row[data-type="activity"] .module-activity-link > span:first-child {
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+            .dashboard-module-row[data-type="activity"] .module-activity-link.is-available .module-activity-status {
+                color: var(--stone);
+                font-weight: 400;
+            }
+            .dashboard-module-row[data-type="activity"] .module-activity-link.is-completed .module-activity-status {
+                color: var(--green-main);
+                font-weight: 750;
+            }
             .sidebar { width: var(--sidebar-collapsed-w); flex-basis: var(--sidebar-collapsed-w); }
             .sidebar .logo-full { display: none !important; }
             .sidebar .logo-mono { display: flex !important; }
@@ -1270,7 +1311,7 @@
             <div class="nav-section-label">Activities</div>
             <div class="nav-item">
                 <button type="button" class="nav-link-custom activities-toggle" id="activitiesToggle" onclick="toggleActivitiesNav()" aria-expanded="false" aria-controls="activitiesSubmenu">
-                    <iconify-icon icon="lucide:code"></iconify-icon><span class="nav-text">Activities</span><i class="fas fa-chevron-down activities-chevron"></i>
+                    <iconify-icon icon="lucide:layout-grid"></iconify-icon><span class="nav-text">Activities</span><i class="fas fa-chevron-down activities-chevron"></i>
                 </button>
                 <div class="activities-submenu" id="activitiesSubmenu">
                     <a href="/student_activities">All Activities</a>
@@ -1337,7 +1378,7 @@
                     <div class="profile-trigger-avatar"><i class="fas fa-user"></i></div>
                     <div class="profile-trigger-info">
                         <span class="profile-trigger-name" id="profileName">{{ full_name or username or 'Student' }}</span>
-                        <span class="profile-trigger-role" id="profileRole">{{ grade_level or 'Grade 11 - ICT' }}</span>
+                        <span class="profile-trigger-role" id="profileRole">{{ grade_label or 'Grade 11 - ICT' }}</span>
                     </div>
                     <i class="fas fa-chevron-down profile-trigger-chevron"></i>
                 </div>
@@ -1347,7 +1388,7 @@
                         <div class="pd-avatar"><i class="fas fa-user"></i></div>
                         <div>
                             <div class="pd-name" id="pdName">{{ full_name or username or 'Student' }}</div>
-                            <div class="pd-grade" id="pdGrade">{{ grade_level or 'Grade 11 - ICT' }}</div>
+                            <div class="pd-grade" id="pdGrade">{{ grade_label or 'Grade 11 - ICT' }}</div>
                         </div>
                     </div>
                     <div class="pd-links">
@@ -1421,13 +1462,15 @@
                                 </span>
                                 <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
                             </button>
-                            <div class="module-status" id="moduleDetailsPython" hidden>
+                            <div class="module-status" id="moduleDetailsPython" hidden inert>
+                                <div class="module-status-content">
                                 <div class="module-language-links">
                                     <a class="module-language-link" data-module-id="python-01-basics" href="/student_modules/python/1"><span>Python Module 1: Basics</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                     <a class="module-language-link" data-module-id="python-02-loops" href="/student_modules/python/2"><span>Python Module 2: Loops</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                 </div>
                                 <div class="module-assessments" data-assessment-language="python"><div class="progress-text">Loading assessments...</div></div>
                                 <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                                </div>
                             </div>
                         </div>
                         <div class="dashboard-module-row" data-language="java" data-suffix="Java" data-type="assessment">
@@ -1440,13 +1483,15 @@
                                 </span>
                                 <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
                             </button>
-                            <div class="module-status" id="moduleDetailsJava" hidden>
+                            <div class="module-status" id="moduleDetailsJava" hidden inert>
+                                <div class="module-status-content">
                                 <div class="module-language-links">
                                     <a class="module-language-link" data-module-id="java-01-basics" href="/student_modules/java/1"><span>Java Module 1: Basics</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                     <a class="module-language-link" data-module-id="java-02-loops" href="/student_modules/java/2"><span>Java Module 2: Loops</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                 </div>
                                 <div class="module-assessments" data-assessment-language="java"><div class="progress-text">Loading assessments...</div></div>
                                 <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                                </div>
                             </div>
                         </div>
                         <div class="dashboard-module-row" data-language="php" data-suffix="Php" data-type="activity">
@@ -1459,13 +1504,15 @@
                                 </span>
                                 <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
                             </button>
-                            <div class="module-status" id="moduleDetailsPhp" hidden>
+                            <div class="module-status" id="moduleDetailsPhp" hidden inert>
+                                <div class="module-status-content">
                                 <div class="module-language-links">
                                     <a class="module-language-link" data-module-id="php-01-variables" href="/student_modules/php/1"><span>PHP Module 1: Variables</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                     <a class="module-language-link" data-module-id="php-02-conditionals" href="/student_modules/php/2"><span>PHP Module 2: Conditionals</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                 </div>
                                 <div class="module-activities"><div class="progress-text">Loading activities...</div></div>
                                 <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                                </div>
                             </div>
                         </div>
                         <div class="dashboard-module-row" data-language="javascript" data-suffix="Javascript" data-type="activity">
@@ -1478,13 +1525,15 @@
                                 </span>
                                 <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
                             </button>
-                            <div class="module-status" id="moduleDetailsJavascript" hidden>
+                            <div class="module-status" id="moduleDetailsJavascript" hidden inert>
+                                <div class="module-status-content">
                                 <div class="module-language-links">
                                     <a class="module-language-link" data-module-id="js-01-variables" href="/student_modules/javascript/1"><span>JavaScript Module 1: Variables</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                     <a class="module-language-link" data-module-id="js-02-functions" href="/student_modules/javascript/2"><span>JavaScript Module 2: Functions</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                 </div>
                                 <div class="module-activities"><div class="progress-text">Loading activities...</div></div>
                                 <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                                </div>
                             </div>
                         </div>
                         <div class="dashboard-module-row" data-language="cpp" data-suffix="Cpp" data-type="activity">
@@ -1497,13 +1546,15 @@
                                 </span>
                                 <i class="fas fa-chevron-right dashboard-module-arrow" aria-hidden="true"></i>
                             </button>
-                            <div class="module-status" id="moduleDetailsCpp" hidden>
+                            <div class="module-status" id="moduleDetailsCpp" hidden inert>
+                                <div class="module-status-content">
                                 <div class="module-language-links">
                                     <a class="module-language-link" data-module-id="cpp-01-basics" href="/student_modules/cpp/1"><span>C++ Module 1: Basics</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                     <a class="module-language-link" data-module-id="cpp-02-loops" href="/student_modules/cpp/2"><span>C++ Module 2: Loops</span><span class="module-language-status" data-module-status>Loading...</span></a>
                                 </div>
                                 <div class="module-activities"><div class="progress-text">Loading activities...</div></div>
                                 <div class="module-awards-content"><div class="progress-text">Loading badges and certificates...</div></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2230,11 +2281,10 @@
             var expanded = button.getAttribute('aria-expanded') === 'true';
             var details = document.getElementById(button.getAttribute('aria-controls'));
             button.setAttribute('aria-expanded', String(!expanded));
-            if (details) details.hidden = expanded;
-            var arrow = button.querySelector('.dashboard-module-arrow');
-            if (arrow) {
-                arrow.classList.toggle('fa-chevron-right', expanded);
-                arrow.classList.toggle('fa-chevron-down', !expanded);
+            if (details) {
+                details.hidden = expanded;
+                details.inert = expanded;
+                details.setAttribute('aria-hidden', String(expanded));
             }
         });
     });
