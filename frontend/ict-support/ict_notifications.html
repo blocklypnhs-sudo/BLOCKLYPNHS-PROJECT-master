@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ICT Notifications · BlockLearn</title>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
         body { margin: 0; font-family: Inter, Arial, sans-serif; background: #f5f7f8; color: #24343b; }
         main { max-width: 760px; margin: 40px auto; padding: 0 20px; }
@@ -14,8 +15,56 @@
         .notification { padding: 16px 18px; } .notification.unread { border-left: 4px solid #e8a838; } .notification h2 { margin: 0 0 6px; font-size: 15px; } .notification p { margin: 0 0 8px; color: #53666d; } small { color: #82939a; }
     </style>
     <link href="/static/mobile_responsive.css" rel="stylesheet">
+    <style>
+        .sidebar.ict-notifications-sidebar { display: none !important; }
+        @media (max-width: 768px) {
+            .sidebar.ict-notifications-sidebar { display: flex !important; }
+            .sidebar.ict-notifications-sidebar .logo-full,
+            .sidebar.ict-notifications-sidebar .toggle-btn { display: none !important; }
+            .sidebar.ict-notifications-sidebar .logo-image { display: none !important; }
+            .sidebar.ict-notifications-sidebar .logo-mono,
+            .sidebar.ict-notifications-sidebar .hamburger-wrap { display: flex !important; }
+            .sidebar.ict-notifications-sidebar .sidebar-logo { justify-content: center; min-height: 62px; padding: 0.75rem 0.4rem; }
+            .sidebar.ict-notifications-sidebar .nav-link-custom { justify-content: center; width: calc(100% - 0.6rem); margin: 0 0.3rem; padding: 0.55rem 0; }
+            .sidebar.ict-notifications-sidebar .nav-text,
+            .sidebar.ict-notifications-sidebar .nav-section-label { display: none !important; }
+            .sidebar.ict-notifications-sidebar.mobile-open .logo-image,
+            .sidebar.ict-notifications-sidebar.mobile-open .logo-full { display: flex !important; }
+            .sidebar.ict-notifications-sidebar.mobile-open .logo-image { display: block !important; }
+            .sidebar.ict-notifications-sidebar.mobile-open .logo-mono,
+            .sidebar.ict-notifications-sidebar.mobile-open .hamburger-wrap { display: none !important; }
+            .sidebar.ict-notifications-sidebar.mobile-open .nav-link-custom { justify-content: flex-start; width: calc(100% - 1rem); margin: 0 0.5rem; padding: 0.5rem 0.85rem; }
+            .sidebar.ict-notifications-sidebar.mobile-open .nav-text { display: inline !important; }
+            .sidebar.ict-notifications-sidebar.mobile-open .nav-section-label { display: block !important; }
+            main { max-width: 760px; margin: 66px auto 0; padding: 0 12px 20px; }
+        }
+    </style>
+    <script defer src="/static/js/ict_mobile_sidebar.js"></script>
 </head>
-<body><main>
+<body class="ict-support-portal">
+<aside class="sidebar ict-notifications-sidebar" id="sidebar" aria-label="ICT support navigation">
+    <div class="sidebar-logo">
+        <img src="/static/BL-LOGO.png" alt="BlockLearn Logo" class="logo-image">
+        <div class="logo-full"><h2>Block<em>Learn</em></h2><p>PNHS · ICT Studio</p></div>
+        <div class="logo-mono"><img src="/static/BL-LOGO.png" alt="BlockLearn Logo"></div>
+        <button class="toggle-btn" type="button" aria-label="Collapse sidebar"><iconify-icon icon="lucide:panel-left-close"></iconify-icon></button>
+    </div>
+    <div class="hamburger-wrap"><button class="hamburger-btn" type="button" aria-label="Expand sidebar"><iconify-icon icon="lucide:menu"></iconify-icon></button></div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <div class="nav-item"><a href="/ict_support_dashboard" class="nav-link-custom"><iconify-icon icon="lucide:layout-dashboard"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
+        <div class="nav-section-label">Operations</div>
+        <div class="nav-item"><a href="/ict_support_tickets" class="nav-link-custom"><iconify-icon icon="lucide:ticket"></iconify-icon><span class="nav-text">Tickets</span></a></div>
+        <div class="nav-item"><a href="/ict_support_students" class="nav-link-custom"><iconify-icon icon="lucide:users"></iconify-icon><span class="nav-text">Users</span></a></div>
+        <div class="nav-section-label">Insights</div>
+        <div class="nav-item"><a href="/ict_support_reports" class="nav-link-custom"><iconify-icon icon="lucide:file-text"></iconify-icon><span class="nav-text">Reports</span></a></div>
+        <div class="nav-item"><a href="/ict_feedback_analytics" class="nav-link-custom"><iconify-icon icon="lucide:message-square-more"></iconify-icon><span class="nav-text">Feedback Analytics</span></a></div>
+        <div class="nav-section-label">System</div>
+        <div class="nav-item"><a href="/ict_support_audit_logs" class="nav-link-custom"><iconify-icon icon="lucide:scroll-text"></iconify-icon><span class="nav-text">Audit Logs</span></a></div>
+        <div class="nav-item"><a href="/ict_support_settings" class="nav-link-custom"><iconify-icon icon="lucide:settings"></iconify-icon><span class="nav-text">Settings</span></a></div>
+    </nav>
+</aside>
+<main>
     <section class="header"><h1>ICT Notifications <span id="badge">0</span></h1><button id="read">Mark all as read</button></section>
     <section id="list"><p>Loading notifications...</p></section>
 </main>
