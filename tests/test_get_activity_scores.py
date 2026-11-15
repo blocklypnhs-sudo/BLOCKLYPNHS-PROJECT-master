@@ -1,3 +1,5 @@
+import pytest
+
 from backend.app import app
 
 
@@ -169,7 +171,7 @@ def test_assessment_results_returns_scores_out_of_ten(monkeypatch):
                     {'Field': 'lrn'},
                 ]
             return [{
-                'score': 9.0,
+                'score': 9,
                 'max_score': 10,
                 'result': 'Passed',
             }]
@@ -198,10 +200,61 @@ def test_assessment_results_returns_scores_out_of_ten(monkeypatch):
 
     assert response.status_code == 200
     result = response.get_json()['results'][0]
-    assert result['score'] == 9.0
+    assert result['score'] == 9
+    assert type(result['score']) is int
     assert result['max_score'] == 10
-    assert 'ROUND(a.score / 10, 1)' in connection.cursor_instance.query
+    assert 'CAST(ROUND(a.score / 10) AS UNSIGNED) AS score' in connection.cursor_instance.query
     assert "CASE WHEN a.score >= 75 THEN 'Passed'" in connection.cursor_instance.query
+
+
+def test_teacher_student_list_includes_student_email(monkeypatch):
+    class FakeCursor:
+        query = ''
+
+        def execute(self, query):
+            self.query = query
+
+        def fetchall(self):
+            if self.query == 'SHOW COLUMNS FROM students':
+                return [
+                    {'Field': 'full_name'},
+                    {'Field': 'username'},
+                    {'Field': 'lrn'},
+                ]
+            return [{
+                'id': 5,
+                'lrn': '123456789012',
+                'full_name': 'Student One',
+                'email': 'student@example.com',
+                'grade_level': 'Grade 11',
+                'created_at': '2026-11-14',
+            }]
+
+        def close(self):
+            pass
+
+    class FakeConnection:
+        def __init__(self):
+            self.cursor_instance = FakeCursor()
+
+        def cursor(self, dictionary=True):
+            return self.cursor_instance
+
+        def close(self):
+            pass
+
+    connection = FakeConnection()
+    monkeypatch.setattr('backend.app.get_db_connection', lambda: connection)
+
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['role'] = 'teacher'
+        response = client.get('/get_students')
+
+    assert response.status_code == 200
+    student = response.get_json()['students'][0]
+    assert student['email'] == 'student@example.com'
+    assert 's.email' in connection.cursor_instance.query
 
 
 def test_activity_score_leaderboard_returns_per_item_rankings(monkeypatch):
@@ -456,8 +509,19 @@ def test_teacher_score_submissions_route_uses_assessment_attempts(monkeypatch):
         assert 'code_blocks' not in submission
 
 
-def test_teacher_review_route_saves_teacher_score_to_attempt(monkeypatch):
+@pytest.mark.parametrize(
+    ('language', 'item_label', 'previous_score', 'new_score', 'should_notify'),
+    [
+        ('python', 'Assessment', 6, 8, True),
+        ('php', 'Activity', 6, 8, True),
+        ('php', 'Activity', 8, 8, False),
+    ],
+)
+def test_teacher_review_route_saves_teacher_score_and_notifies_student(
+    monkeypatch, language, item_label, previous_score, new_score, should_notify
+):
     executed = []
+    notifications = []
 
     class FakeCursor:
         def execute(self, query, params=()):
@@ -467,9 +531,10 @@ def test_teacher_review_route_saves_teacher_score_to_attempt(monkeypatch):
             return {
                 'points': 10,
                 'title': 'Hello Python',
-                'language': 'python',
+                'language': language,
                 'assessment_number': 3,
                 'student_id': 99,
+                'teacher_score': previous_score,
             }
 
         def close(self):
@@ -489,7 +554,10 @@ def test_teacher_review_route_saves_teacher_score_to_attempt(monkeypatch):
             pass
 
     monkeypatch.setattr('backend.app.get_db_connection', lambda: FakeConn())
-    monkeypatch.setattr('backend.app.notify_assessment_checked', lambda *args: None)
+    monkeypatch.setattr(
+        'backend.app.notify_assessment_checked',
+        lambda *args: notifications.append(args),
+    )
     awarded = []
     monkeypatch.setattr(
         'backend.app.try_award_after_submission',
@@ -509,7 +577,7 @@ def test_teacher_review_route_saves_teacher_score_to_attempt(monkeypatch):
 
         response = client.post('/teacher/review_submission', json={
             'submission_id': 42,
-            'score': 8,
+            'score': new_score,
             'feedback': 'Good work',
         })
 
@@ -521,6 +589,10 @@ def test_teacher_review_route_saves_teacher_score_to_attempt(monkeypatch):
     assert result['module_complete'] is True
     update_query, update_params = executed[1]
     assert 'UPDATE assessment_attempts' in update_query
-    assert update_params[:4] == (80, 8, 'Good work', 7)
+    assert update_params[:4] == (new_score * 10, new_score, 'Good work', 7)
     assert update_params[-1] == 42
-    assert awarded == [(99, 'python', 3)]
+    assert awarded == [(99, language, 3)]
+    assert notifications == (
+        [(99, 'Hello Python', new_score, 'Good work', 42, 10, item_label)]
+        if should_notify else []
+    )

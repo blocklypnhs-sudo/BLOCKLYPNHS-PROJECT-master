@@ -744,11 +744,12 @@
                         <tr>
                             <th>#</th>
                             <th>Student Name</th>
+                            <th>Email</th>
                             <th>Grade Level</th>
                             <th>Registered Date</th>
                         </tr>
                     </thead>
-                    <tbody id="studentList"><tr><td colspan="4" class="text-center py-4">Loading students...</td></tr></tbody>
+                    <tbody id="studentList"><tr><td colspan="5" class="text-center py-4">Loading students...</td></tr></tbody>
                 </table>
             </div>
         </section>
@@ -1042,7 +1043,7 @@
         const visible = students;
         const list = document.getElementById('studentList');
         if (!visible.length) {
-            list.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No students found.</td></tr>';
+            list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No students found.</td></tr>';
             return;
         }
         list.innerHTML = visible.map((student, index) => `
@@ -1051,6 +1052,7 @@
                 <td>
                     <div class="fw-semibold">${esc(student.full_name || 'Student')}</div>
                 </td>
+                <td>${esc(student.email || 'Not set')}</td>
                 <td>${esc(student.grade_level || '—')}</td>
                 <td>${esc(student.created_at || '—')}</td>
             </tr>
@@ -1068,7 +1070,7 @@
             renderStudents();
         } catch (error) {
             console.error('Failed to load students:', error);
-            list.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-danger">Unable to load students.</td></tr>';
+            list.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Unable to load students.</td></tr>';
             showToast('Failed to load students');
         }
     }

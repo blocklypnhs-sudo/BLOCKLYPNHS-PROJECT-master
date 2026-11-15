@@ -273,6 +273,8 @@
         .activities-submenu iconify-icon { font-size: 0.95rem; }
         .sidebar.collapsed .activities-submenu,
         .sidebar.collapsed .activities-chevron { display: none; }
+        .mobile-nav-toggle,
+        .mobile-nav-submenu { display: none; }
 
         .nav-badge {
             position: absolute; top: 50%; left: 22px; transform: translateY(-50%);
@@ -870,6 +872,11 @@
             .assessment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 768px) {
+            .sidebar .desktop-nav-link { display: none !important; }
+            .sidebar .mobile-nav-toggle { display: flex !important; }
+            .sidebar .mobile-nav-submenu { display: none !important; padding: 0.1rem 0 0.25rem 2.35rem; }
+            .sidebar .mobile-nav-submenu.open { display: flex !important; flex-direction: column; }
+            .sidebar.collapsed .mobile-nav-submenu { display: none !important; }
             .sidebar { width: var(--sidebar-collapsed-w); }
             .sidebar .logo-full { display: none !important; }
             .sidebar .logo-mono { display: flex !important; }
@@ -969,8 +976,29 @@
         <nav class="sidebar-nav">
             <div class="nav-section-label">Main</div>
             <div class="nav-item"><a href="/student_dashboard" class="nav-link-custom"><iconify-icon icon="lucide:house"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
-            <div class="nav-item"><a href="/assessments" class="nav-link-custom active" aria-current="page"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a></div>
-            <div class="nav-item"><a href="/student_modules" class="nav-link-custom"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a></div>
+            <div class="nav-item">
+                <a href="/assessments" class="nav-link-custom desktop-nav-link active" aria-current="page"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a>
+                <button type="button" class="nav-link-custom mobile-nav-toggle activities-toggle active" id="assessmentNavToggle" onclick="toggleStudentNavGroup('assessmentNavToggle', 'assessmentSubnav')" aria-expanded="false" aria-controls="assessmentSubnav">
+                    <iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span><i class="fas fa-chevron-down activities-chevron"></i>
+                </button>
+                <div class="activities-submenu mobile-nav-submenu" id="assessmentSubnav">
+                    <a href="/assessments_python">Python Assessments</a>
+                    <a href="/assessments_java">Java Assessments</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="/student_modules" class="nav-link-custom desktop-nav-link"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a>
+                <button type="button" class="nav-link-custom mobile-nav-toggle activities-toggle" id="modulesNavToggle" onclick="toggleStudentNavGroup('modulesNavToggle', 'modulesSubnav')" aria-expanded="false" aria-controls="modulesSubnav">
+                    <iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span><i class="fas fa-chevron-down activities-chevron"></i>
+                </button>
+                <div class="activities-submenu mobile-nav-submenu" id="modulesSubnav">
+                    <a href="/module_assessments#python-modules">Python Modules</a>
+                    <a href="/module_assessments#java-modules">Java Modules</a>
+                    <a href="/module_assessments#php-modules">PHP Modules</a>
+                    <a href="/module_assessments#javascript-modules">JavaScript Modules</a>
+                    <a href="/module_assessments#cpp-modules">C++ Modules</a>
+                </div>
+            </div>
             <div class="nav-item"><a href="/student_progress" class="nav-link-custom"><iconify-icon icon="lucide:chart-no-axes-combined"></iconify-icon><span class="nav-text">Progress</span></a></div>
             <div class="nav-section-label">Activities</div>
             <div class="nav-item">
@@ -1255,6 +1283,13 @@
         toggle.classList.toggle('open', isOpen);
         toggle.setAttribute('aria-expanded', String(isOpen));
     }
+    function toggleStudentNavGroup(toggleId, submenuId) {
+        var toggle = document.getElementById(toggleId);
+        var submenu = document.getElementById(submenuId);
+        var isOpen = submenu.classList.toggle('open');
+        toggle.classList.toggle('open', isOpen);
+        toggle.setAttribute('aria-expanded', String(isOpen));
+    }
 
     window.addEventListener('resize', function() {
         if (window.innerWidth <= 768) {
@@ -1423,6 +1458,7 @@
                 <div class="notif-item ${unreadClass}" id="notif-${notif.id}">
                     <div class="notif-title">${notif.title}</div>
                     <div class="notif-message">${notif.message}</div>
+                    ${notif.retry_url ? `<a class="notif-retry-link" href="${notif.retry_url}" data-retry-url="${notif.retry_url}">Retry this item</a>` : ''}
                     ${scoreHtml}
                     <span class="notif-time">${timeAgo}</span>
                     ${readBtn}

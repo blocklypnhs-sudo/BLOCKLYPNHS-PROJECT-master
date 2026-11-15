@@ -155,8 +155,162 @@
         repositionOpenDropdowns();
     }
 
+    function initializeNotificationReadOnClose() {
+        const dropdownSelector = '.notif-dropdown';
+        const openStates = new WeakMap();
+        const itemSelector = '.notif-item.unread, .notification.unread, .module-notif-item.unread';
+
+        const notificationIdFor = (item) => {
+            const button = item.querySelector(
+                '[data-notification-id], [data-id], [data-mark-read]'
+            );
+            const id = item.dataset.notificationId
+                || item.dataset.id
+                || (button && (
+                    button.dataset.notificationId
+                    || button.dataset.id
+                    || button.dataset.markRead
+                ));
+            if (id && /^\d+$/.test(id)) return id;
+            const match = (item.id || '').match(/(?:notif|notification)-(\d+)$/);
+            return match ? match[1] : null;
+        };
+
+        const markUnreadAsRead = async (dropdown) => {
+            const pending = Array.from(dropdown.querySelectorAll(itemSelector))
+                .map((item) => ({ item, id: notificationIdFor(item) }))
+                .filter(({ id }) => id);
+
+            await Promise.all(pending.map(async ({ item, id }) => {
+                try {
+                    const response = await fetch('/mark_notification_read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ notification_id: id })
+                    });
+                    const data = await response.json();
+                    if (!response.ok && response.status !== 404) {
+                        throw new Error(data.message || `HTTP ${response.status}`);
+                    }
+                    if (response.ok || response.status === 404) {
+                        item.classList.remove('unread');
+                        item.querySelectorAll(
+                            '.notif-read-btn, .module-notif-read, [data-mark-read]'
+                        ).forEach((button) => button.remove());
+                    }
+                } catch (error) {
+                    console.error(`Unable to mark notification ${id} as read:`, error);
+                }
+            }));
+
+            try {
+                const response = await fetch('/get_unread_count');
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Unable to refresh unread count');
+                }
+                document.querySelectorAll('#notifBadge, .notif-badge').forEach((badge) => {
+                    const count = Number(data.count) || 0;
+                    badge.textContent = count > 99 ? '99+' : String(count);
+                    badge.classList.toggle('hidden', count === 0);
+                });
+            } catch (error) {
+                console.error('Unable to refresh notification count:', error);
+            }
+        };
+
+        const removeManualReadControls = (dropdown) => {
+            dropdown.querySelectorAll(
+                '.notif-read-btn, .mark-read-btn, .module-notif-read, [data-mark-read]'
+            ).forEach((button) => {
+                const item = button.closest('.notif-item, .notification, .module-notif-item');
+                const id = button.dataset.notificationId
+                    || button.dataset.id
+                    || button.dataset.markRead;
+                if (item && id && !item.dataset.notificationId) {
+                    item.dataset.notificationId = id;
+                }
+                button.remove();
+            });
+        };
+
+        document.querySelectorAll(dropdownSelector).forEach((dropdown) => {
+            openStates.set(dropdown, dropdown.classList.contains('open'));
+            removeManualReadControls(dropdown);
+        });
+
+        document.addEventListener('click', async (event) => {
+            const clickTarget = event.target instanceof Element ? event.target : null;
+            const link = clickTarget && clickTarget.closest('a[data-retry-url]');
+            if (!link) return;
+
+            const target = new URL(link.dataset.retryUrl, window.location.origin);
+            if (target.origin !== window.location.origin) return;
+            event.preventDefault();
+
+            const item = link.closest(
+                '.notif-item, .notification, .module-notif-item'
+            );
+            const id = item && notificationIdFor(item);
+            if (id) {
+                try {
+                    const response = await fetch('/mark_notification_read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ notification_id: id })
+                    });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.message || `HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error(`Unable to mark notification ${id} as read:`, error);
+                }
+            }
+            window.location.assign(target.href);
+        });
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    const containingDropdown = mutation.target instanceof Element
+                        ? mutation.target.closest(dropdownSelector)
+                        : null;
+                    if (containingDropdown) removeManualReadControls(containingDropdown);
+                    mutation.addedNodes.forEach((node) => {
+                        if (!(node instanceof Element)) return;
+                        if (node.matches(dropdownSelector)) {
+                            openStates.set(node, node.classList.contains('open'));
+                            removeManualReadControls(node);
+                        }
+                        node.querySelectorAll(dropdownSelector).forEach((dropdown) => {
+                            openStates.set(dropdown, dropdown.classList.contains('open'));
+                            removeManualReadControls(dropdown);
+                        });
+                    });
+                    return;
+                }
+
+                if (!mutation.target.matches(dropdownSelector)) return;
+                const dropdown = mutation.target;
+                const wasOpen = openStates.get(dropdown) === true;
+                const isOpen = dropdown.classList.contains('open');
+                openStates.set(dropdown, isOpen);
+                if (wasOpen && !isOpen) markUnreadAsRead(dropdown);
+                if (isOpen) removeManualReadControls(dropdown);
+            });
+        });
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+            childList: true,
+            subtree: true
+        });
+    }
+
     function initializePortalSidebar() {
         initializeMobileDropdownPositioning();
+        initializeNotificationReadOnClose();
 
         try {
             if (localStorage.getItem('blocklearn-theme') === 'dark') {

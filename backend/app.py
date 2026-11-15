@@ -17,6 +17,7 @@ from backend.notification_service import (
     notify_assessment_checked,
     notify_student_assessment_result,
     notify_module_assessment_result,
+    notify_module_score_updated,
     notify_new_support_ticket,
     notify_student_ticket_received,
     notify_ticket_updated,
@@ -614,30 +615,11 @@ def init_database():
                 UNIQUE KEY uq_student_learning_item_attempt (language, assessment_id, student_id)
             )
         """)
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS activity_attempt_sessions (
-                student_id INT NOT NULL,
-                language VARCHAR(20) NOT NULL,
-                assessment_number TINYINT UNSIGNED NOT NULL,
-                started_at DATETIME NOT NULL,
-                expires_at DATETIME NOT NULL,
-                status ENUM('active', 'submitted') NOT NULL DEFAULT 'active',
-                PRIMARY KEY (student_id, language, assessment_number),
-                INDEX idx_activity_session_expiry (expires_at),
-                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        """)
         cursor.execute("SHOW INDEX FROM assessment_attempts WHERE Key_name = 'uq_student_learning_item_attempt'")
         if not cursor.fetchall():
             cursor.execute("""
                 ALTER TABLE assessment_attempts
                 ADD UNIQUE KEY uq_student_learning_item_attempt (language, assessment_id, student_id)
-            """)
-        cursor.execute("SHOW INDEX FROM activity_attempt_sessions WHERE Key_name = 'PRIMARY'")
-        if not cursor.fetchall():
-            cursor.execute("""
-                ALTER TABLE activity_attempt_sessions
-                ADD PRIMARY KEY (student_id, language, assessment_number)
             """)
 
         cursor.execute("""
@@ -1747,7 +1729,6 @@ def start_activity():
     data = request.get_json(silent=True) or {}
     language = str(data.get('language') or '').lower()
     assessment_number = data.get('assessment_number')
-    restart = data.get('restart') is True
     if (
         language not in ACTIVITY_LANGUAGES
         or not isinstance(assessment_number, int)
@@ -1795,52 +1776,11 @@ def start_activity():
                 'message': 'Complete and pass the previous activity first',
             }), 403
 
-        cursor.execute("""
-            SELECT 1 AS expired
-            FROM activity_attempt_sessions
-            WHERE student_id = %s AND language = %s AND assessment_number = %s
-              AND status = 'active' AND expires_at <= NOW()
-            LIMIT 1
-        """, (session['user_id'], language, assessment_number))
-        expired_session = cursor.fetchone()
-        if expired_session and not restart:
-            return jsonify({
-                'success': True,
-                'completed': False,
-                'expired': True,
-                'assessment_number': assessment_number,
-            })
-
-        cursor.execute("""
-            INSERT INTO activity_attempt_sessions
-                (student_id, language, assessment_number, started_at, expires_at, status)
-            VALUES (%s, %s, %s, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR), 'active')
-            ON DUPLICATE KEY UPDATE
-                started_at = IF(
-                    status = 'submitted' OR expires_at <= NOW(),
-                    NOW(), started_at
-                ),
-                expires_at = IF(
-                    status = 'submitted' OR expires_at <= NOW(),
-                    DATE_ADD(NOW(), INTERVAL 1 HOUR), expires_at
-                ),
-                status = 'active'
-        """, (session['user_id'], language, assessment_number))
-        cursor.execute("""
-            SELECT UNIX_TIMESTAMP(expires_at) * 1000 AS expires_at_ms,
-                   UNIX_TIMESTAMP(NOW()) * 1000 AS server_now_ms
-            FROM activity_attempt_sessions
-            WHERE student_id = %s AND language = %s AND assessment_number = %s
-        """, (session['user_id'], language, assessment_number))
-        timer = cursor.fetchone()
         conn.commit()
         return jsonify({
             'success': True,
             'completed': False,
             'assessment_number': assessment_number,
-            'expires_at_ms': int(timer['expires_at_ms']),
-            'server_now_ms': int(timer['server_now_ms']),
-            'time_limit_seconds': 3600,
         })
     except Exception as error:
         if conn:
@@ -2137,20 +2077,6 @@ def submit_assessment():
                     'success': False,
                     'message': 'Complete and pass the previous activity first',
                 }), 403
-            cursor.execute("""
-                SELECT expires_at > NOW() AS active
-                FROM activity_attempt_sessions
-                WHERE student_id = %s AND language = %s AND assessment_number = %s
-                  AND status = 'active'
-                LIMIT 1
-            """, (session['user_id'], language, assessment_number))
-            timer = cursor.fetchone()
-            if not timer or not timer.get('active'):
-                return jsonify({
-                    'success': False,
-                    'message': 'This activity time limit has ended. Restart the activity to try again.',
-                }), 403
-
         expected_output = normalize_output(assessment['expected_output'] or '')
         server_output = '__PENDING_REVIEW__'
         if language == 'python' and generated_code.strip():
@@ -2242,12 +2168,6 @@ def submit_assessment():
             earned_points, max_points, result_status, json.dumps(answer_breakdown),
             duration_seconds, submitted_at,
         ))
-        if request.path == '/submit_activity':
-            cursor.execute("""
-                UPDATE activity_attempt_sessions
-                SET status = 'submitted'
-                WHERE student_id = %s AND language = %s AND assessment_number = %s
-            """, (session['user_id'], language, assessment_number))
         conn.commit()
 
         new_badges = []
@@ -5234,6 +5154,7 @@ def get_students():
                     s.id,
                     s.lrn,
                     {student_name} AS full_name,
+                    s.email,
                     s.grade_level,
                     DATE_FORMAT(s.created_at, '%Y-%m-%d') as created_at
                 FROM students s
@@ -5393,7 +5314,7 @@ def get_assessment_results():
         cursor.execute(f"""
             SELECT s.lrn, {student_name} AS student_name,
                    d.title AS assessment_name, d.language,
-                   ROUND(a.score / 10, 1) AS score,
+                   CAST(ROUND(a.score / 10) AS UNSIGNED) AS score,
                    10 AS max_score,
                    CASE
                        WHEN a.teacher_score IS NOT NULL THEN
@@ -5653,6 +5574,12 @@ def teacher_score_attempt_detail(attempt_type, attempt_id):
                        h.points_earned,
                        h.max_points,
                        h.status AS result_status,
+                       h.id = (
+                           SELECT MAX(latest.id)
+                           FROM module_assessment_submission_history latest
+                           WHERE latest.student_id = h.student_id
+                             AND latest.module_id = h.module_id
+                       ) AS is_latest,
                        h.answer_breakdown,
                        h.submitted_at
                 FROM module_assessment_submission_history h
@@ -5662,6 +5589,7 @@ def teacher_score_attempt_detail(attempt_type, attempt_id):
         attempt = cursor.fetchone()
         if not attempt:
             return jsonify({'success': False, 'message': 'Score attempt not found'}), 404
+        attempt['attempt_type'] = attempt_type
         attempt['answer_breakdown'] = normalize_breakdown_points(
             json.loads(attempt['answer_breakdown'])
         )
@@ -5669,6 +5597,112 @@ def teacher_score_attempt_detail(attempt_type, attempt_id):
     except Exception as e:
         print(f"Get teacher score attempt detail error: {e}")
         return jsonify({'success': False, 'message': 'Failed to retrieve score attempt'}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@app.route('/api/teacher/module-assessment-score', methods=['POST'])
+def review_teacher_module_assessment():
+    if session.get('role') != 'teacher':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    data = request.get_json(silent=True) or {}
+    attempt_id = data.get('attempt_id')
+    score = data.get('score')
+    if (
+        not isinstance(attempt_id, int)
+        or isinstance(attempt_id, bool)
+        or attempt_id < 1
+        or not isinstance(score, int)
+        or isinstance(score, bool)
+        or not 0 <= score <= 10
+    ):
+        return jsonify({'success': False, 'message': 'Enter an attempt ID and a score from 0 to 10'}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT h.id, h.student_id, h.module_id, h.module_title, h.language,
+                   h.module_number, h.max_points, h.points_earned,
+                   a.id AS module_attempt_id, a.score AS current_score,
+                   a.points_earned AS current_points_earned, a.status AS current_status
+            FROM module_assessment_submission_history h
+            JOIN module_assessment_attempts a
+              ON a.student_id = h.student_id AND a.module_id = h.module_id
+            WHERE h.id = %s
+            LIMIT 1
+        """, (attempt_id,))
+        attempt = cursor.fetchone()
+        if not attempt:
+            return jsonify({'success': False, 'message': 'Module attempt not found'}), 404
+
+        cursor.execute("""
+            SELECT MAX(id) AS latest_id
+            FROM module_assessment_submission_history
+            WHERE student_id = %s AND module_id = %s
+        """, (attempt['student_id'], attempt['module_id']))
+        latest_id = (cursor.fetchone() or {}).get('latest_id')
+        if int(latest_id or 0) != attempt_id:
+            return jsonify({
+                'success': False,
+                'message': 'Only the latest module attempt can be graded',
+            }), 409
+
+        max_points = int(attempt.get('max_points') or 10)
+        if score > max_points:
+            return jsonify({
+                'success': False,
+                'message': f'Score cannot exceed {max_points} points',
+            }), 400
+        points_earned = score
+        score_percent = round(points_earned * 100 / max_points) if max_points else 0
+        status = 'passed' if score_percent >= PASS_THRESHOLD else 'failed'
+        score_changed = (
+            int(attempt.get('points_earned') or 0) != points_earned
+            or int(attempt.get('current_points_earned') or 0) != points_earned
+            or int(attempt.get('current_score') or 0) != score_percent
+            or attempt.get('current_status') != status
+        )
+        cursor.execute("""
+            UPDATE module_assessment_submission_history
+            SET score = %s, points_earned = %s, status = %s
+            WHERE id = %s
+        """, (score_percent, points_earned, status, attempt_id))
+        cursor.execute("""
+            UPDATE module_assessment_attempts
+            SET score = %s, points_earned = %s, status = %s
+            WHERE id = %s
+        """, (score_percent, points_earned, status, attempt['module_attempt_id']))
+        conn.commit()
+
+        if score_changed:
+            notify_module_score_updated(
+                attempt['student_id'],
+                attempt['module_title'],
+                points_earned,
+                max_points,
+                status,
+                attempt['module_attempt_id'],
+            )
+        return jsonify({
+            'success': True,
+            'status': status,
+            'score': score_percent,
+            'points': points_earned,
+            'max_points': max_points,
+            'retry_required': status != 'passed',
+        })
+    except Exception:
+        if conn:
+            conn.rollback()
+        app.logger.exception("Unable to update teacher module assessment score")
+        return jsonify({'success': False, 'message': 'Failed to update module score'}), 500
     finally:
         if cursor:
             cursor.close()
@@ -5757,7 +5791,8 @@ def review_teacher_submission():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT d.points, d.title, d.language, d.assessment_number, a.student_id
+            SELECT d.points, d.title, d.language, d.assessment_number,
+                   a.student_id, a.teacher_score
             FROM learning_items d
             JOIN assessment_attempts a ON a.assessment_id = d.id AND a.language = d.language
             WHERE a.id = %s
@@ -5797,13 +5832,21 @@ def review_teacher_submission():
             except Exception as award_err:
                 print(f"[review_teacher_submission] award error: {award_err}")
                 conn.rollback()
-        notify_assessment_checked(
-            assessment['student_id'],
-            assessment['title'],
-            stored_score,
-            feedback,
-            submission_id,
-        )
+        if assessment.get('teacher_score') is None or assessment['teacher_score'] != score:
+            item_label = (
+                'Activity'
+                if assessment['language'] in ('php', 'javascript', 'cpp')
+                else 'Assessment'
+            )
+            notify_assessment_checked(
+                assessment['student_id'],
+                assessment['title'],
+                score,
+                feedback,
+                submission_id,
+                10,
+                item_label,
+            )
         return jsonify({
             'success': True,
             'message': 'Review saved',

@@ -48,8 +48,9 @@ def notify_assessment_checked(student_id, assessment_name, score, feedback, subm
     score_text = f'{score}/{max_points}' if max_points is not None else f'{score}%'
     return _insert_notification(
         'activity_checked' if item_label == 'Activity' else 'assessment_checked',
-        f'{item_label} Checked',
-        f'{assessment_name} was auto-graded. Score: {score_text}. Feedback: {feedback_text}',
+        f'{item_label} Score Updated',
+        f'Your teacher updated your {item_label.lower()} score for {assessment_name}: '
+        f'{score_text} points. Feedback: {feedback_text}',
         user_id=student_id,
         target_role='student',
         related_id=submission_id,
@@ -77,6 +78,19 @@ def notify_module_assessment_result(student_id, module_title, points, max_points
         user_id=student_id,
         target_role='student',
         related_id=None,
+    )
+
+
+def notify_module_score_updated(student_id, module_title, points, max_points, status, attempt_id):
+    return _insert_notification(
+        'module_score_updated',
+        'Module Score Updated',
+        f'Your teacher updated your module score for {module_title}: '
+        f'{points}/{max_points} points. '
+        f'{"You need to retry this module." if status == "failed" else "You passed this module."}',
+        user_id=student_id,
+        target_role='student',
+        related_id=attempt_id,
     )
 
 
@@ -121,7 +135,14 @@ def get_notifications_for_user(user_id, role):
         cursor.execute(
             """
             SELECT n.id, n.type, n.title, n.message, n.related_id, n.is_read, n.created_at,
-                   reviewed_item.points AS max_points
+                   reviewed_item.points AS max_points,
+                   reviewed_item.language AS item_language,
+                   reviewed_item.assessment_number AS item_number,
+                   attempt_by_id.teacher_score,
+                   module_attempt.language AS module_language,
+                   module_attempt.module_number,
+                   module_attempt.points_earned AS module_points_earned,
+                   module_attempt.max_points AS module_max_points
             FROM notifications AS n
             LEFT JOIN assessment_attempts AS attempt_by_id
                 ON n.type IN ('assessment_checked', 'activity_checked')
@@ -129,6 +150,9 @@ def get_notifications_for_user(user_id, role):
             LEFT JOIN learning_items AS reviewed_item
                 ON reviewed_item.id = attempt_by_id.assessment_id
                AND reviewed_item.language = attempt_by_id.language
+            LEFT JOIN module_assessment_attempts AS module_attempt
+                ON n.type = 'module_score_updated'
+               AND n.related_id = module_attempt.id
             WHERE n.target_role = %s AND (n.user_id IS NULL OR n.user_id = %s)
             ORDER BY n.created_at DESC
             LIMIT 50
@@ -138,7 +162,28 @@ def get_notifications_for_user(user_id, role):
         rows = cursor.fetchall()
         for row in rows:
             if row['type'] in ('assessment_checked', 'activity_checked'):
-                row['title'] = 'Activity Checked' if row['type'] == 'activity_checked' else 'Assessment Checked'
+                item_label = 'Activity' if row['type'] == 'activity_checked' else 'Assessment'
+                row['title'] = f'{item_label} Score Updated'
+                teacher_score = row.get('teacher_score')
+                if teacher_score is not None:
+                    score_value = int(teacher_score)
+                    normalized_score = (
+                        score_value * 10 if score_value <= 10 else score_value
+                    )
+                    language = row.get('item_language')
+                    passing_score = 80 if row['type'] == 'assessment_checked' else 75
+                    if normalized_score < passing_score:
+                        item_number = row.get('item_number')
+                        route = {
+                            'php': 'playground_php',
+                            'javascript': 'playground_javascript',
+                            'cpp': 'playground_cpp',
+                            'python': 'assessment_python_activity',
+                            'java': 'assessment_java_activity',
+                        }.get(language)
+                        if route and item_number:
+                            query_key = 'activity' if language in ('php', 'javascript', 'cpp') else 'id'
+                            row['retry_url'] = f'/{route}?{query_key}={int(item_number)}'
                 score_match = re.search(r'Score:\s*(\d+)%', row['message'] or '')
                 max_points = row.get('max_points')
                 if score_match and max_points is not None:
@@ -149,6 +194,21 @@ def get_notifications_for_user(user_id, role):
                         f'Score: {earned_points}/{max_points}',
                         row['message'],
                         count=1,
+                    )
+            elif row['type'] == 'module_score_updated':
+                module_language = row.get('module_language')
+                module_number = row.get('module_number')
+                module_points = row.get('module_points_earned')
+                module_max_points = row.get('module_max_points')
+                if (
+                    module_language
+                    and module_number
+                    and module_points is not None
+                    and module_max_points
+                    and int(module_points) * 100 / int(module_max_points) < 75
+                ):
+                    row['retry_url'] = (
+                        f'/student_modules/{module_language}/{int(module_number)}'
                     )
             if row.get('created_at'):
                 created_at = row['created_at']

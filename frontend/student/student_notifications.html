@@ -126,7 +126,7 @@ let activeFilter = 'all';
 
 function notificationCategory(type) {
     if (['assessment_result', 'assessment_checked', 'activity_checked'].includes(type)) return 'assessments';
-    if (['activity_completed', 'module_assessment_result'].includes(type)) return 'progress';
+    if (['activity_completed', 'module_assessment_result', 'module_score_updated'].includes(type)) return 'progress';
     if (['support_ticket_received', 'support_ticket_updated'].includes(type)) return 'support';
     if (['announcement', 'teacher_announcement'].includes(type)) return 'announcements';
     if (['reminder', 'deadline_reminder'].includes(type)) return 'reminders';
@@ -167,8 +167,17 @@ function renderNotifications() {
         const time = document.createElement('time');
 
         article.className = 'notification' + (item.is_read ? '' : ' unread');
+        article.dataset.notificationId = item.id;
         title.textContent = item.title || 'Notification';
         message.textContent = item.message || '';
+        if (item.retry_url) {
+            const retryLink = document.createElement('a');
+            retryLink.className = 'notif-retry-link';
+            retryLink.href = item.retry_url;
+            retryLink.dataset.retryUrl = item.retry_url;
+            retryLink.textContent = 'Retry this item';
+            article.appendChild(retryLink);
+        }
         meta.className = 'notification-meta';
         categoryTag.className = 'notification-category';
         categoryTag.textContent = categoryLabel(category);

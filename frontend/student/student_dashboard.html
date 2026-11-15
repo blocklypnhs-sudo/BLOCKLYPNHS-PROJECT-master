@@ -1785,6 +1785,7 @@
                 <div class="notif-item ${unreadClass}" id="notif-${notif.id}">
                     <div class="notif-title">${statusIcon} ${notif.title}</div>
                     <div class="notif-message">${notif.message}</div>
+                    ${notif.retry_url ? `<a class="notif-retry-link" href="${notif.retry_url}" data-retry-url="${notif.retry_url}">Retry this item</a>` : ''}
                     ${scoreHtml}
                     <span class="notif-time">${timeAgo}</span>
                     ${readBtn}

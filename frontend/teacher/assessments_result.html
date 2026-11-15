@@ -1145,11 +1145,12 @@
         rows.innerHTML = items.map(function(x) {
             var passed = x.result === 'Passed';
             var statusIcon = passed ? 'fa-circle-check' : 'fa-triangle-exclamation';
+            var score = x.score == null || x.score === '' ? NaN : Number(x.score);
             return '<tr>' +
                 '<td class="cell-lrn">' + esc(x.student_name || 'Student') + '</td>' +
                 '<td class="cell-assess">' + esc(x.assessment_name || '') + '</td>' +
                 '<td><span class="lang-chip ' + langClass(x.language) + '">' + esc(String(x.language || '').toUpperCase()) + '</span></td>' +
-                '<td><span class="score-pill">' + esc(x.score) + '/10</span></td>' +
+                '<td><span class="score-pill">' + esc(Number.isFinite(score) ? Math.round(score) : '—') + '/10</span></td>' +
                 '<td><span class="result-pill ' + (passed ? 'passed' : 'review') + '"><i class="fas ' + statusIcon + '"></i>' + esc(x.result) + '</span></td>' +
                 '<td class="cell-date">' + esc(x.completed_at || '') + '</td>' +
                 '</tr>';

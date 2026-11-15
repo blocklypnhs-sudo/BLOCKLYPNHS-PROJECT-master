@@ -656,9 +656,9 @@
                 <iconify-icon icon="lucide:moon" class="icon-moon"></iconify-icon>
                 <iconify-icon icon="lucide:sun" class="icon-sun"></iconify-icon>
             </button>
-            <button class="icon-btn" onclick="showNotification()" title="Notifications" aria-label="Notifications">
+            <button class="icon-btn" id="ictNotificationButton" onclick="showNotification()" title="Notifications" aria-label="Notifications" aria-expanded="false" aria-controls="notificationToast">
                 <iconify-icon icon="lucide:bell"></iconify-icon>
-                <span class="dot"></span>
+                <span class="dot" id="ictNotificationDot"></span>
             </button>
 
             <!-- ═══ USER PILL + DROPDOWN ═══ -->
@@ -798,12 +798,13 @@
 </div>
 
 <!-- Notification Toast -->
-<div id="notificationToast" class="toast-msg hidden" style="position:fixed; bottom:20px; right:20px; z-index:99999; max-width:340px;">
+<div id="notificationToast" class="toast-msg hidden" style="position:fixed; bottom:20px; right:20px; z-index:99999; width:min(340px, calc(100vw - 40px));">
     <iconify-icon icon="lucide:bell"></iconify-icon>
-    <div>
+    <div style="min-width:0; flex:1;">
         <p style="font-weight:600">New Notification</p>
-        <p style="font-size:.68rem; opacity:.75">You have 3 new ticket updates</p>
-        <button onclick="closeNotification()" style="background:none; border:none; color:var(--gold-warm); font:inherit; font-size:.68rem; font-weight:700; cursor:pointer; padding:2px 0 0;">Mark as read</button>
+        <p id="notificationToastMessage" style="font-size:.68rem; opacity:.75">Loading notifications...</p>
+        <div id="notificationToastList" style="max-height:180px; overflow-y:auto; font-size:.68rem;"></div>
+        <button onclick="closeNotification()" style="background:none; border:none; color:var(--gold-warm); font:inherit; font-size:.68rem; font-weight:700; cursor:pointer; padding:2px 0 0;">Close</button>
     </div>
 </div>
 
@@ -894,13 +895,94 @@ function timeAgo(s) {
 const fullDate = s => { const d = parseDate(s); return d ? d.toLocaleString() : ''; };
 
 /* ── Notification ── */
-function showNotification() {
+let notificationToastIds = [];
+let notificationToastRequest = 0;
+
+async function showNotification() {
     const t = $('notificationToast');
+    if (!t.classList.contains('hidden')) {
+        closeNotification();
+        return;
+    }
+    const requestId = ++notificationToastRequest;
     t.classList.remove('hidden');
-    clearTimeout(window.toastTimeout);
-    window.toastTimeout = setTimeout(closeNotification, 5000);
+    $('ictNotificationButton').setAttribute('aria-expanded', 'true');
+    $('notificationToastMessage').textContent = 'Loading notifications...';
+    $('notificationToastList').replaceChildren();
+    notificationToastIds = [];
+
+    try {
+        const response = await fetch('/get_notifications', {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!response.ok) throw new Error('Unable to load notifications');
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || 'Unable to load notifications');
+        if (requestId !== notificationToastRequest || t.classList.contains('hidden')) return;
+
+        const unread = (data.notifications || []).filter(notification => !notification.is_read);
+        notificationToastIds = unread.map(notification => notification.id);
+        $('notificationToastMessage').textContent = unread.length
+            ? `You have ${unread.length} unread notification${unread.length === 1 ? '' : 's'}.`
+            : 'No unread notifications.';
+        const list = $('notificationToastList');
+        unread.forEach(notification => {
+            const item = document.createElement('p');
+            item.style.cssText = 'margin:0; padding:6px 0; border-top:1px solid rgba(255,255,255,.15);';
+            const title = document.createElement('strong');
+            title.textContent = notification.title || 'Notification';
+            const message = document.createElement('span');
+            message.textContent = ` ${notification.message || ''}`;
+            item.append(title, message);
+            list.append(item);
+        });
+        $('ictNotificationDot').style.display = unread.length ? '' : 'none';
+    } catch (error) {
+        if (requestId !== notificationToastRequest) return;
+        console.error('Unable to load ICT notifications:', error);
+        $('notificationToastMessage').textContent = 'Unable to load notifications. Please try again.';
+    }
 }
-function closeNotification() { $('notificationToast').classList.add('hidden'); }
+
+async function closeNotification() {
+    const t = $('notificationToast');
+    if (t.classList.contains('hidden')) return;
+    const notificationIds = notificationToastIds.slice();
+    notificationToastIds = [];
+    notificationToastRequest += 1;
+    t.classList.add('hidden');
+    $('ictNotificationButton').setAttribute('aria-expanded', 'false');
+
+    const results = await Promise.allSettled(notificationIds.map(async id => {
+        const response = await fetch('/mark_notification_read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notification_id: id })
+        });
+        const data = await response.json();
+        if (!response.ok && response.status !== 404) {
+            throw new Error(data.message || `Unable to mark notification ${id} as read`);
+        }
+    }));
+    results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+            console.error(`Unable to mark notification ${notificationIds[index]} as read:`, result.reason);
+        }
+    });
+
+    try {
+        const response = await fetch('/get_unread_count');
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || 'Unable to refresh unread count');
+        $('ictNotificationDot').style.display = data.count ? '' : 'none';
+    } catch (error) {
+        console.error('Unable to refresh ICT notification count:', error);
+    }
+}
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeNotification();
+});
 
 /* ── Data ── */
 const AV_COLORS = ['a-green', 'a-gold', 'a-blue', 'a-coral'];

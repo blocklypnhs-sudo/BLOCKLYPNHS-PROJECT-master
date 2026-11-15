@@ -61,15 +61,6 @@ def test_init_database_moves_activity_definitions_before_cleaning_assessments(mo
                 )
                 self._fetchone_result = None
                 return
-            if "SHOW INDEX FROM activity_attempt_sessions" in query:
-                self._has_unread_index_result = True
-                self._show_index_result = [
-                    {'Key_name': 'PRIMARY', 'Seq_in_index': 1},
-                    {'Key_name': 'PRIMARY', 'Seq_in_index': 2},
-                    {'Key_name': 'PRIMARY', 'Seq_in_index': 3},
-                ]
-                self._fetchone_result = None
-                return
             if "SHOW INDEX FROM module_assessment_attempts" in query:
                 self._has_unread_index_result = True
                 self._show_index_result = (

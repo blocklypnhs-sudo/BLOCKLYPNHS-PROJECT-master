@@ -44,7 +44,7 @@
     return result.activities;
   }
 
-  async function start(activityId, restart) {
+  async function start(activityId) {
     const number = activityNumbers[activityId];
     if (!number) {
       const submit = document.querySelector('.btn-submit');
@@ -57,8 +57,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         language,
-        assessment_number: number,
-        restart: restart === true
+        assessment_number: number
       })
     });
     const result = await response.json();

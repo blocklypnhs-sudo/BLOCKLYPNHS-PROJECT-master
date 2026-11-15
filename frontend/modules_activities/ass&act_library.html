@@ -162,7 +162,8 @@
         .student-sidebar.collapsed .nav-text,
         .student-sidebar.collapsed .nav-section-label { display: none; }
         .student-sidebar.collapsed .activities-submenu,
-        .student-sidebar.collapsed .activities-chevron { display: none; }
+        .student-sidebar.collapsed .activities-chevron,
+        .student-sidebar.collapsed .mobile-nav-submenu { display: none; }
         .student-sidebar.collapsed .student-sidebar-brand-mono { display: flex; }
         .student-sidebar.collapsed .student-sidebar-expand-wrap { display: flex; }
         .student-sidebar.collapsed .nav-link-custom {
@@ -230,6 +231,8 @@
         }
         .activities-submenu a:hover { background: rgba(255,255,255,0.08); color: white; }
         .activities-submenu iconify-icon { font-size: 0.95rem; }
+        .student-sidebar .mobile-nav-toggle,
+        .student-sidebar .mobile-nav-submenu { display: none; }
         .module-language-nav {
             display: grid;
             gap: 2px;
@@ -860,6 +863,12 @@
             .page-shell { padding: 18px 18px 28px; }
         }
         @media (max-width: 768px) {
+            .student-sidebar .desktop-nav-link,
+            .student-sidebar .module-language-nav { display: none !important; }
+            .student-sidebar .mobile-nav-toggle { display: flex !important; }
+            .student-sidebar .mobile-nav-submenu { display: none !important; padding: 0.1rem 0 0.25rem 2.35rem; }
+            .student-sidebar .mobile-nav-submenu.open { display: flex !important; flex-direction: column; }
+            .student-sidebar.collapsed .mobile-nav-submenu { display: none !important; }
             .student-sidebar { width: 70px; }
             .student-sidebar-brand { justify-content: center; padding: 0.75rem 0.4rem; min-height: 62px; }
             .student-sidebar-logo-image, .student-sidebar-wordmark,
@@ -940,8 +949,29 @@
         <nav class="sidebar-nav">
             <div class="nav-section-label">Main</div>
             <div class="nav-item"><a href="/student_dashboard" class="nav-link-custom"><iconify-icon icon="lucide:house"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
-            <div class="nav-item"><a href="/assessments" class="nav-link-custom"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a></div>
-            <div class="nav-item"><a href="/student_modules" class="nav-link-custom active" aria-current="page"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a></div>
+            <div class="nav-item">
+                <a href="/assessments" class="nav-link-custom desktop-nav-link"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a>
+                <button type="button" class="nav-link-custom mobile-nav-toggle activities-toggle" id="assessmentNavToggle" onclick="toggleLibraryNavGroup('assessmentNavToggle', 'assessmentSubnav')" aria-expanded="false" aria-controls="assessmentSubnav">
+                    <iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span><i class="fas fa-chevron-down activities-chevron"></i>
+                </button>
+                <div class="activities-submenu mobile-nav-submenu" id="assessmentSubnav">
+                    <a href="/assessments_python">Python Assessments</a>
+                    <a href="/assessments_java">Java Assessments</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="/student_modules" class="nav-link-custom desktop-nav-link active" aria-current="page"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a>
+                <button type="button" class="nav-link-custom mobile-nav-toggle activities-toggle active" id="modulesNavToggle" onclick="toggleLibraryNavGroup('modulesNavToggle', 'modulesSubnav')" aria-expanded="false" aria-controls="modulesSubnav">
+                    <iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span><i class="fas fa-chevron-down activities-chevron"></i>
+                </button>
+                <div class="activities-submenu mobile-nav-submenu" id="modulesSubnav">
+                    <a href="/module_assessments#python-modules">Python Modules</a>
+                    <a href="/module_assessments#java-modules">Java Modules</a>
+                    <a href="/module_assessments#php-modules">PHP Modules</a>
+                    <a href="/module_assessments#javascript-modules">JavaScript Modules</a>
+                    <a href="/module_assessments#cpp-modules">C++ Modules</a>
+                </div>
+            </div>
             <div class="module-language-nav" aria-label="Module languages">
                 <a href="#python-modules" class="active" aria-current="location"><i class="fab fa-python language-python"></i><span>Python</span></a>
                 <a href="#java-modules"><i class="fab fa-java language-java"></i><span>Java</span></a>
@@ -1249,12 +1279,21 @@
             notifications.forEach(function (notification) {
                 var item = document.createElement('article');
                 item.className = 'module-notif-item' + (notification.is_read ? '' : ' unread');
+                item.dataset.notificationId = notification.id;
                 var title = document.createElement('div');
                 title.className = 'module-notif-title';
                 title.textContent = notification.title || 'Notification';
                 var message = document.createElement('div');
                 message.className = 'module-notif-message';
                 message.textContent = notification.message || '';
+                if (notification.retry_url) {
+                    var retryLink = document.createElement('a');
+                    retryLink.className = 'notif-retry-link';
+                    retryLink.href = notification.retry_url;
+                    retryLink.dataset.retryUrl = notification.retry_url;
+                    retryLink.textContent = 'Retry this item';
+                    item.append(retryLink);
+                }
                 var time = document.createElement('time');
                 time.className = 'module-notif-time';
                 time.textContent = getNotificationTimeAgo(notification.created_at);
@@ -1354,6 +1393,13 @@
         function toggleActivitiesNav() {
             var toggle = document.getElementById('activitiesToggle');
             var submenu = document.getElementById('activitiesSubmenu');
+            var isOpen = submenu.classList.toggle('open');
+            toggle.classList.toggle('open', isOpen);
+            toggle.setAttribute('aria-expanded', String(isOpen));
+        }
+        function toggleLibraryNavGroup(toggleId, submenuId) {
+            var toggle = document.getElementById(toggleId);
+            var submenu = document.getElementById(submenuId);
             var isOpen = submenu.classList.toggle('open');
             toggle.classList.toggle('open', isOpen);
             toggle.setAttribute('aria-expanded', String(isOpen));

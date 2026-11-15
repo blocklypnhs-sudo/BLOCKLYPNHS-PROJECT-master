@@ -25,4 +25,25 @@
             output.className = 'output-text';
         });
     };
+
+    window.addEventListener('pageshow', function (event) {
+        if (!event.persisted || !window.Blockly || !Blockly.Workspace) return;
+
+        requestAnimationFrame(function () {
+            Blockly.Workspace.getAll().forEach(function (workspace) {
+                if (
+                    typeof workspace.isFlyout === 'function' && workspace.isFlyout()
+                    || workspace.isFlyout === true
+                ) {
+                    return;
+                }
+                workspace.clear();
+            });
+
+            document.querySelectorAll('.output-text').forEach(function (output) {
+                output.textContent = 'Run your code to see output';
+                output.className = 'output-text';
+            });
+        });
+    });
 })();

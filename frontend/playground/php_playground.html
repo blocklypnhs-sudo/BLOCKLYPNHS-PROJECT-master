@@ -11,6 +11,7 @@
     <script src="/static/js/score_breakdown.js"></script>
     <script src="/static/js/learning_timer.js"></script>
     <script src="/static/js/activity_session.js"></script>
+    <script src="/static/js/workspace_cleanup.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f0f6f3; min-height: 100vh; }
@@ -1040,9 +1041,14 @@
                     duration_seconds: window.getLearningDurationSeconds()
                 })
             })
-            .then(response => {
-                if (!response.ok) return response.text().then(text => { throw new Error(text || `HTTP ${response.status}`); });
-                return response.json();
+            .then(async response => {
+                const result = await response.json().catch(() => null);
+                if (!response.ok) {
+                    throw new Error(
+                        (result && result.message) || `Submission failed (HTTP ${response.status}).`
+                    );
+                }
+                return result;
             })
             .then(async result => {
                 submitBtn.innerHTML = originalText;
@@ -1064,7 +1070,7 @@
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
                 console.error('Submit activity failed:', error);
-                showToast('Unable to submit. Please try again.', 'error');
+                showToast(error.message || 'Unable to submit. Please try again.', 'error');
             });
         }
 

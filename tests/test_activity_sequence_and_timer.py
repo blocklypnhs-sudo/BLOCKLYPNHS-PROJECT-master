@@ -50,7 +50,7 @@ def test_activity_sequence_requires_previous_activity_to_pass(monkeypatch):
     )
 
 
-def test_start_activity_records_activity_without_timer(monkeypatch):
+def test_start_activity_does_not_create_a_timer_session(monkeypatch):
     executed = []
 
     class FakeCursor:
@@ -104,8 +104,64 @@ def test_start_activity_records_activity_without_timer(monkeypatch):
     result = response.get_json()
     assert result['success'] is True
     assert 'time_limit_seconds' not in result
-    timer_insert = next(query for query, _ in executed if 'INSERT INTO activity_attempt_sessions' in query)
-    assert 'INTERVAL 10 YEAR' in timer_insert
+    assert not any('activity_attempt_sessions' in query for query, _ in executed)
+
+
+def test_start_activity_does_not_check_or_renew_timer_session(monkeypatch):
+    executed = []
+
+    class FakeCursor:
+        def execute(self, query, params=()):
+            executed.append(query)
+            if 'FROM learning_items' in query:
+                self.result = {'id': 12}
+            elif 'FROM assessment_attempts' in query:
+                self.result = None
+            else:
+                self.result = None
+
+        def fetchone(self):
+            result = getattr(self, 'result', None)
+            self.result = None
+            return result
+
+        def close(self):
+            pass
+
+    class FakeConnection:
+        def cursor(self, dictionary=True):
+            return FakeCursor()
+
+        def commit(self):
+            pass
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr('backend.app.get_db_connection', FakeConnection)
+    monkeypatch.setattr('backend.app._activity_is_unlocked', lambda *args: True)
+    monkeypatch.setattr('backend.app.log_audit', lambda *args, **kwargs: None)
+
+    with app.test_client() as client:
+        with client.session_transaction() as student_session:
+            student_session.update({
+                'role': 'student',
+                'user_id': 41,
+                'student_name_loaded': True,
+            })
+        response = client.post('/start_activity', json={
+            'language': 'php',
+            'assessment_number': 2,
+        })
+
+    result = response.get_json()
+    assert response.status_code == 200
+    assert result['success'] is True
+    assert 'expires_at_ms' not in result
+    assert not any('activity_attempt_sessions' in query for query in executed)
 
 
 def test_start_activity_rejects_later_activity_until_previous_passes(monkeypatch):
@@ -154,9 +210,12 @@ def test_start_activity_rejects_later_activity_until_previous_passes(monkeypatch
     assert response.get_json()['message'] == 'Complete and pass the previous activity first'
 
 
-def test_submit_activity_allows_submission_without_timer(monkeypatch):
+def test_submit_activity_does_not_require_a_timer_session(monkeypatch):
+    executed = []
+
     class FakeCursor:
         def execute(self, query, params=()):
+            executed.append(query)
             if 'SELECT id, title, description, hint, required_blocks' in query:
                 self.result = {
                     'id': 12,
@@ -210,3 +269,4 @@ def test_submit_activity_allows_submission_without_timer(monkeypatch):
 
     assert response.status_code == 200
     assert response.get_json()['success'] is True
+    assert not any('activity_attempt_sessions' in query for query in executed)

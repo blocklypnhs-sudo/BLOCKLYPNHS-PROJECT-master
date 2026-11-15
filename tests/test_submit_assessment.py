@@ -186,8 +186,6 @@ def test_submission_scores_each_output_line_and_awards_partial_points(
             elif 'INSERT INTO learning_item_submission_history' in query:
                 self.history_params = params
                 self.fetchone_result = None
-            elif 'expires_at > NOW() AS active' in query:
-                self.fetchone_result = {'active': 1}
             else:
                 self.fetchone_result = None
 
@@ -854,8 +852,6 @@ def test_php_assessment_scores_from_server_interpreted_blocks(monkeypatch):
                     'expected_output': 'Hello, PHP!',
                     'points': 10,
                 }
-            elif 'expires_at > NOW() AS active' in query:
-                self.fetchone_result = {'active': 1}
             elif 'INSERT INTO assessment_attempts' in query:
                 self.insert_params = params
                 self.fetchone_result = None

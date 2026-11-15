@@ -306,7 +306,48 @@
             <section class="detail-section"><h3>Student output</h3><pre>${escapeHtml(attempt.student_answer || '(empty)')}</pre></section>
             <section class="detail-section"><h3>Expected output</h3><pre>${escapeHtml(attempt.expected_output || '(not available)')}</pre></section>
             <section class="detail-section"><h3>Generated code</h3><pre>${escapeHtml(attempt.generated_code || '(not available)')}</pre></section>
-            <section class="detail-section"><h3>Blockly answer</h3><pre>${escapeHtml(attempt.code_blocks || '(not available)')}</pre></section>`;
+            <section class="detail-section"><h3>Blockly answer</h3><pre>${escapeHtml(attempt.code_blocks || '(not available)')}</pre></section>
+            ${attempt.attempt_type === 'module' && attempt.is_latest ? `
+                <section class="detail-section">
+                    <h3>Update module score</h3>
+                    <form id="moduleGradeForm">
+                        <label for="moduleGradeScore">Score (0–${escapeHtml(attempt.max_points)})</label>
+                        <input id="moduleGradeScore" name="score" type="number" min="0"
+                            max="${escapeHtml(attempt.max_points)}" step="1"
+                            value="${escapeHtml(attempt.points_earned)}" required>
+                        <button class="btn btn-primary" type="submit">Save score</button>
+                        <p id="moduleGradeMessage" role="status"></p>
+                    </form>
+                </section>` : ''}`;
+        const gradeForm = detail.querySelector('#moduleGradeForm');
+        if (gradeForm) {
+            gradeForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const message = detail.querySelector('#moduleGradeMessage');
+                const submitButton = gradeForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                message.textContent = 'Saving score...';
+                try {
+                    const response = await fetch('/api/teacher/module-assessment-score', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            attempt_id: attempt.attempt_id,
+                            score: Number(gradeForm.querySelector('#moduleGradeScore').value)
+                        })
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'Unable to save module score.');
+                    }
+                    await loadAttempts();
+                    await loadAttemptDetail(selectedRow);
+                } catch (error) {
+                    message.textContent = error.message;
+                    submitButton.disabled = false;
+                }
+            });
+        }
     }
 
     ['search', 'typeFilter', 'languageFilter', 'statusFilter'].forEach(id =>
