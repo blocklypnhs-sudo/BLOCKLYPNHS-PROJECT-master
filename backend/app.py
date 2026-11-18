@@ -230,10 +230,12 @@ def module_assets(filename):
 
 # Database configuration
 db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '2004Nath29',
-    'database': 'blocklypnhsproject'
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'user': os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD', 'mUHrcybHaK2xYyGn'),
+    'database': os.environ.get('DB_NAME', 'blocklypnhsproject'),
+    'port': int(os.environ.get('DB_PORT', 3306)),
+    'ssl_disabled': False,
 }
 
 def get_db_connection():
