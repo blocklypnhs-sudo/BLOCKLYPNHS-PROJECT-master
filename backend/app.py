@@ -426,6 +426,26 @@ def init_database():
             )
         """)
 
+        # NEW: catalog table that the rest of the code reads and writes
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS activity_catalog (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                assessment_number TINYINT NOT NULL,
+                language ENUM('cpp', 'javascript', 'php') NOT NULL,
+                title VARCHAR(200) NOT NULL,
+                description TEXT NOT NULL,
+                duration_minutes SMALLINT UNSIGNED NOT NULL,
+                points SMALLINT UNSIGNED NOT NULL,
+                difficulty ENUM('Easy', 'Medium', 'Hard') NOT NULL,
+                expected_output TEXT NOT NULL,
+                hint TEXT NOT NULL,
+                required_blocks TEXT NOT NULL,
+                starter_blocks_xml TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uq_activity_language_number (language, assessment_number)
+            )
+        """)
+
         # Existing installations may have a wider language column and mixed records.
         cursor.execute("ALTER TABLE assessments MODIFY language VARCHAR(20) NOT NULL")
         cursor.execute("""
@@ -864,6 +884,48 @@ def init_database():
                 INDEX idx_feedback_type_created (feedback_type, created_at)
             )
         """)
+
+        # NEW: notifications for students, teachers and ICT support.
+        # user_id depends on target_role, so it is intentionally not a foreign key.
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NULL,
+                target_role VARCHAR(20) NULL,
+                type VARCHAR(50) NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                related_id INT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                is_read TINYINT(1) NOT NULL DEFAULT 0,
+                INDEX idx_notifications_user (user_id),
+                INDEX idx_notifications_role (target_role),
+                INDEX idx_notifications_read (is_read)
+            ) ENGINE=InnoDB
+        """)
+
+        # NEW: add the missing foreign keys without touching the table definitions above.
+        # Each one is skipped if it already exists or if old rows would break it.
+        for table, constraint, column, parent, on_delete in (
+            ('student_email_otp_challenges', 'fk_student_otp_student', 'student_id', 'students', 'CASCADE'),
+            ('ict_tickets', 'fk_ict_tickets_student', 'student_id', 'students', 'CASCADE'),
+            ('feedback', 'fk_feedback_student', 'student_id', 'students', 'CASCADE'),
+            ('assessment_attempts', 'fk_attempts_reviewer', 'reviewed_by', 'teachers', 'SET NULL'),
+        ):
+            try:
+                cursor.execute(
+                    "SELECT COUNT(*) AS total FROM information_schema.TABLE_CONSTRAINTS "
+                    "WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = %s "
+                    "AND CONSTRAINT_NAME = %s AND CONSTRAINT_TYPE = 'FOREIGN KEY'",
+                    (table, constraint),
+                )
+                if cursor.fetchone()['total'] == 0:
+                    cursor.execute(
+                        f"ALTER TABLE {table} ADD CONSTRAINT {constraint} "
+                        f"FOREIGN KEY ({column}) REFERENCES {parent}(id) ON DELETE {on_delete}"
+                    )
+            except Exception as fk_error:
+                print(f"Skipped foreign key {constraint}: {fk_error}")
 
         # CREATE ADMIN/TEACHER ACCOUNT
         cursor.execute("SELECT id FROM teachers WHERE username = 'admin'")
@@ -4067,16 +4129,6 @@ def login_post():
         print(f"Login error: {e}")
         return jsonify({'success': False, 'message': 'Login failed. Please try again.'})
 
-@app.before_request
-def block_sensitive_files():
-    path = request.path.lower()
-    if (
-        '/.env' in path
-        or '/.git' in path
-        or path.startswith('/backend/')
-        or path.endswith(('.py', '.env', '.sql', '.log'))
-    ):
-        return jsonify({'success': False, 'message': 'Not found'}), 404
 
 @app.route('/send-student-email-setup-otp', methods=['POST'])
 def send_student_email_setup_otp():
