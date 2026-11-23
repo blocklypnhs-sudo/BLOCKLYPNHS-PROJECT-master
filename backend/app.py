@@ -4067,6 +4067,16 @@ def login_post():
         print(f"Login error: {e}")
         return jsonify({'success': False, 'message': 'Login failed. Please try again.'})
 
+@app.before_request
+def block_sensitive_files():
+    path = request.path.lower()
+    if (
+        '/.env' in path
+        or '/.git' in path
+        or path.startswith('/backend/')
+        or path.endswith(('.py', '.env', '.sql', '.log'))
+    ):
+        return jsonify({'success': False, 'message': 'Not found'}), 404
 
 @app.route('/send-student-email-setup-otp', methods=['POST'])
 def send_student_email_setup_otp():
