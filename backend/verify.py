@@ -17,7 +17,7 @@ MAX_RANGE_ITEMS = 500
 SAFE_CALLS = {'print', 'range', 'int', 'float', 'str', 'bool', 'len', 'abs', 'min', 'max', 'round'}
 ALLOWED_NODES = (
     ast.Module, ast.Expr, ast.Assign, ast.AugAssign, ast.FunctionDef, ast.arguments,
-    ast.Return, ast.If, ast.For, ast.Pass, ast.Break, ast.Continue,
+    ast.Return, ast.If, ast.For, ast.While, ast.Pass, ast.Break, ast.Continue,
     ast.Name, ast.Load, ast.Store, ast.Constant, ast.Call, ast.keyword,
     ast.BinOp, ast.UnaryOp, ast.BoolOp, ast.Compare,
     ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mod,
@@ -39,7 +39,7 @@ class _StudentCodeValidator(ast.NodeVisitor):
         super().generic_visit(node)
 
     def visit_Name(self, node):
-        if node.id.startswith('_'):
+        if node.id.startswith('_') and node.id != '_':
             raise ValueError('Private names are not allowed')
         self.generic_visit(node)
 

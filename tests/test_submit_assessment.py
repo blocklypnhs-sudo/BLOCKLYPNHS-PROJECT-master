@@ -723,7 +723,7 @@ def test_cpp_module_assessment_accepts_valid_submission(
                 '</value></block></statement></block></xml>'
             ),
             'generated_code': f'for (int i = 1; i <= {module_number * 5}; i++) {{ cout << i; }}',
-            'output': expected_output,
+            'output': 'tampered browser output',
         })
 
     result = response.get_json()
@@ -733,6 +733,102 @@ def test_cpp_module_assessment_accepts_valid_submission(
     assert connection.cursor_instance.insert_params[1:4] == (
         module_id, 'cpp', module_number,
     )
+    assert connection.cursor_instance.insert_params[7:9] == (
+        expected_output, expected_output,
+    )
+
+
+@pytest.mark.parametrize(
+    ('module_id', 'language', 'code_blocks', 'expected_output'),
+    [
+        (
+            'java-01-basics', 'java',
+            '<xml><block type="java_variable"><field name="TYPE">int</field>'
+            '<field name="NAME">age</field><value name="VALUE">'
+            '<block type="math_number"><field name="NUM">16</field></block>'
+            '</value><next><block type="java_print"><value name="TEXT">'
+            '<block type="java_variable_get"><field name="NAME">age</field></block>'
+            '</value></block></next></block></xml>',
+            '16',
+        ),
+        (
+            'js-02-functions', 'javascript',
+            '<xml><block type="js_function_def">'
+            '<field name="NAME">multiply</field><field name="PARAM1">a</field>'
+            '<field name="PARAM2">b</field><statement name="BODY">'
+            '<block type="js_return"><value name="VALUE">'
+            '<block type="js_math"><field name="OP">MULTIPLY</field>'
+            '<value name="A"><block type="js_get"><field name="NAME">a</field></block></value>'
+            '<value name="B"><block type="js_get"><field name="NAME">b</field></block></value>'
+            '</block></value></block></statement><next>'
+            '<block type="js_print"><value name="TEXT">'
+            '<block type="js_function_call_value"><field name="NAME">multiply</field>'
+            '<value name="ARG1"><block type="js_number"><field name="NUM">6</field></block></value>'
+            '<value name="ARG2"><block type="js_number"><field name="NUM">7</field></block></value>'
+            '</block></value></block></next></block></xml>',
+            '42',
+        ),
+    ],
+)
+def test_module_assessment_uses_server_execution_for_java_and_javascript(
+    monkeypatch, module_id, language, code_blocks, expected_output
+):
+    class FakeCursor:
+        def __init__(self):
+            self.insert_params = None
+
+        def execute(self, query, params=()):
+            if 'INSERT INTO module_assessment_attempts' in query:
+                self.insert_params = params
+
+        def fetchone(self):
+            return None
+
+        def close(self):
+            pass
+
+    class FakeConnection:
+        def __init__(self):
+            self.cursor_instance = FakeCursor()
+
+        def cursor(self, dictionary=True):
+            return self.cursor_instance
+
+        def commit(self):
+            pass
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    connection = FakeConnection()
+    monkeypatch.setattr('backend.app.get_db_connection', lambda: connection)
+    monkeypatch.setattr('backend.app._module_is_unlocked', lambda *args: True)
+    monkeypatch.setattr('backend.app.notify_module_assessment_result', lambda *args: None)
+    monkeypatch.setattr('backend.app.mark_lesson_complete', lambda *args: None)
+    monkeypatch.setattr('backend.app.try_award_after_lesson', lambda *args: {
+        'new_badges': [],
+        'certificate_issued': False,
+        'module_complete': False,
+    })
+
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session.update({'role': 'student', 'user_id': 43})
+
+        response = client.post('/submit_module_assessment', json={
+            'module_id': module_id,
+            'language': language,
+            'code_blocks': code_blocks,
+            'generated_code': 'untrusted generated code',
+            'output': 'tampered browser output',
+        })
+
+    result = response.get_json()
+    assert response.status_code == 200
+    assert result['passed'] is True
     assert connection.cursor_instance.insert_params[7:9] == (
         expected_output, expected_output,
     )

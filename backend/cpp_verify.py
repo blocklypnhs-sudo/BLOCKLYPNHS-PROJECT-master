@@ -18,6 +18,9 @@ CPP_BLOCKS = {
     'cpp_if': 'js_if',
     'cpp_compare': 'js_compare',
     'cpp_for': 'js_for',
+    'cpp_while': 'js_while',
+    'cpp_do_while': 'js_do_while',
+    'cpp_increment': 'js_increment',
 }
 
 
@@ -44,6 +47,10 @@ class _CppBlocklyInterpreter(_JavaScriptBlocklyInterpreter):
                 block_type = block.get('type')
                 if block_type in CPP_BLOCKS:
                     block.set('type', CPP_BLOCKS[block_type])
+                if block_type in {'cpp_while', 'cpp_do_while'}:
+                    for child in block:
+                        if self._tag(child) == 'value' and child.get('name') == 'COND':
+                            child.set('name', 'CONDITION')
 
         return super().run(ET.tostring(root, encoding='unicode'))
 

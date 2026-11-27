@@ -1629,13 +1629,13 @@ def student_help():
 def assessments_overview():
     if session.get('role') != 'student':
         return redirect('/')
-    return redirect('/module_assessments')
+    return redirect('/assessments_python')
 
 @app.route('/assessment')
 def assessment_overview_alias():
     if session.get('role') != 'student':
         return redirect('/')
-    return redirect('/module_assessments')
+    return redirect('/assessments')
 
 @app.route('/module_assessments')
 def module_assessments():
@@ -3003,8 +3003,14 @@ def submit_module_assessment():
     output = client_output
     if language == 'python':
         output = normalize_output(run_python(generated_code)) if generated_code else '__ERROR__'
+    elif language == 'java':
+        output = normalize_output(run_java_blocks(code_blocks))
     elif language == 'php':
         output = normalize_output(run_php_blocks(code_blocks))
+    elif language == 'cpp':
+        output = normalize_output(run_cpp_blocks(code_blocks))
+    elif language == 'javascript':
+        output = normalize_output(run_javascript_blocks(code_blocks))
     scoring_result = score_block_submission(
         language,
         code_blocks,

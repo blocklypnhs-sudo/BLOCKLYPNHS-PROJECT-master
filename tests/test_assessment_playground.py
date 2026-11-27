@@ -3,6 +3,24 @@ import pytest
 from backend.app import app
 
 
+def test_assessment_navigation_opens_assessment_list():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session.update({
+                'role': 'student',
+                'user_id': 1,
+                'student_name_loaded': True,
+            })
+
+        response = client.get('/assessments')
+        alias_response = client.get('/assessment')
+
+    assert response.status_code == 302
+    assert response.headers['Location'].endswith('/assessments_python')
+    assert alias_response.status_code == 302
+    assert alias_response.headers['Location'].endswith('/assessments')
+
+
 @pytest.mark.parametrize(
     ('language', 'expected_heading'),
     [('python', 'Python Playground'), ('java', 'Java Playground')],

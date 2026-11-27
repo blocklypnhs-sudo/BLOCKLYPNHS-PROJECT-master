@@ -60,3 +60,41 @@ def test_interprets_cpp_math_condition_and_loop_blocks():
 def test_rejects_unsupported_cpp_blocks_and_invalid_xml():
     assert run_cpp_blocks('<xml><block type="unknown"/></xml>') == '__ERROR__'
     assert run_cpp_blocks('<!DOCTYPE xml><xml/>') == '__ERROR__'
+
+
+def test_interprets_cpp_while_do_while_and_increment_blocks():
+    while_loop = """<xml xmlns="https://developers.google.com/blockly/xml">
+      <block type="cpp_variable">
+        <field name="NAME">i</field>
+        <value name="VALUE"><block type="cpp_number"><field name="NUM">1</field></block></value>
+        <next><block type="cpp_while">
+          <value name="COND"><block type="cpp_compare"><field name="OP">LTE</field>
+            <value name="A"><block type="cpp_variable_get"><field name="NAME">i</field></block></value>
+            <value name="B"><block type="cpp_number"><field name="NUM">3</field></block></value>
+          </block></value>
+          <statement name="DO"><block type="cpp_cout"><value name="TEXT">
+            <block type="cpp_variable_get"><field name="NAME">i</field></block>
+          </value><next><block type="cpp_increment"><field name="NAME">i</field></block></next>
+          </block></statement>
+        </block></next>
+      </block>
+    </xml>"""
+    do_while_loop = """<xml xmlns="https://developers.google.com/blockly/xml">
+      <block type="cpp_variable">
+        <field name="NAME">i</field>
+        <value name="VALUE"><block type="cpp_number"><field name="NUM">1</field></block></value>
+        <next><block type="cpp_do_while">
+          <statement name="DO"><block type="cpp_cout"><value name="TEXT">
+            <block type="cpp_variable_get"><field name="NAME">i</field></block>
+          </value><next><block type="cpp_increment"><field name="NAME">i</field></block></next>
+          </block></statement>
+          <value name="COND"><block type="cpp_compare"><field name="OP">LTE</field>
+            <value name="A"><block type="cpp_variable_get"><field name="NAME">i</field></block></value>
+            <value name="B"><block type="cpp_number"><field name="NUM">3</field></block></value>
+          </block></value>
+        </block></next>
+      </block>
+    </xml>"""
+    expected = '1\n2\n3'
+    assert run_cpp_blocks(while_loop) == expected
+    assert run_cpp_blocks(do_while_loop) == expected

@@ -9,13 +9,22 @@ MAX_OUTPUT_LENGTH = 4096
 MAX_STEPS = 2000
 MAX_LOOP_ITERATIONS = 500
 MAX_BLOCK_DEPTH = 50
+MAX_FUNCTION_CALL_DEPTH = 20
+_UNDEFINED = object()
+
+
+class _ReturnSignal(Exception):
+    def __init__(self, value):
+        self.value = value
 
 
 class _JavaScriptBlocklyInterpreter:
     def __init__(self):
         self.output = []
         self.variables = {}
+        self.functions = {}
         self.steps = 0
+        self.call_depth = 0
 
     @staticmethod
     def _tag(element):
@@ -66,9 +75,10 @@ class _JavaScriptBlocklyInterpreter:
     def _format_number(value):
         return str(int(value)) if isinstance(value, float) and value.is_integer() else str(value)
 
-    def _value(self, block, depth=0):
+    def _value(self, block, depth=0, variables=None):
         if block is None:
             raise ValueError('Missing value block')
+        variables = self.variables if variables is None else variables
         self._step(depth)
         block_type = block.get('type')
 
@@ -83,12 +93,20 @@ class _JavaScriptBlocklyInterpreter:
             return self._number(value)
         if block_type == 'js_get':
             name = self._field(block, 'NAME')
-            if name not in self.variables:
+            if name not in variables:
                 raise ValueError('Variable is not defined')
-            return self.variables[name]
+            return variables[name]
+        if block_type == 'js_function_call_value':
+            name = self._field(block, 'NAME')
+            arguments = [
+                self._value(self._input(block, input_name), depth + 1, variables)
+                for input_name in ('ARG1', 'ARG2')
+                if self._input(block, input_name) is not None
+            ]
+            return self._call_function(name, arguments, depth + 1, variables)
         if block_type == 'js_math':
-            left = self._number(self._value(self._input(block, 'A'), depth + 1))
-            right = self._number(self._value(self._input(block, 'B'), depth + 1))
+            left = self._number(self._value(self._input(block, 'A'), depth + 1, variables))
+            right = self._number(self._value(self._input(block, 'B'), depth + 1, variables))
             operation = self._field(block, 'OP')
             if operation == 'ADD':
                 result = left + right
@@ -102,8 +120,8 @@ class _JavaScriptBlocklyInterpreter:
                 raise ValueError('Invalid arithmetic operation')
             return self._number(result)
         if block_type == 'js_compare':
-            left = self._value(self._input(block, 'A'), depth + 1)
-            right = self._value(self._input(block, 'B'), depth + 1)
+            left = self._value(self._input(block, 'A'), depth + 1, variables)
+            right = self._value(self._input(block, 'B'), depth + 1, variables)
             operation = self._field(block, 'OP')
             comparisons = {
                 'EQ': lambda: left == right,
@@ -119,44 +137,136 @@ class _JavaScriptBlocklyInterpreter:
         raise ValueError('Unsupported value block')
 
     def _output_value(self, value):
+        if value is _UNDEFINED:
+            return 'undefined'
         if isinstance(value, bool):
             return 'true' if value else 'false'
         if isinstance(value, (int, float)):
             return self._format_number(value)
         return str(value)
 
-    def _run_chain(self, block, depth=0):
+    def _call_function(self, name, arguments, depth, caller_variables):
+        function = self.functions.get(name)
+        if function is None or self.call_depth >= MAX_FUNCTION_CALL_DEPTH:
+            raise ValueError('Function is undefined or recursion limit exceeded')
+        parameters, body = function
+        if len(arguments) != len(parameters):
+            raise ValueError('Incorrect number of function arguments')
+        local_variables = dict(caller_variables)
+        local_variables.update(zip(parameters, arguments))
+        self.call_depth += 1
+        try:
+            self._run_chain(body, depth + 1, local_variables, in_function=True)
+        except _ReturnSignal as result:
+            return result.value
+        finally:
+            self.call_depth -= 1
+        return _UNDEFINED
+
+    @staticmethod
+    def _identifier(name):
+        reserved = {
+            'await', 'break', 'case', 'catch', 'class', 'const', 'continue',
+            'debugger', 'default', 'delete', 'do', 'else', 'enum', 'export',
+            'extends', 'false', 'finally', 'for', 'function', 'if', 'import',
+            'in', 'instanceof', 'let', 'new', 'null', 'return', 'static',
+            'super', 'switch', 'this', 'throw', 'true', 'try', 'typeof', 'var',
+            'void', 'while', 'with', 'yield',
+        }
+        return bool(re.fullmatch(r'[A-Za-z_$][A-Za-z0-9_$]{0,63}', name)) and name not in reserved
+
+    def _run_chain(self, block, depth=0, variables=None, in_function=False):
+        variables = self.variables if variables is None else variables
         while block is not None:
             self._step(depth)
             block_type = block.get('type')
 
             if block_type == 'js_print':
-                self.output.append(self._output_value(self._value(self._input(block, 'TEXT'), depth + 1)))
+                self.output.append(self._output_value(self._value(self._input(block, 'TEXT'), depth + 1, variables)))
             elif block_type == 'js_set':
                 name = self._field(block, 'NAME')
-                if not re.fullmatch(r'[A-Za-z_$][A-Za-z0-9_$]{0,63}', name):
+                if not self._identifier(name):
                     raise ValueError('Invalid variable name')
-                self.variables[name] = self._value(self._input(block, 'VALUE'), depth + 1)
+                variables[name] = self._value(self._input(block, 'VALUE'), depth + 1, variables)
             elif block_type == 'js_if':
-                condition = self._value(self._input(block, 'IF0'), depth + 1)
+                condition = self._value(self._input(block, 'IF0'), depth + 1, variables)
                 if not isinstance(condition, bool):
                     raise ValueError('Condition must be boolean')
                 branch = 'DO0' if condition else 'ELSE'
-                self._run_chain(self._statement(block, branch), depth + 1)
+                self._run_chain(self._statement(block, branch), depth + 1, variables, in_function)
             elif block_type == 'js_for':
                 name = self._field(block, 'VAR')
-                if not re.fullmatch(r'[A-Za-z_$][A-Za-z0-9_$]{0,63}', name):
+                if not self._identifier(name):
                     raise ValueError('Invalid loop variable')
-                start = self._number(self._value(self._input(block, 'FROM'), depth + 1))
-                end = self._number(self._value(self._input(block, 'TO'), depth + 1))
+                start = self._number(self._value(self._input(block, 'FROM'), depth + 1, variables))
+                end = self._number(self._value(self._input(block, 'TO'), depth + 1, variables))
                 if not isinstance(start, int) or not isinstance(end, int):
                     raise ValueError('Loop bounds must be integers')
-                iterations = max(0, min(end - start + 1, MAX_LOOP_ITERATIONS + 1))
-                if iterations > MAX_LOOP_ITERATIONS:
-                    raise ValueError('Loop limit exceeded')
-                for value in range(start, end + 1):
-                    self.variables[name] = value
-                    self._run_chain(self._statement(block, 'DO'), depth + 1)
+                condition = self._field(block, 'CONDITION', 'LTE')
+                update = self._field(block, 'UPDATE', 'INC')
+                if condition not in {'LTE', 'GTE'} or update not in {'INC', 'DEC', 'STEP_TWO'}:
+                    raise ValueError('Invalid loop operation')
+                value = start
+                iterations = 0
+                while (value <= end if condition == 'LTE' else value >= end):
+                    if iterations >= MAX_LOOP_ITERATIONS:
+                        raise ValueError('Loop limit exceeded')
+                    variables[name] = value
+                    self._run_chain(self._statement(block, 'DO'), depth + 1, variables, in_function)
+                    value = variables[name] + (
+                        -1 if update == 'DEC' else 2 if update == 'STEP_TWO' else 1
+                    )
+                    iterations += 1
+            elif block_type in {'js_while', 'js_do_while'}:
+                condition_name = 'CONDITION'
+                condition_block = self._input(block, condition_name)
+                iterations = 0
+                while True:
+                    if block_type == 'js_while':
+                        condition = self._value(condition_block, depth + 1, variables)
+                        if not isinstance(condition, bool):
+                            raise ValueError('Condition must be boolean')
+                        if not condition:
+                            break
+                    if iterations >= MAX_LOOP_ITERATIONS:
+                        raise ValueError('Loop limit exceeded')
+                    self._run_chain(self._statement(block, 'DO'), depth + 1, variables, in_function)
+                    iterations += 1
+                    if block_type == 'js_do_while':
+                        condition = self._value(condition_block, depth + 1, variables)
+                        if not isinstance(condition, bool):
+                            raise ValueError('Condition must be boolean')
+                        if not condition:
+                            break
+            elif block_type == 'js_increment':
+                name = self._field(block, 'NAME')
+                if name not in variables or isinstance(variables[name], bool) or not isinstance(variables[name], (int, float)):
+                    raise ValueError('Increment target must be a number variable')
+                variables[name] = self._number(variables[name] + 1)
+            elif block_type == 'js_function_def':
+                name = self._field(block, 'NAME')
+                parameters = [
+                    parameter for parameter in (
+                        self._field(block, 'PARAM1', ''),
+                        self._field(block, 'PARAM2', ''),
+                    ) if parameter
+                ]
+                if not self._identifier(name) or any(
+                    not self._identifier(parameter) for parameter in parameters
+                ) or len(set(parameters)) != len(parameters):
+                    raise ValueError('Invalid function name or parameter')
+                self.functions[name] = (parameters, self._statement(block, 'BODY'))
+            elif block_type == 'js_function_call':
+                name = self._field(block, 'NAME')
+                argument = self._input(block, 'ARG')
+                arguments = [self._value(argument, depth + 1, variables)] if argument is not None else []
+                self._call_function(name, arguments, depth + 1, variables)
+            elif block_type == 'js_return':
+                if not in_function:
+                    raise ValueError('Return block must be inside a function')
+                value_block = self._input(block, 'VALUE')
+                value = self._value(value_block, depth + 1, variables) if value_block is not None else _UNDEFINED
+                raise _ReturnSignal(value)
             else:
                 raise ValueError('Unsupported statement block')
 

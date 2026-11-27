@@ -62,3 +62,26 @@ def test_interprets_greater_than_and_repeat_blocks():
 def test_rejects_unsupported_blocks_and_invalid_xml():
     assert run_javascript_blocks('<xml><block type="unknown"/></xml>') == '__ERROR__'
     assert run_javascript_blocks('<!DOCTYPE xml><xml/>') == '__ERROR__'
+
+
+def test_interprets_function_parameters_and_return_values():
+    blocks = """<xml xmlns="https://developers.google.com/blockly/xml">
+      <block type="js_function_def">
+        <field name="NAME">add</field>
+        <field name="PARAM1">a</field><field name="PARAM2">b</field>
+        <statement name="BODY"><block type="js_return">
+          <value name="VALUE"><block type="js_math"><field name="OP">ADD</field>
+            <value name="A"><block type="js_get"><field name="NAME">a</field></block></value>
+            <value name="B"><block type="js_get"><field name="NAME">b</field></block></value>
+          </block></value>
+        </block></statement>
+        <next><block type="js_print"><value name="TEXT">
+          <block type="js_function_call_value">
+            <field name="NAME">add</field>
+            <value name="ARG1"><block type="js_number"><field name="NUM">19</field></block></value>
+            <value name="ARG2"><block type="js_number"><field name="NUM">23</field></block></value>
+          </block>
+        </value></block></next>
+      </block>
+    </xml>"""
+    assert run_javascript_blocks(blocks) == '42'

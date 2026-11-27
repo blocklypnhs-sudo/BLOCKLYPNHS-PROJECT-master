@@ -48,3 +48,30 @@ def test_java_block_interpreter_runs_called_methods():
 
 def test_java_block_interpreter_rejects_unsupported_blocks():
     assert run_java_blocks('<xml><block type="unsupported"></block></xml>') == '__ERROR__'
+
+
+def test_java_block_interpreter_runs_while_and_formats_boolean_output():
+    source = '''<xml xmlns="https://developers.google.com/blockly/xml">
+      <block type="java_variable">
+        <field name="NAME">i</field>
+        <value name="VALUE"><block type="math_number"><field name="NUM">1</field></block></value>
+        <next><block type="java_while">
+          <value name="CONDITION"><block type="logic_compare"><field name="OP">LTE</field>
+            <value name="A"><block type="java_variable_get"><field name="NAME">i</field></block></value>
+            <value name="B"><block type="math_number"><field name="NUM">2</field></block></value>
+          </block></value>
+          <statement name="DO"><block type="java_print"><value name="TEXT">
+            <block type="java_variable_get"><field name="NAME">i</field></block>
+          </value><next><block type="java_variable"><field name="NAME">i</field>
+            <value name="VALUE"><block type="math_arithmetic"><field name="OP">ADD</field>
+              <value name="A"><block type="java_variable_get"><field name="NAME">i</field></block></value>
+              <value name="B"><block type="math_number"><field name="NUM">1</field></block></value>
+            </block></value>
+          </block></next></block></statement>
+        </block></next>
+      </block>
+      <block type="java_print"><value name="TEXT">
+        <block type="logic_boolean"><field name="BOOL">TRUE</field></block>
+      </value></block>
+    </xml>'''
+    assert run_java_blocks(source) == '1\n2\ntrue'

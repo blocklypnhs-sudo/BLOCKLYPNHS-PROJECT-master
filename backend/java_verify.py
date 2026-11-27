@@ -133,7 +133,7 @@ class _JavaBlocklyInterpreter:
 
             if block_type == 'java_print':
                 value = self._value(self._input(block, 'TEXT'), variables, depth + 1)
-                self.output.append(str(value))
+                self.output.append('true' if value is True else 'false' if value is False else str(value))
                 if sum(map(len, self.output)) + len(self.output) > MAX_OUTPUT_LENGTH:
                     raise ValueError('Output limit exceeded')
             elif block_type == 'java_variable':
@@ -164,7 +164,12 @@ class _JavaBlocklyInterpreter:
             elif block_type == 'java_while':
                 condition_block = self._input(block, 'CONDITION')
                 iterations = 0
-                while self._value(condition_block, variables, depth + 1):
+                while True:
+                    condition = self._value(condition_block, variables, depth + 1)
+                    if not isinstance(condition, bool):
+                        raise ValueError('Condition must be boolean')
+                    if not condition:
+                        break
                     iterations += 1
                     if iterations > MAX_LOOP_ITERATIONS:
                         raise ValueError('Loop limit exceeded')
