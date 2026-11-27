@@ -1288,7 +1288,6 @@
         var submenu = document.getElementById(submenuId);
         var isOpen = submenu.classList.toggle('open');
         toggle.classList.toggle('open', isOpen);
-        if (toggle.classList.contains('modules-nav-toggle')) toggle.classList.toggle('active', isOpen);
         toggle.setAttribute('aria-expanded', String(isOpen));
     }
 
