@@ -1092,8 +1092,11 @@ def refresh_student_session_name():
         and not session.get('student_name_loaded')
         and request.endpoint != 'static'
     ):
-        student = _get_student_identity()
-        session['full_name'] = _student_display_name(student)
+        try:
+            student = _get_student_identity()
+            session['full_name'] = _student_display_name(student)
+        except Exception:
+            session['full_name'] = str(session.get('full_name') or 'Student').strip() or 'Student'
         session['student_name_loaded'] = True
 
 
@@ -1210,6 +1213,10 @@ def student_module(language, module_number):
                     module_completion_date = (
                         submitted_at.strftime('%B %d, %Y') if submitted_at else None
                     )
+        except Exception:
+            module_completed = False
+            module_completion_score = None
+            module_completion_date = None
         finally:
             if cursor:
                 cursor.close()
@@ -1622,11 +1629,13 @@ def student_help():
 def assessments_overview():
     if session.get('role') != 'student':
         return redirect('/')
-    return redirect('/assessments_python')
+    return redirect('/module_assessments')
 
 @app.route('/assessment')
 def assessment_overview_alias():
-    return redirect('/assessments')
+    if session.get('role') != 'student':
+        return redirect('/')
+    return redirect('/module_assessments')
 
 @app.route('/module_assessments')
 def module_assessments():
@@ -2835,6 +2844,8 @@ def _module_is_unlocked(student_id, language, module_number):
         """, (student_id, previous_module_id))
         previous = cursor.fetchone()
         return bool(previous and previous.get('status') == 'passed')
+    except Exception:
+        return False
     finally:
         if cursor:
             cursor.close()
