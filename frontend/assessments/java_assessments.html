@@ -281,6 +281,7 @@
         .mobile-nav-toggle,
         .mobile-nav-submenu { display: none; }
         .sidebar .assessment-nav-toggle { display: flex; }
+        .sidebar .modules-nav-toggle { display: flex; }
 
         .nav-badge {
             position: absolute; top: 50%; left: 22px; transform: translateY(-50%);
@@ -997,8 +998,7 @@
                 </div>
             </div>
             <div class="nav-item">
-                <a href="/student_modules" class="nav-link-custom desktop-nav-link"><iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span></a>
-                <button type="button" class="nav-link-custom mobile-nav-toggle activities-toggle" id="modulesNavToggle" onclick="toggleStudentNavGroup('modulesNavToggle', 'modulesSubnav')" aria-expanded="false" aria-controls="modulesSubnav">
+                <button type="button" class="nav-link-custom mobile-nav-toggle modules-nav-toggle activities-toggle" id="modulesNavToggle" onclick="toggleStudentNavGroup('modulesNavToggle', 'modulesSubnav')" aria-expanded="false" aria-controls="modulesSubnav">
                     <iconify-icon icon="lucide:layers"></iconify-icon><span class="nav-text">Modules</span><i class="fas fa-chevron-down activities-chevron"></i>
                 </button>
                 <div class="activities-submenu mobile-nav-submenu" id="modulesSubnav">
@@ -1298,6 +1298,7 @@
         var submenu = document.getElementById(submenuId);
         var isOpen = submenu.classList.toggle('open');
         toggle.classList.toggle('open', isOpen);
+        if (toggle.classList.contains('modules-nav-toggle')) toggle.classList.toggle('active', isOpen);
         toggle.setAttribute('aria-expanded', String(isOpen));
     }
 
