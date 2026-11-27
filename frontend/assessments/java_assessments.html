@@ -280,6 +280,7 @@
         .sidebar.collapsed .activities-chevron { display: none; }
         .mobile-nav-toggle,
         .mobile-nav-submenu { display: none; }
+        .sidebar .assessment-nav-toggle { display: flex; }
 
         .nav-badge {
             position: absolute; top: 50%; left: 22px; transform: translateY(-50%);
@@ -987,8 +988,7 @@
             <div class="nav-section-label">Main</div>
             <div class="nav-item"><a href="/student_dashboard" class="nav-link-custom"><iconify-icon icon="lucide:house"></iconify-icon><span class="nav-text">Dashboard</span></a></div>
             <div class="nav-item">
-                <a href="/assessments" class="nav-link-custom desktop-nav-link active" aria-current="page"><iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span></a>
-                <button type="button" class="nav-link-custom mobile-nav-toggle activities-toggle active" id="assessmentNavToggle" onclick="toggleStudentNavGroup('assessmentNavToggle', 'assessmentSubnav')" aria-expanded="false" aria-controls="assessmentSubnav">
+                <button type="button" class="nav-link-custom mobile-nav-toggle assessment-nav-toggle activities-toggle active" id="assessmentNavToggle" onclick="toggleStudentNavGroup('assessmentNavToggle', 'assessmentSubnav')" aria-current="page" aria-expanded="false" aria-controls="assessmentSubnav">
                     <iconify-icon icon="lucide:clipboard-check"></iconify-icon><span class="nav-text">Assessments</span><i class="fas fa-chevron-down activities-chevron"></i>
                 </button>
                 <div class="activities-submenu mobile-nav-submenu" id="assessmentSubnav">
